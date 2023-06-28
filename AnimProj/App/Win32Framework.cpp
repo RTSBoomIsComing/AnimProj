@@ -7,8 +7,8 @@ pa::Win32Framework::Win32Framework(Win32Application* pApplication)
 	const HWND hWnd = pApplication->GetHwnd();
 	::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApplication));
 	::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
-
-	::RedrawWindow(hWnd, nullptr, NULL, RDW_INVALIDATE);
+	::ShowWindow(hWnd, SW_SHOWDEFAULT);
+	//::RedrawWindow(hWnd, nullptr, NULL, RDW_INVALIDATE);
 	//::UpdateWindow(hWnd);
 }
 

@@ -8,6 +8,9 @@ namespace pa
 	{
 		friend MeshFactory;
 	public:
+		Mesh() = default;
+		~Mesh() = default;
+
 		void setVertexIndexBuffers(ID3D11DeviceContext* pDeviceContext);
 
 	public:
