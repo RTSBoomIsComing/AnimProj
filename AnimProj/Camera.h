@@ -12,17 +12,29 @@ namespace pa
 		};
 
 	public:
-		void initializeCamera(float viewWidth, float viewHeight);
-		void updateMatrices();
-		const Matrices&	getMatrices() const;
+		Camera();
+		~Camera() = default;
+
+
+		void initialize(void);
+		void updateAspectRatio(float aspectRatio);
+		void updateEyePosition(const DirectX::XMVECTOR& eyePosition);
+		void updateFocusPosition(const DirectX::XMVECTOR& focusPosition);
+
+		const DirectX::XMFLOAT4& getEyePosition() const;
+		const DirectX::XMFLOAT4& getFocusPosition() const;
+		const Matrices& getMatrices(void);
+
+	private:
+		void calculateMatrices();
 
 
 	private:
-		Matrices _matrices;
-		float				_viewWidth;
-		float				_viewHeight;
+		Matrices			_matrices;
 		DirectX::XMFLOAT4	_eyePosition;
 		DirectX::XMFLOAT4	_focusPosition;
+		float				_aspectRatio;
+		bool				_dirtyBit;
 	};
 }
 

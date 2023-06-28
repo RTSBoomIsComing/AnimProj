@@ -9,10 +9,8 @@ pa::MyApplication::MyApplication()
 	using namespace DirectX;
 
 	_pCamera = new Camera{};
-	_pCamera->initializeCamera(static_cast<float>(getWidth()), static_cast<float>(getHeight()));
-
 	_pCubeMesh = Mesh::GetCubeMesh(_device.Get());
-	
+
 	{
 		ComPtr<ID3DBlob> vertexShaderBlob;
 #if defined(DEBUG) || defined(_DEBUG)
@@ -77,16 +75,21 @@ void pa::MyApplication::OnUpdate()
 {
 	{
 		// Test for Clear rendertargetview
-		static int testClearColorFactor = 0;
-		_clearColor[0] = std::sinf(testClearColorFactor * 0.01f);
-		_clearColor[1] = std::sinf(testClearColorFactor * 0.02f);
-		_clearColor[2] = std::sinf(testClearColorFactor++ * 0.04f);
+		static int testFactor = 0;
+		_clearColor[0] = std::sinf(testFactor * 0.01f);
+		_clearColor[1] = std::sinf(testFactor * 0.02f);
+		_clearColor[2] = std::sinf(testFactor++ * 0.04f);
 	}
 
-	// TODO: Update eyePosition and focusPosition of Camera
-	// _pCamera->setEyePosition(...);
-	// _pCamera->setFocusPosition(...);
-	_pCamera->updateMatrices();
+	{
+		static int testFactor = 0;
+		using namespace DirectX;
+		_pCamera->updateEyePosition(XMVECTOR{
+			3.0f * std::cosf(0.01f * testFactor),
+			3.0f,
+			3.0f * std::sinf(0.01f * testFactor++),
+			1.0f, });
+	}
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 }
