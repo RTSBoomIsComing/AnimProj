@@ -26,7 +26,6 @@ namespace pa
 
 		Camera* _pCamera;
 		Mesh* _pCubeMesh;
-
 	};
 }
 

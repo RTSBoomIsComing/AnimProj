@@ -1,6 +1,10 @@
 // author: Changwan Yu
 #pragma once
-class AMC
+
+namespace pa
 {
-};
+	class AMC
+	{
+	};
+}
 

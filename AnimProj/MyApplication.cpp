@@ -66,8 +66,11 @@ pa::MyApplication::MyApplication()
 
 pa::MyApplication::~MyApplication()
 {
-	delete _pCamera;
-	delete _pCubeMesh;
+	if (nullptr != _pCamera)
+		delete _pCamera;
+
+	if (nullptr != _pCubeMesh)
+		delete _pCubeMesh;
 }
 
 void pa::MyApplication::OnUpdate()
