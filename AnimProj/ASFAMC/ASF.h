@@ -17,6 +17,11 @@ namespace pa
 		bool loadASFFromFile(const wchar_t* filePath);
 
 	private:
+		void ParseUnits(std::ifstream& stream);
+		void ParseRoot(std::ifstream& stream);
+		void ParseBoneData(std::ifstream& stream);
+		void ParseHierarchy(std::ifstream& stream);
+	private:
 		float		_unitMass;
 		float		_unitLength;
 		UnitAngle	_unitAngle;
