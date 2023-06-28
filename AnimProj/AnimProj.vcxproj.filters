@@ -36,10 +36,13 @@
     <ClInclude Include="Mesh\Mesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ASFAMC\ASFLoader.h">
+    <ClInclude Include="Common\DirectX11Helper.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\DirectX11Helper.h">
+    <ClInclude Include="ASFAMC\ASF.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ASFAMC\AMC.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,10 +71,13 @@
     <ClCompile Include="Mesh\Mesh.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ASFAMC\ASFLoader.cpp">
+    <ClCompile Include="Common\DirectX11Helper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Common\DirectX11Helper.cpp">
+    <ClCompile Include="ASFAMC\ASF.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ASFAMC\AMC.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

@@ -86,10 +86,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ASFAMC\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
     <ClInclude Include="app\Win32D3D11Application.h" />
-    <ClInclude Include="ASFAMC\ASFLoader.h" />
+    <ClInclude Include="ASFAMC\ASF.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
     <ClInclude Include="Mesh\Mesh.h" />
@@ -97,10 +98,11 @@
     <ClInclude Include="Common\pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ASFAMC\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />
     <ClCompile Include="app\Win32D3D11Application.cpp" />
-    <ClCompile Include="ASFAMC\ASFLoader.cpp" />
+    <ClCompile Include="ASFAMC\ASF.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />

@@ -3,6 +3,5 @@
 
 namespace pa
 {
-
 	bool checkResult(HRESULT result);
 }

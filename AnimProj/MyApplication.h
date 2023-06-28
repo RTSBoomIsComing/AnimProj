@@ -17,10 +17,6 @@ namespace pa
 	private:
 		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
 
-		//ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
-		//ComPtr<ID3D11Buffer>		_vertexColorBuffer;
-
-		//ComPtr<ID3D11Buffer>		_indexBuffer;
 		ComPtr<ID3D11Buffer>		_cameraConstantBuffer;
 
 		ComPtr<ID3D11InputLayout>		_inputLayout;
