@@ -17,32 +17,49 @@ pa::MyApplication::MyApplication()
 	using namespace DirectX;
 
 	_pCamera = new Camera{};
+	_pCamera->initializeCamera(static_cast<float>(getWidth()), static_cast<float>(getHeight()));
 
 	{
 		// Supply the actual vertex data.
-		Vertex vertices[] = {
-			XMFLOAT4{-0.5f, 0.0f, 0.5f, 1.0f }, XMFLOAT4{ 1.0f, 0.0f, 0.0f, 1.0f },
-			XMFLOAT4{ 0.0f, 0.5f, 0.5f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 1.0f, 1.0f },
-			XMFLOAT4{ 0.5f, 0.0f, 0.5f, 1.0f }, XMFLOAT4{ 0.0f, 1.0f, 0.0f, 1.0f },
+		Vertex vertices[3] = {
+			XMFLOAT4{-0.5f, 0.0f, 0.0f, 1.0f }, XMFLOAT4{ 1.0f, 0.0f, 0.0f, 1.0f },
+			XMFLOAT4{ 0.0f, 0.5f, 0.0f, 1.0f }, XMFLOAT4{ 0.0f, 0.0f, 1.0f, 1.0f },
+			XMFLOAT4{ 0.5f, 0.0f, 0.0f, 1.0f }, XMFLOAT4{ 0.0f, 1.0f, 0.0f, 1.0f },
 		};
 
-		D3D11_BUFFER_DESC bufferDesc;
+		D3D11_BUFFER_DESC bufferDesc = {};
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		bufferDesc.ByteWidth = sizeof(vertices);
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;
 		bufferDesc.MiscFlags = 0;
 
-		// Fill in the subresource data.
-		D3D11_SUBRESOURCE_DATA initData;
+		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = vertices;
 		initData.SysMemPitch = 0;
 		initData.SysMemSlicePitch = 0;
 
-		// Create the vertex buffer.
 		checkResult(_device->CreateBuffer(&bufferDesc, &initData, &_vertexBuffer));
 	}
 	
+	{
+		// Supply the actual index data.
+		unsigned int indices[3] = { 0, 1, 2 };
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = sizeof(indices);
+		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA initData = {};
+		initData.pSysMem = indices;
+		initData.SysMemPitch = 0;
+		initData.SysMemSlicePitch = 0;
+
+		checkResult(_device->CreateBuffer(&bufferDesc, &initData, &_indexBuffer));
+	}
+
 	{
 		ComPtr<ID3DBlob> vertexShaderBlob;
 #if defined(DEBUG) || defined(_DEBUG)
@@ -77,7 +94,7 @@ pa::MyApplication::MyApplication()
 	{
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-		rasterizerDesc.CullMode = D3D11_CULL_BACK;
+		rasterizerDesc.CullMode = D3D11_CULL_NONE;
 		rasterizerDesc.FrontCounterClockwise = FALSE;
 		checkResult(_device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState));
 	}
@@ -109,8 +126,11 @@ void pa::MyApplication::OnUpdate()
 	}
 
 	// TODO: Update eyePosition and focusPosition of Camera
-	_pCamera->updateMatrices(static_cast<float>(getWidth()), static_cast<float>(getHeight()));
+	// _pCamera->setEyePosition(...);
+	// _pCamera->setFocusPosition(...);
+	_pCamera->updateMatrices();
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
+	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 }
 
 void pa::MyApplication::OnRender()
@@ -118,16 +138,22 @@ void pa::MyApplication::OnRender()
 	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
 
-	UINT strides[] = { sizeof(Vertex) };
-	UINT offsets[] = { 0 };
+
 	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	_deviceContext->IASetInputLayout(_inputLayout.Get());
+
+	UINT strides[] = { sizeof(Vertex) };
+	UINT offsets[] = { 0 };
 	_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), strides, offsets);
+	_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
 	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+
 	_deviceContext->RSSetState(_rasterizerState.Get());
 	_deviceContext->RSSetViewports(1, &_viewport);
-	_deviceContext->Draw(3, 0);
+
+	_deviceContext->DrawIndexed(3, 0, 0);
 
 	_swapChain->Present(1, 0);
 }

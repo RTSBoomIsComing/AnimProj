@@ -1,8 +1,9 @@
-struct CameraConstantBuffer
+cbuffer CameraConstantBuffer
 {
 	float4x4 View;
 	float4x4 Projection;
 };
+
 
 struct VertexShaderInput
 {
@@ -19,7 +20,10 @@ struct VertexShaderOutput
 VertexShaderOutput main(VertexShaderInput vsInput)
 {
 	VertexShaderOutput vsOut = (VertexShaderOutput)0;
-	vsOut.position = vsInput.position;
+
+	const float4x4 matrixViewProjection = mul(Projection, View);
+	vsOut.position = mul(matrixViewProjection, vsInput.position);
+
 	vsOut.color = vsInput.color;
 	return vsOut;
 }

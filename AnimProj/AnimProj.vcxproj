@@ -90,6 +90,7 @@
     <ClInclude Include="App\Win32Framework.h" />
     <ClInclude Include="app\Win32D3D11Application.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Mesh\Mesh.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="Common\pch.h" />
   </ItemGroup>
@@ -99,6 +100,7 @@
     <ClCompile Include="app\Win32D3D11Application.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh\Mesh.cpp" />
     <ClCompile Include="MyApplication.cpp" />
     <ClCompile Include="Common\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

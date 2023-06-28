@@ -8,20 +8,21 @@ namespace pa
 		struct Matrices
 		{
 			DirectX::XMFLOAT4X4 View;
-			DirectX::XMFLOAT4X4 ViewProjection;
+			DirectX::XMFLOAT4X4 Projection;
 		};
 
 	public:
-		Camera();
-		void updateMatrices(float viewWidth, float viewHeight);
+		void initializeCamera(float viewWidth, float viewHeight);
+		void updateMatrices();
 		const Matrices&	getMatrices() const;
 
-		void initializeCamera();
 
 	private:
 		Matrices _matrices;
-		DirectX::XMFLOAT4 _eyePosition;
-		DirectX::XMFLOAT4 _focusPosition;
+		float				_viewWidth;
+		float				_viewHeight;
+		DirectX::XMFLOAT4	_eyePosition;
+		DirectX::XMFLOAT4	_focusPosition;
 	};
 }
 
