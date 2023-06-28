@@ -64,8 +64,18 @@ void pa::ASF::ParseUnits(std::ifstream& stream)
 void pa::ASF::ParseRoot(std::ifstream& stream)
 {
 	std::cout << "Parse Root\n";
+	_boneData.emplace_back();
 
+	std::string buffer;
+	for (int i = 0; i < 4; i++)
+	{
+		stream >> buffer;
+		if (0 == buffer.compare("order"))
+			ParseAMCRootDataOrder(stream);
 
+		if (0 == buffer.compare("axis"))
+			ParseRotationAxisOrder(stream, _boneData.back());
+	}
 }
 
 void pa::ASF::ParseBoneData(std::ifstream& stream)
@@ -76,4 +86,56 @@ void pa::ASF::ParseBoneData(std::ifstream& stream)
 void pa::ASF::ParseHierarchy(std::ifstream& stream)
 {
 	std::cout << "Parse Hierarchy\n";
+}
+
+void pa::ASF::ParseAMCRootDataOrder(std::ifstream& stream)
+{
+	std::cout << "\tParse AMC Root Data Order\n";
+	std::string buffer;
+	for (int i = 0; i < 6; i++)
+	{
+		stream >> buffer;
+		if (0 == buffer.compare("TX"))
+			_amcRootOrder[0] = i;
+
+		if (0 == buffer.compare("TY"))
+			_amcRootOrder[1] = i;
+
+		if (0 == buffer.compare("TZ"))
+			_amcRootOrder[2] = i;
+
+		if (0 == buffer.compare("RX"))
+			_amcRootOrder[3] = i;
+
+		if (0 == buffer.compare("RY"))
+			_amcRootOrder[4] = i;
+
+		if (0 == buffer.compare("RZ"))
+			_amcRootOrder[5] = i;
+	}
+
+}
+
+void pa::ASF::ParseRotationAxisOrder(std::ifstream& stream, Bone& bone)
+{
+	std::cout << "\tParse Rotation Axis Order\n";
+	std::string buffer;
+	stream >> buffer;
+	if (0 == buffer.compare("XYZ"))
+		bone.axis = Bone::RotationAxisOrder::XYZ;
+
+	if (0 == buffer.compare("XZY"))
+		bone.axis = Bone::RotationAxisOrder::XZY;
+
+	if (0 == buffer.compare("YZX"))
+		bone.axis = Bone::RotationAxisOrder::YZX;
+
+	if (0 == buffer.compare("YXZ"))
+		bone.axis = Bone::RotationAxisOrder::YXZ;
+
+	if (0 == buffer.compare("ZXY"))
+		bone.axis = Bone::RotationAxisOrder::ZXY;
+
+	if (0 == buffer.compare("ZYX"))
+		bone.axis = Bone::RotationAxisOrder::ZYX;
 }

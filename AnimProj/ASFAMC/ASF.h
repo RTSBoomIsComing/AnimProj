@@ -36,6 +36,8 @@ namespace pa
 		void	ParseRoot(std::ifstream& stream);
 		void	ParseBoneData(std::ifstream& stream);
 		void	ParseHierarchy(std::ifstream& stream);
+		void	ParseAMCRootDataOrder(std::ifstream& stream);
+		void	ParseRotationAxisOrder(std::ifstream& stream, Bone& bone);
 
 	private:
 		float				_unitMass;
@@ -43,7 +45,7 @@ namespace pa
 		UnitAngle			_unitAngle;
 		std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
-		std::uint8_t		_AMCRootDataOrder[6];
+		std::uint8_t		_amcRootOrder[6];
 		DirectX::XMFLOAT4	_rootPosition;
 	};
 }
