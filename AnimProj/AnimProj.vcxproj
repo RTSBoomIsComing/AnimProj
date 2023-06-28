@@ -93,7 +93,7 @@
     <ClInclude Include="ASFAMC\ASF.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
-    <ClInclude Include="Mesh\Mesh.h" />
+    <ClInclude Include="Rendering\Mesh.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="Common\pch.h" />
   </ItemGroup>
@@ -106,7 +106,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mesh\Mesh.cpp" />
+    <ClCompile Include="Rendering\Mesh.cpp" />
     <ClCompile Include="MyApplication.cpp" />
     <ClCompile Include="Common\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

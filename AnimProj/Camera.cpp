@@ -13,7 +13,7 @@ void pa::Camera::initialize(void)
 	_aspectRatio = aspectRatio;
 
 	using namespace DirectX;
-	XMStoreFloat4(&_eyePosition, XMVECTOR{ 0.0f, 0.0f, -1.0f, 1.0f });
+	XMStoreFloat4(&_eyePosition, XMVECTOR{ 0.0f, 0.0f, -3.0f, 1.0f });
 	XMStoreFloat4(&_focusPosition, XMVECTOR{ 0.0f, 0.0f,  0.0f, 1.0f });
 
 	calculateMatrices();

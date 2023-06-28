@@ -11,7 +11,17 @@ void pa::Mesh::setVertexIndexBuffers(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
 
-pa::Mesh* pa::Mesh::GetCubeMesh(ID3D11Device* pDevice)
+UINT pa::Mesh::getVertexCount() const
+{
+	return _vertexCount;
+}
+
+UINT pa::Mesh::getIndexCount() const
+{
+	return _indexCount;
+}
+
+pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice)
 {
 	using namespace DirectX;
 	Mesh* cubeMesh = new Mesh{};
@@ -125,17 +135,7 @@ pa::Mesh* pa::Mesh::GetCubeMesh(ID3D11Device* pDevice)
 	return cubeMesh;
 }
 
-pa::Mesh* pa::Mesh::GetSphereMesh()
+pa::Mesh* pa::MeshFactory::CreateSphereMesh(ID3D11Device* pDevice)
 {
 	return nullptr;
-}
-
-UINT pa::Mesh::getVertexCount() const
-{
-	return _vertexCount;
-}
-
-UINT pa::Mesh::getIndexCount() const
-{
-	return _indexCount;
 }

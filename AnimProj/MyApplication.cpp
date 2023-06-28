@@ -2,14 +2,14 @@
 #include "pch.h"
 #include "MyApplication.h"
 #include "Camera.h"
-#include "Mesh/Mesh.h"
+#include "Rendering/Mesh.h"
 
 pa::MyApplication::MyApplication()
 {
 	using namespace DirectX;
 
 	_pCamera = new Camera{};
-	_pCubeMesh = Mesh::GetCubeMesh(_device.Get());
+	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get());
 
 	{
 		ComPtr<ID3DBlob> vertexShaderBlob;
