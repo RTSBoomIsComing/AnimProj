@@ -75,6 +75,9 @@ void pa::ASF::ParseRoot(std::ifstream& stream)
 
 		if (0 == buffer.compare("axis"))
 			ParseRotationAxisOrder(stream, _boneData.back());
+
+		if (0 == buffer.compare("position"))
+			ParseRootPosition(stream);
 	}
 }
 
@@ -138,4 +141,15 @@ void pa::ASF::ParseRotationAxisOrder(std::ifstream& stream, Bone& bone)
 
 	if (0 == buffer.compare("ZYX"))
 		bone.axis = Bone::RotationAxisOrder::ZYX;
+}
+
+void pa::ASF::ParseRootPosition(std::ifstream& stream)
+{
+	std::cout << "\tParse Root Position\n";
+	float position[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	for (int i = 0; i < 3; i++)
+	{
+		stream >> position[i];
+	}
+	_rootPosition = DirectX::XMFLOAT4{ position };
 }

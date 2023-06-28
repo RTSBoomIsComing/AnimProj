@@ -38,6 +38,7 @@ namespace pa
 		void	ParseHierarchy(std::ifstream& stream);
 		void	ParseAMCRootDataOrder(std::ifstream& stream);
 		void	ParseRotationAxisOrder(std::ifstream& stream, Bone& bone);
+		void	ParseRootPosition(std::ifstream& stream);
 
 	private:
 		float				_unitMass;
