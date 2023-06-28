@@ -11,6 +11,7 @@ namespace pa
 
 		DirectX::XMFLOAT4	rotation;
 		DirectX::XMFLOAT4	direction;
+		std::string			name;
 		float				length;
 		RotationAxisOrder	axis;
 	};
