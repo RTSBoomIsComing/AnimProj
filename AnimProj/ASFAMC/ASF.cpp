@@ -58,7 +58,6 @@ void pa::ASF::ParseUnits(std::ifstream& stream)
 			stream >> unitAngleString;
 			_unitAngle = (0 == unitAngleString.compare("deg")) ? UnitAngle::Degree : UnitAngle::Radian;
 		}
-		std::cout << unitName << std::endl;
 	}
 }
 
