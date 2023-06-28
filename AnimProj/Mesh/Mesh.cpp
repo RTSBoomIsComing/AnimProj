@@ -19,13 +19,13 @@ pa::Mesh* pa::Mesh::GetCubeMesh(ID3D11Device* pDevice)
 	{
 		XMVECTOR positions[] = {
 			-1, -1, -1, 1, //0
-			 1, -1, -1, 1, //1
-			-1,  1, -1, 1, //2
-			 1,  1, -1, 1, //3
+			-1,  1, -1, 1, //1
+			 1,  1, -1, 1, //2
+			 1, -1, -1, 1, //3
 			-1, -1,  1, 1, //4
-			 1, -1,  1, 1, //5
-			-1,  1,  1, 1, //6
-			 1,  1,  1, 1, //7
+			-1,  1,  1, 1, //5
+			 1,  1,  1, 1, //6
+			 1, -1,  1, 1, //7
 		};
 		cubeMesh->_vertexCount = ARRAYSIZE(positions);
 
@@ -73,29 +73,29 @@ pa::Mesh* pa::Mesh::GetCubeMesh(ID3D11Device* pDevice)
 	{
 		// Supply the actual index data.
 		unsigned int indices[] = {
-			//Top
-			2, 6, 7,
-			2, 3, 7,
-
-			//Bottom
-			0, 4, 5,
-			0, 1, 5,
-
-			//Left
-			0, 2, 6,
-			0, 4, 6,
-
-			//Right
-			1, 3, 7,
-			1, 5, 7,
-
 			//Front
+			0, 1, 2,
 			0, 2, 3,
-			0, 1, 3,
 
 			//Back
-			4, 6, 7,
-			4, 5, 7
+			7, 6, 5,
+			7, 5, 4,
+
+			//Top
+			1, 5, 6,
+			1, 6, 2,
+
+			//Bottom
+			3, 7, 4,
+			3, 4, 0,
+
+			//Left
+			3, 2, 6,
+			3, 6, 7,
+
+			//Right
+			4, 5, 1,
+			4, 1, 0,
 		};
 		cubeMesh->_indexCount = ARRAYSIZE(indices);
 

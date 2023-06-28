@@ -47,7 +47,7 @@ pa::MyApplication::MyApplication()
 	{
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
 		rasterizerDesc.FillMode = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME D3D11_FILL_SOLID
-		rasterizerDesc.CullMode = D3D11_CULL_NONE; //D3D11_CULL_NONE D3D11_CULL_BACK
+		rasterizerDesc.CullMode = D3D11_CULL_BACK; //D3D11_CULL_NONE D3D11_CULL_BACK
 		rasterizerDesc.FrontCounterClockwise = FALSE;
 		checkResult(_device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState));
 	}
