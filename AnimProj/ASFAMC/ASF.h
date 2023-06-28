@@ -37,8 +37,9 @@ namespace pa
 		void	ParseBoneData(std::ifstream& stream);
 		void	ParseHierarchy(std::ifstream& stream);
 		void	ParseAMCRootDataOrder(std::ifstream& stream);
-		void	ParseRotationAxisOrder(std::ifstream& stream, Bone& bone);
 		void	ParseRootPosition(std::ifstream& stream);
+		void	ParseBoneRotationAxisOrder(std::ifstream& stream, Bone& bone);
+		void	ParseBoneRotation(std::ifstream& stream, Bone& bone);
 
 	private:
 		float				_unitMass;

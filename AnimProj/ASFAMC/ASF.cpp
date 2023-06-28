@@ -15,8 +15,6 @@ bool pa::ASF::loadASFFromFile(const wchar_t* filePath)
 		return false;
 
 	std::string line;
-	line.reserve();
-
 	while (true != stream.eof())
 	{
 		std::getline(stream, line);
@@ -74,16 +72,27 @@ void pa::ASF::ParseRoot(std::ifstream& stream)
 			ParseAMCRootDataOrder(stream);
 
 		if (0 == buffer.compare("axis"))
-			ParseRotationAxisOrder(stream, _boneData.back());
+			ParseBoneRotationAxisOrder(stream, _boneData.back());
 
 		if (0 == buffer.compare("position"))
 			ParseRootPosition(stream);
+
+		if (0 == buffer.compare("orientation"))
+			ParseBoneRotation(stream, _boneData.back());
 	}
 }
 
 void pa::ASF::ParseBoneData(std::ifstream& stream)
 {
 	std::cout << "Parse BoneData\n";
+	std::string buffer;
+	while (true)
+	{
+		stream >> buffer;
+		if (0 == buffer.compare("begin"))
+			;
+	}
+
 }
 
 void pa::ASF::ParseHierarchy(std::ifstream& stream)
@@ -119,7 +128,7 @@ void pa::ASF::ParseAMCRootDataOrder(std::ifstream& stream)
 
 }
 
-void pa::ASF::ParseRotationAxisOrder(std::ifstream& stream, Bone& bone)
+void pa::ASF::ParseBoneRotationAxisOrder(std::ifstream& stream, Bone& bone)
 {
 	std::cout << "\tParse Rotation Axis Order\n";
 	std::string buffer;
@@ -152,4 +161,17 @@ void pa::ASF::ParseRootPosition(std::ifstream& stream)
 		stream >> position[i];
 	}
 	_rootPosition = DirectX::XMFLOAT4{ position };
+}
+
+void pa::ASF::ParseBoneRotation(std::ifstream& stream, Bone& bone)
+{
+	std::cout << "\tParse Root Position\n";
+	float rotation[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // rotation.w have to be not used
+	for (int i = 0; i < 3; i++)
+	{
+		stream >> rotation[i];
+	}
+	bone.rotation = DirectX::XMFLOAT4{ rotation };
+
+
 }
