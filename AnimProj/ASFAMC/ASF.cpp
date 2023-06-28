@@ -65,6 +65,7 @@ void pa::ASF::ParseRoot(std::ifstream& stream)
 {
 	std::cout << "Parse Root\n";
 
+
 }
 
 void pa::ASF::ParseBoneData(std::ifstream& stream)

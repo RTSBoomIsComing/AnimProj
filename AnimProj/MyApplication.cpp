@@ -78,9 +78,9 @@ void pa::MyApplication::OnUpdate()
 	{
 		// Test for Clear rendertargetview
 		static int testClearColorFactor = 0;
-		_clearColor[0] = sinf(testClearColorFactor * 0.01f);
-		_clearColor[1] = sinf(testClearColorFactor * 0.02f);
-		_clearColor[2] = sinf(testClearColorFactor++ * 0.04f);
+		_clearColor[0] = std::sinf(testClearColorFactor * 0.01f);
+		_clearColor[1] = std::sinf(testClearColorFactor * 0.02f);
+		_clearColor[2] = std::sinf(testClearColorFactor++ * 0.04f);
 	}
 
 	// TODO: Update eyePosition and focusPosition of Camera

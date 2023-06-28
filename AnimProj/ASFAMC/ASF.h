@@ -9,11 +9,11 @@ namespace pa
 			XYZ, XZY, YZX, YXZ, ZXY, ZYX,
 		};
 
-		DirectX::XMFLOAT4	rotation;
-		DirectX::XMFLOAT4	direction;
+		DirectX::XMFLOAT4	rotation = {};
+		DirectX::XMFLOAT4	direction = {};
 		std::string			name;
-		float				length;
-		RotationAxisOrder	axis;
+		float				length = 0.0f;
+		RotationAxisOrder	axis = RotationAxisOrder::XYZ;
 	};
 
 	class ASF
@@ -38,12 +38,13 @@ namespace pa
 		void	ParseHierarchy(std::ifstream& stream);
 
 	private:
-		float		_unitMass;
-		float		_unitLength;
-		UnitAngle	_unitAngle;
+		float				_unitMass;
+		float				_unitLength;
+		UnitAngle			_unitAngle;
+		std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
-
-
+		std::uint8_t		_AMCRootDataOrder[6];
+		DirectX::XMFLOAT4	_rootPosition;
 	};
 }
 
