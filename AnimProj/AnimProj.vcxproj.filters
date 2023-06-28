@@ -39,6 +39,9 @@
     <ClInclude Include="ASFAMC\ASFLoader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Common\DirectX11Helper.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\Win32Application.cpp">
@@ -66,6 +69,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ASFAMC\ASFLoader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\DirectX11Helper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

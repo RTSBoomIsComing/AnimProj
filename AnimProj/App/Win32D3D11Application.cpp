@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "Win32D3D11Application.h"
-#include <comdef.h>
+
 
 pa::Win32D3D11Application::Win32D3D11Application()
 {
@@ -30,7 +30,7 @@ void pa::Win32D3D11Application::initializeD3D11Application()
 	};
 	D3D_FEATURE_LEVEL featureLevel = {};
 	checkResult(D3D11CreateDeviceAndSwapChain(
-		nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION, 
+		nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
 		&swapChainDesc, _swapChain.GetAddressOf(), _device.GetAddressOf(), &featureLevel, _deviceContext.GetAddressOf()));
 
 	ComPtr<ID3D11Texture2D> backBuffer;
@@ -44,17 +44,23 @@ void pa::Win32D3D11Application::initializeD3D11Application()
 	_viewport.Height = static_cast<FLOAT>(getHeight());
 	_viewport.MinDepth = 0.0f;
 	_viewport.MaxDepth = 1.0f;
-}
 
-bool pa::Win32D3D11Application::checkResult(HRESULT result)
-{
-	if (FAILED(result))
 	{
-		_com_error error(result);
-		LPCTSTR errorMessage = error.ErrorMessage();
-		::OutputDebugString(errorMessage);
-		exit(-1);
-		return false;
+		// Create the depth stencil texture
+		ComPtr<ID3D11Texture2D> depthStencilBuffer{};
+		CD3D11_TEXTURE2D_DESC textureDesc{ 
+			DXGI_FORMAT_D24_UNORM_S8_UINT, static_cast<UINT>(getWidth()), static_cast<UINT>(getHeight()),
+			1, 0, D3D11_BIND_DEPTH_STENCIL };
+		checkResult(_device->CreateTexture2D(&textureDesc, nullptr, &depthStencilBuffer));
+
+		// Create the main depth stencil view
+		CD3D11_DEPTH_STENCIL_VIEW_DESC dsviewDesc{ D3D11_DSV_DIMENSION_TEXTURE2D };
+		checkResult(_device->CreateDepthStencilView(depthStencilBuffer.Get(), &dsviewDesc, &_depthStencilView));
 	}
-	return true;
+
+	{
+		// Create depth stencil state
+		CD3D11_DEPTH_STENCIL_DESC depthStencilDesc{ D3D11_DEFAULT };
+		checkResult(_device->CreateDepthStencilState(&depthStencilDesc, &_depthStencilState));
+	}
 }

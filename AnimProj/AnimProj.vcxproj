@@ -91,6 +91,7 @@
     <ClInclude Include="app\Win32D3D11Application.h" />
     <ClInclude Include="ASFAMC\ASFLoader.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Common\DirectX11Helper.h" />
     <ClInclude Include="Mesh\Mesh.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="Common\pch.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="app\Win32D3D11Application.cpp" />
     <ClCompile Include="ASFAMC\ASFLoader.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh\Mesh.cpp" />
     <ClCompile Include="MyApplication.cpp" />

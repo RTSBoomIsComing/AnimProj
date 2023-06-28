@@ -12,3 +12,4 @@
 using Microsoft::WRL::ComPtr;
 
 #include <DirectXMath.h>
+#include "DirectX11Helper.h"
