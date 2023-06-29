@@ -5,9 +5,9 @@
 
 pa::Win32D3D11Application::Win32D3D11Application()
 {
-	initializeD3D11Application();
+	initializeD3D11Devices();
 }
-void pa::Win32D3D11Application::initializeD3D11Application()
+void pa::Win32D3D11Application::initializeD3D11Devices()
 {
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;

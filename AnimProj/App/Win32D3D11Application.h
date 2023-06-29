@@ -19,7 +19,7 @@ namespace pa
 		D3D11_VIEWPORT _viewport;
 
 	private:
-		void initializeD3D11Application();
+		void initializeD3D11Devices();
 
 	};
 }
