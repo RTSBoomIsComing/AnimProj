@@ -14,6 +14,8 @@ namespace pa
 		~MyApplication();
 		virtual void OnUpdate(void) override;
 		virtual void OnRender(void) override;
+		virtual void OnKeyDown(UINT8 key) override;
+		virtual void OnKeyUp(UINT8 key) override;
 	
 	
 	private:
@@ -21,6 +23,8 @@ namespace pa
 
 	private:
 		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
+		float	_cameraVerticalMovement = 0;
+		float	_cameraHorizontalMovement = 0;
 
 		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
 		ComPtr<ID3D11Buffer>			_meshConstantBuffer;

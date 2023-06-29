@@ -34,14 +34,14 @@ pa::MyApplication::~MyApplication()
 
 void pa::MyApplication::OnUpdate()
 {
+	using namespace DirectX;
 	{
 		static int testFactor = 0;
-		using namespace DirectX;
 		float cameraDistance = 10.f;
 		_pCamera->updateEyePosition(XMVECTOR{
-			cameraDistance * std::cosf(0.01f * testFactor),
-			cameraDistance,
-			cameraDistance * std::sinf(0.01f * testFactor++),
+			cameraDistance * std::cosf(-XM_PIDIV2 + _cameraHorizontalMovement),
+			cameraDistance * std::sinf(_cameraVerticalMovement),
+			cameraDistance * std::sinf(-XM_PIDIV2 + _cameraHorizontalMovement),
 			1.0f, });
 	}
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
@@ -81,6 +81,30 @@ void pa::MyApplication::OnRender()
 	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), 31/*number of bones, hard coded, need fix*/, 0, 0, 0);
 
 	_swapChain->Present(1, 0);
+}
+
+void pa::MyApplication::OnKeyDown(UINT8 key)
+{
+	constexpr float cameraMovementScale = 0.05f;
+	switch (key)
+	{
+	case 'W':
+		_cameraVerticalMovement += cameraMovementScale;
+		break;
+	case 'S':
+		_cameraVerticalMovement -= cameraMovementScale;
+		break;
+	case 'A':
+		_cameraHorizontalMovement -= cameraMovementScale;
+		break;
+	case 'D':
+		_cameraHorizontalMovement += cameraMovementScale;
+		break;
+	}
+}
+
+void pa::MyApplication::OnKeyUp(UINT8 key)
+{
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
