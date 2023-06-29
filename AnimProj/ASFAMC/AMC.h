@@ -7,7 +7,10 @@ namespace pa
 	{
 	public:
 		AMC();
+		AMC(const wchar_t* filePath);
 		~AMC() = default;
+
+		bool	loadFromFile(const wchar_t* filePath);
 
 	private:
 		
