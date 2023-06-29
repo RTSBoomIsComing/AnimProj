@@ -325,5 +325,5 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const st
 		result = rotationZ * rotationY * rotationX;
 
 	//return result;
-	return XMMatrixIdentity();
+	return XMMatrixInverse(nullptr, result);
 }
