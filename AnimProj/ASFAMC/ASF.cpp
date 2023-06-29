@@ -22,13 +22,13 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 		if (0 == line.compare(":units"))
 			parseUnits(stream);
 
-		if (0 == line.compare(":root"))
+		else if (0 == line.compare(":root"))
 			parseRoot(stream);
 
-		if (0 == line.compare(":bonedata"))
+		else if (0 == line.compare(":bonedata"))
 			parseBoneData(stream);
 
-		if (0 == line.compare(":hierarchy"))
+		else if (0 == line.compare(":hierarchy"))
 			parseHierarchy(stream);
 	}
 
@@ -90,8 +90,9 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 	std::string buffer;
 	while (stream)
 	{
+		auto rollBackPosition = stream.tellg();
 		stream >> buffer;
-		if (buffer.find("begin") != std::string::npos)
+		if (0 == buffer.compare("begin"))
 		{
 			int boneIndex = static_cast<int>(_boneData.size());
 			_boneData.emplace_back();
@@ -99,7 +100,8 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 		}
 		else
 		{
-			stream.seekg(-1 * buffer.size(), std::ios::cur);
+			stream.seekg(rollBackPosition);
+			stream.seekg(-1, std::ios::cur);
 			break;
 		}
 	}
@@ -155,7 +157,29 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
 	std::cout << "Parse Hierarchy\n";
 	// TODO
+	_boneParentArray.resize(_boneData.size());
+	std::string buffer;
+	stream >> buffer;
+	if (0 == buffer.compare("begin"))
+	{
+		while (stream)
+		{
+			char lineBuffer[100] = {};
+			stream.getline(lineBuffer, sizeof(lineBuffer));
+			std::stringstream lineStream{ lineBuffer };
+			
+			lineStream >> buffer;
+			if (0 == buffer.compare("end"))
+				break;
 
+			std::string parentBoneName = buffer;
+			while (lineStream)
+			{
+				lineStream >> buffer;
+				_boneParentArray[_boneNameMap[buffer]] = parentBoneName;
+			}
+		}
+	}
 
 }
 

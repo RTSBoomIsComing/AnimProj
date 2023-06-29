@@ -59,9 +59,8 @@ namespace pa
 		Bone::DOF			_rootOrder[6];
 		DirectX::XMFLOAT4	_rootPosition;
 
-		std::unordered_map<std::string, int> _boneNameMap;
-
-
+		std::unordered_map<std::string, int>	_boneNameMap;
+		std::vector<std::string>				_boneParentArray;
 	};
 }
 
