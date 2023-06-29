@@ -10,9 +10,9 @@
 
 int main()
 {
-	//std::wstring asfFilePath = _SOLUTIONDIR;
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	//pa::ASF asf(asfFilePath.c_str());
+	std::wstring asfFilePath = _SOLUTIONDIR;
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	pa::ASF asf(asfFilePath.c_str());
 
 	pa::MyApplication myApplication{};
 	pa::Win32Framework myFramework{ &myApplication };

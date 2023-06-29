@@ -4,38 +4,38 @@
 
 pa::ASF::ASF(const wchar_t* filePath)
 {
-	if (false == loadASFFromFile(filePath))
+	if (false == loadFromFile(filePath))
 		DebugBreak();
 }
 
-bool pa::ASF::loadASFFromFile(const wchar_t* filePath)
+bool pa::ASF::loadFromFile(const wchar_t* filePath)
 {
 	std::ifstream stream{ filePath };
 	if (false == stream.is_open())
 		return false;
 
 	std::string line;
-	while (true != stream.eof())
+	while (stream)
 	{
 		std::getline(stream, line);
 
 		if (0 == line.compare(":units"))
-			ParseUnits(stream);
+			parseUnits(stream);
 
 		if (0 == line.compare(":root"))
-			ParseRoot(stream);
+			parseRoot(stream);
 
 		if (0 == line.compare(":bonedata"))
-			ParseBoneData(stream);
+			parseBoneData(stream);
 
 		if (0 == line.compare(":hierarchy"))
-			ParseHierarchy(stream);
+			parseHierarchy(stream);
 	}
 
 	return true;
 }
 
-void pa::ASF::ParseUnits(std::ifstream& stream)
+void pa::ASF::parseUnits(std::ifstream& stream)
 {
 	std::cout << "Parse Units\n";
 	for (int i = 0; i < 3; i++)
@@ -59,7 +59,7 @@ void pa::ASF::ParseUnits(std::ifstream& stream)
 	}
 }
 
-void pa::ASF::ParseRoot(std::ifstream& stream)
+void pa::ASF::parseRoot(std::ifstream& stream)
 {
 	std::cout << "Parse Root\n";
 	_boneData.emplace_back();
@@ -69,38 +69,88 @@ void pa::ASF::ParseRoot(std::ifstream& stream)
 	{
 		stream >> buffer;
 		if (0 == buffer.compare("order"))
-			ParseAMCRootDataOrder(stream);
+			parseAMCRootDataOrder(stream);
 
 		if (0 == buffer.compare("axis"))
-			ParseBoneRotationAxisOrder(stream, _boneData.back());
+			parseAxisOrder(stream, _boneData[0]);
 
 		if (0 == buffer.compare("position"))
-			ParseRootPosition(stream);
+			parseRootPosition(stream);
 
 		if (0 == buffer.compare("orientation"))
-			ParseBoneRotation(stream, _boneData.back());
+			parseAxis(stream, _boneData[0]);
 	}
 }
 
-void pa::ASF::ParseBoneData(std::ifstream& stream)
+void pa::ASF::parseBoneData(std::ifstream& stream)
 {
 	std::cout << "Parse BoneData\n";
 	std::string buffer;
-	while (true)
+	while (stream)
 	{
 		stream >> buffer;
-		if (0 == buffer.compare("begin"))
-			;
+		if (buffer.find("begin") != std::string::npos)
+		{
+			_boneData.emplace_back();
+			parseEachBone(stream, _boneData.back());
+		}
+		else
+		{
+			stream.seekg(-1 * buffer.size(), std::ios::cur);
+			break;
+		}
 	}
 
 }
 
-void pa::ASF::ParseHierarchy(std::ifstream& stream)
+void pa::ASF::parseEachBone(std::ifstream& stream, Bone& bone)
+{
+	std::cout << "\t\tPars Each Bone\n";
+	std::string buffer;
+	while (stream)
+	{
+		stream >> buffer;
+
+		if (buffer.find("name") != std::string::npos)
+		{
+			stream >> bone.name;
+		}
+
+		if (buffer.find("direction") != std::string::npos)
+		{
+			float direction[4] = {};
+			for (int i = 0; i < 3; i++)
+			{
+				stream >> direction[i];
+			}
+			bone.direction = DirectX::XMFLOAT4{ direction };
+		}
+
+		if (buffer.find("length") != std::string::npos)
+			stream >> bone.length;
+
+		if (buffer.find("axis") != std::string::npos)
+		{
+			parseAxis(stream, bone);
+			parseAxisOrder(stream, bone);
+		}
+
+		if (buffer.find("dof") != std::string::npos)
+		{
+			parseDOF(stream, bone);
+		}
+
+		if (buffer.find("end") != std::string::npos)
+			break;
+	}
+}
+
+void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
 	std::cout << "Parse Hierarchy\n";
 }
 
-void pa::ASF::ParseAMCRootDataOrder(std::ifstream& stream)
+void pa::ASF::parseAMCRootDataOrder(std::ifstream& stream)
 {
 	std::cout << "\tParse AMC Root Data Order\n";
 	std::string buffer;
@@ -108,51 +158,51 @@ void pa::ASF::ParseAMCRootDataOrder(std::ifstream& stream)
 	{
 		stream >> buffer;
 		if (0 == buffer.compare("TX"))
-			_amcRootOrder[0] = i;
+			_rootOrder[0] = Bone::DOF::TX;
 
 		if (0 == buffer.compare("TY"))
-			_amcRootOrder[1] = i;
+			_rootOrder[1] = Bone::DOF::TY;
 
 		if (0 == buffer.compare("TZ"))
-			_amcRootOrder[2] = i;
+			_rootOrder[2] = Bone::DOF::TZ;
 
 		if (0 == buffer.compare("RX"))
-			_amcRootOrder[3] = i;
+			_rootOrder[3] = Bone::DOF::RX;
 
 		if (0 == buffer.compare("RY"))
-			_amcRootOrder[4] = i;
+			_rootOrder[4] = Bone::DOF::RY;
 
 		if (0 == buffer.compare("RZ"))
-			_amcRootOrder[5] = i;
+			_rootOrder[5] = Bone::DOF::RZ;
 	}
 
 }
 
-void pa::ASF::ParseBoneRotationAxisOrder(std::ifstream& stream, Bone& bone)
+void pa::ASF::parseAxisOrder(std::ifstream& stream, Bone& bone)
 {
 	std::cout << "\tParse Rotation Axis Order\n";
 	std::string buffer;
 	stream >> buffer;
 	if (0 == buffer.compare("XYZ"))
-		bone.axis = Bone::RotationAxisOrder::XYZ;
+		bone.axisOrder = Bone::AxisOrder::XYZ;
 
 	if (0 == buffer.compare("XZY"))
-		bone.axis = Bone::RotationAxisOrder::XZY;
+		bone.axisOrder = Bone::AxisOrder::XZY;
 
 	if (0 == buffer.compare("YZX"))
-		bone.axis = Bone::RotationAxisOrder::YZX;
+		bone.axisOrder = Bone::AxisOrder::YZX;
 
 	if (0 == buffer.compare("YXZ"))
-		bone.axis = Bone::RotationAxisOrder::YXZ;
+		bone.axisOrder = Bone::AxisOrder::YXZ;
 
 	if (0 == buffer.compare("ZXY"))
-		bone.axis = Bone::RotationAxisOrder::ZXY;
+		bone.axisOrder = Bone::AxisOrder::ZXY;
 
 	if (0 == buffer.compare("ZYX"))
-		bone.axis = Bone::RotationAxisOrder::ZYX;
+		bone.axisOrder = Bone::AxisOrder::ZYX;
 }
 
-void pa::ASF::ParseRootPosition(std::ifstream& stream)
+void pa::ASF::parseRootPosition(std::ifstream& stream)
 {
 	std::cout << "\tParse Root Position\n";
 	float position[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -163,15 +213,44 @@ void pa::ASF::ParseRootPosition(std::ifstream& stream)
 	_rootPosition = DirectX::XMFLOAT4{ position };
 }
 
-void pa::ASF::ParseBoneRotation(std::ifstream& stream, Bone& bone)
+void pa::ASF::parseAxis(std::ifstream& stream, Bone& bone)
 {
 	std::cout << "\tParse Root Position\n";
-	float rotation[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // rotation.w have to be not used
+	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // rotation.w have to be not used
 	for (int i = 0; i < 3; i++)
 	{
-		stream >> rotation[i];
+		stream >> axis[i];
 	}
-	bone.rotation = DirectX::XMFLOAT4{ rotation };
+	bone.axis = DirectX::XMFLOAT4{ axis };
 
 
+}
+
+void pa::ASF::parseDOF(std::ifstream& stream, Bone& bone)
+{
+	std::cout << "\tParse DOF\n";
+	std::string buffer;
+	int dofId = 0;
+	while (stream)
+	{
+		stream >> buffer;
+
+		Bone::DOF dof = {};
+		if (0 == buffer.compare("rx"))
+			dof = Bone::DOF::RX;
+		else if (0 == buffer.compare("ry"))
+			dof = Bone::DOF::RY;
+		else if (0 == buffer.compare("rz"))
+			dof = Bone::DOF::RZ;
+		else if (0 == buffer.compare("ln"))
+			dof = Bone::DOF::LN;
+		else
+		{
+			stream.seekg(-1 * buffer.size(), std::ios::cur);
+			break;
+		}
+
+		bone.dof[dofId] = dof;
+		dofId++;
+	}
 }

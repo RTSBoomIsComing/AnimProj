@@ -4,16 +4,23 @@ namespace pa
 {
 	struct Bone
 	{
-		enum class RotationAxisOrder : std::uint8_t
+		enum class AxisOrder : std::uint8_t
 		{
 			XYZ, XZY, YZX, YXZ, ZXY, ZYX,
 		};
 
-		DirectX::XMFLOAT4	rotation = {};
+		enum class DOF : std::uint8_t
+		{
+			RX, RY, RZ, LN /* length */,
+			TX, TY, TZ, None
+		};
+
+		DirectX::XMFLOAT4	axis = {};
 		DirectX::XMFLOAT4	direction = {};
 		std::string			name;
 		float				length = 0.0f;
-		RotationAxisOrder	axis = RotationAxisOrder::XYZ;
+		AxisOrder			axisOrder = AxisOrder::XYZ;
+		DOF					dof[4] = { DOF::None, DOF::None, DOF::None, DOF::None };
 	};
 
 	class ASF
@@ -29,17 +36,19 @@ namespace pa
 		~ASF() = default;
 		ASF(const wchar_t* filePath);
 
-		bool	loadASFFromFile(const wchar_t* filePath);
+		bool	loadFromFile(const wchar_t* filePath);
 
 	private:
-		void	ParseUnits(std::ifstream& stream);
-		void	ParseRoot(std::ifstream& stream);
-		void	ParseBoneData(std::ifstream& stream);
-		void	ParseHierarchy(std::ifstream& stream);
-		void	ParseAMCRootDataOrder(std::ifstream& stream);
-		void	ParseRootPosition(std::ifstream& stream);
-		void	ParseBoneRotationAxisOrder(std::ifstream& stream, Bone& bone);
-		void	ParseBoneRotation(std::ifstream& stream, Bone& bone);
+		void	parseUnits(std::ifstream& stream);
+		void	parseRoot(std::ifstream& stream);
+		void	parseBoneData(std::ifstream& stream);
+		void	parseEachBone(std::ifstream& stream, Bone& bone);
+		void	parseHierarchy(std::ifstream& stream);
+		void	parseAMCRootDataOrder(std::ifstream& stream);
+		void	parseRootPosition(std::ifstream& stream);
+		void	parseAxisOrder(std::ifstream& stream, Bone& bone);
+		void	parseAxis(std::ifstream& stream, Bone& bone);
+		void	parseDOF(std::ifstream& stream, Bone& bone);
 
 	private:
 		float				_unitMass;
@@ -47,7 +56,7 @@ namespace pa
 		UnitAngle			_unitAngle;
 		std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
-		std::uint8_t		_amcRootOrder[6];
+		Bone::DOF			_rootOrder[6];
 		DirectX::XMFLOAT4	_rootPosition;
 	};
 }
