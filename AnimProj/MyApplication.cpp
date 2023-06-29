@@ -35,14 +35,6 @@ pa::MyApplication::~MyApplication()
 void pa::MyApplication::OnUpdate()
 {
 	{
-		// Test for Clear rendertargetview
-		static int testFactor = 0;
-		_clearColor[0] = std::sinf(testFactor * 0.01f);
-		_clearColor[1] = std::sinf(testFactor * 0.02f);
-		_clearColor[2] = std::sinf(testFactor++ * 0.04f);
-	}
-
-	{
 		static int testFactor = 0;
 		using namespace DirectX;
 		float cameraDistance = 10.f;

@@ -14,13 +14,15 @@ pa::ASF::ASF(const wchar_t* filePath)
 	parentTransforms["root"] = XMMatrixIdentity();
 
 	_dfsBoneTransforms.resize(_dfsRoute.size());
+	XMMATRIX rootRotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
+	XMMATRIX rootRotationInverse = XMMatrixInverse(nullptr, rootRotation);
 	{
 		XMMATRIX translation =
 			XMMatrixTranslationFromVector(
 				XMLoadFloat4(&_rootPosition) * XMVECTOR{ _unitLength, _unitLength, _unitLength, 0.0f });
 
-		XMMATRIX rotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
-		XMStoreFloat4x4(&_dfsBoneTransforms[0], rotation * translation);
+		
+		XMStoreFloat4x4(&_dfsBoneTransforms[0], rootRotation* translation);
 	}
 
 	for (int i = 1; i < _dfsRoute.size(); i++)
@@ -32,7 +34,6 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const std::string& parentName = _boneParentArray[boneIndex];
 		const XMMATRIX& parentTransform = parentTransforms[parentName];
 
-		// TODO
 		const float translationScale = _unitLength * bone.length;
 		XMMATRIX translation = XMMatrixTranslationFromVector(
 			XMLoadFloat4(&bone.direction) * XMVECTOR{ translationScale, translationScale, translationScale, 0.0f }
@@ -40,8 +41,8 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
 
-		XMMATRIX boneLocalTransform = rotation * translation;
-		XMMATRIX boneGobalTransfrom = parentTransform * boneLocalTransform;
+		XMMATRIX boneLocalTransform = rootRotationInverse * rotation * rootRotation * translation;
+		XMMATRIX boneGobalTransfrom = boneLocalTransform * parentTransform;
 		parentTransforms[boneName] = boneGobalTransfrom;
 		XMStoreFloat4x4(&_dfsBoneTransforms[i], boneGobalTransfrom);
 	}
@@ -259,7 +260,6 @@ void pa::ASF::parseAMCRootDataOrder(std::ifstream& stream)
 
 void pa::ASF::parseAxisOrder(std::ifstream& stream, Bone& bone)
 {
-	std::cout << "\tParse Rotation Axis Order\n";
 	std::string buffer;
 	stream >> buffer;
 	if (0 == buffer.compare("XYZ"))
@@ -283,7 +283,6 @@ void pa::ASF::parseAxisOrder(std::ifstream& stream, Bone& bone)
 
 void pa::ASF::parseRootPosition(std::ifstream& stream)
 {
-	std::cout << "\tParse Root Position\n";
 	float position[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	for (int i = 0; i < 3; i++)
 	{
@@ -294,15 +293,12 @@ void pa::ASF::parseRootPosition(std::ifstream& stream)
 
 void pa::ASF::parseAxis(std::ifstream& stream, Bone& bone)
 {
-	std::cout << "\tParse Root Position\n";
-	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f }; // rotation.w have to be not used
+	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f/*not used*/};
 	for (int i = 0; i < 3; i++)
 	{
 		stream >> axis[i];
 	}
 	bone.axis = DirectX::XMFLOAT4{ axis };
-
-
 }
 
 void pa::ASF::parseDOF(std::ifstream& stream, Bone& bone)
@@ -343,26 +339,32 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, Bone::Ax
 {
 	using namespace DirectX;
 	// Use row major matrix
-	float angleScale = (_unitAngle == UnitAngle::Degree) ? (DirectX::XM_PI / 180) : 1.0f;
-	XMMATRIX rotationX = XMMatrixRotationX(axis.x * angleScale);
-	XMMATRIX rotationY = XMMatrixRotationX(axis.y * angleScale);
-	XMMATRIX rotationZ = XMMatrixRotationX(axis.z * angleScale);
+	const float angleScale = (_unitAngle == UnitAngle::Degree) ? (DirectX::XM_PI / 180) : 1.0f;
+	const XMMATRIX rotationX = XMMatrixRotationX(axis.x * angleScale);
+	const XMMATRIX rotationY = XMMatrixRotationX(axis.y * angleScale);
+	const XMMATRIX rotationZ = XMMatrixRotationX(axis.z * angleScale);
 
 	XMMATRIX result = {};
 	switch (order)
 	{
 	case Bone::AxisOrder::XYZ:
 		result = rotationX * rotationY * rotationZ;
+		break;
 	case Bone::AxisOrder::XZY:
 		result = rotationX * rotationZ * rotationY;
+		break;
 	case Bone::AxisOrder::YZX:
 		result = rotationY * rotationZ * rotationX;
+		break;
 	case Bone::AxisOrder::YXZ:
 		result = rotationY * rotationX * rotationZ;
+		break;
 	case Bone::AxisOrder::ZXY:
 		result = rotationZ * rotationX * rotationY;
+		break;
 	case Bone::AxisOrder::ZYX:
 		result = rotationZ * rotationY * rotationX;
+		break;
 	}
 
 	return result;
