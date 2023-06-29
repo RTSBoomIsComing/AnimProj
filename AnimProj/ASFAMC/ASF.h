@@ -26,12 +26,6 @@ namespace pa
 	class ASF
 	{
 	public:
-		enum class UnitAngle : std::uint8_t
-		{
-			Degree, Radian
-		};
-
-	public:
 		ASF() = default;
 		~ASF() = default;
 		ASF(const wchar_t* filePath);
@@ -55,9 +49,13 @@ namespace pa
 		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, Bone::AxisOrder order);
 
 	private:
-		float				_unitMass;
-		float				_unitLength;
-		UnitAngle			_unitAngle;
+		struct Unit
+		{
+			float	mass = 1.0f;
+			float	length = 1.0f;
+			float	angle = 1.0f;
+		} _unit;
+
 		std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
 		Bone::DOF			_rootOrder[6];
@@ -67,7 +65,7 @@ namespace pa
 		std::vector<std::string>				_boneParentArray;
 
 		std::vector<std::string>				_dfsRoute;
-		std::vector<DirectX::XMFLOAT4X4>			_dfsBoneTransforms;
+		std::vector<DirectX::XMFLOAT4X4>		_dfsBoneTransforms;
 
 
 	};

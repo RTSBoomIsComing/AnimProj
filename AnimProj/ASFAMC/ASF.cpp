@@ -17,7 +17,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 	XMMATRIX rootRotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
 	XMMATRIX rootRotationInverse = XMMatrixInverse(nullptr, rootRotation);
 	{
-		XMVECTOR vectorScale{ _unitLength, _unitLength, _unitLength, 0.0f };
+		XMVECTOR vectorScale{ _unit.length, _unit.length, _unit.length, 0.0f };
 		XMMATRIX translation =
 			XMMatrixTranslationFromVector(
 				XMLoadFloat4(&_rootPosition) * vectorScale);
@@ -34,7 +34,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const std::string& parentName = _boneParentArray[boneIndex];
 		const XMMATRIX& parentTransform = parentTransforms[parentName];
 
-		const float vectorScaleFactor = _unitLength * bone.length;
+		const float vectorScaleFactor = _unit.length * bone.length;
 		XMVECTOR vectorScale{ vectorScaleFactor, vectorScaleFactor, vectorScaleFactor, 0.0f };
 
 		XMMATRIX translation = XMMatrixTranslationFromVector(
@@ -83,18 +83,16 @@ void pa::ASF::parseUnits(std::ifstream& stream)
 		std::string unitName;
 		stream >> unitName;
 		if (0 == unitName.compare("mass"))
-			stream >> _unitMass;
+			stream >> _unit.mass;
 
 		if (0 == unitName.compare("length"))
-			stream >> _unitLength;
+			stream >> _unit.length;
 
 		if (0 == unitName.compare("angle"))
 		{
-			std::string unitAngleString;
-			unitAngleString.reserve(3);
-
-			stream >> unitAngleString;
-			_unitAngle = (0 == unitAngleString.compare("deg")) ? UnitAngle::Degree : UnitAngle::Radian;
+			std::string unitAngle;
+			stream >> unitAngle;
+			_unit.angle = (0 == unitAngle.compare("deg")) ? (DirectX::XM_PI / 180) : 1.0f;
 		}
 	}
 }
@@ -332,10 +330,9 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, Bone::Ax
 {
 	using namespace DirectX;
 	// Use row major matrix
-	const float angleScale = (_unitAngle == UnitAngle::Degree) ? (DirectX::XM_PI / 180) : 1.0f;
-	const XMMATRIX rotationX = XMMatrixRotationX(axis.x * angleScale);
-	const XMMATRIX rotationY = XMMatrixRotationX(axis.y * angleScale);
-	const XMMATRIX rotationZ = XMMatrixRotationX(axis.z * angleScale);
+	const XMMATRIX rotationX = XMMatrixRotationX(axis.x * _unit.angle);
+	const XMMATRIX rotationY = XMMatrixRotationX(axis.y * _unit.angle);
+	const XMMATRIX rotationZ = XMMatrixRotationX(axis.z * _unit.angle);
 
 	XMMATRIX result = {};
 	switch (order)

@@ -53,7 +53,7 @@ void pa::MyApplication::OnUpdate()
 			_cameraHeight -= deltaTime.count();
 
 
-		
+
 		XMVECTOR newEyePosition = XMVECTOR{
 			cameraDistance * std::cosf(-XM_PIDIV2 + _cameraRotationFactor * 3),
 			_cameraHeight * 15,
@@ -113,6 +113,10 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
 {
+	// left  : 37
+	// up    : 38
+	// right : 39
+	// down  : 40
 	keyState[key - 37] = false;
 }
 
@@ -136,7 +140,7 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		checkResult(_device->CreateInputLayout(
 			inputElementDescs, ARRAYSIZE(inputElementDescs),
 			vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_inputLayout));
-	}
+}
 
 	{
 		ComPtr<ID3DBlob> pixelShaderBlob;
