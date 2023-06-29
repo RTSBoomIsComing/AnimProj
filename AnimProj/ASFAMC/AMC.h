@@ -5,6 +5,12 @@ namespace pa
 {
 	class AMC
 	{
+	public:
+		AMC();
+		~AMC() = default;
+
+	private:
+		
 	};
 }
 

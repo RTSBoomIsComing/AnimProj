@@ -17,12 +17,12 @@ pa::ASF::ASF(const wchar_t* filePath)
 	XMMATRIX rootRotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
 	XMMATRIX rootRotationInverse = XMMatrixInverse(nullptr, rootRotation);
 	{
+		XMVECTOR vectorScale{ _unitLength, _unitLength, _unitLength, 0.0f };
 		XMMATRIX translation =
 			XMMatrixTranslationFromVector(
-				XMLoadFloat4(&_rootPosition) * XMVECTOR{ _unitLength, _unitLength, _unitLength, 0.0f });
+				XMLoadFloat4(&_rootPosition) * vectorScale);
 
-		
-		XMStoreFloat4x4(&_dfsBoneTransforms[0], rootRotation* translation);
+		XMStoreFloat4x4(&_dfsBoneTransforms[0], rootRotation * translation);
 	}
 
 	for (int i = 1; i < _dfsRoute.size(); i++)
@@ -34,10 +34,11 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const std::string& parentName = _boneParentArray[boneIndex];
 		const XMMATRIX& parentTransform = parentTransforms[parentName];
 
-		const float translationScale = _unitLength * bone.length;
+		const float vectorScaleFactor = _unitLength * bone.length;
+		XMVECTOR vectorScale{ vectorScaleFactor, vectorScaleFactor, vectorScaleFactor, 0.0f };
+
 		XMMATRIX translation = XMMatrixTranslationFromVector(
-			XMLoadFloat4(&bone.direction) * XMVECTOR{ translationScale, translationScale, translationScale, 0.0f }
-		);
+			XMLoadFloat4(&bone.direction) * vectorScale);
 
 		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
 
@@ -286,7 +287,7 @@ void pa::ASF::parseRootPosition(std::ifstream& stream)
 
 void pa::ASF::parseAxis(std::ifstream& stream, Bone& bone)
 {
-	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f/*not used*/};
+	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f/*not used*/ };
 	for (int i = 0; i < 3; i++)
 	{
 		stream >> axis[i];
