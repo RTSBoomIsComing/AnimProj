@@ -3,6 +3,7 @@
 #include "MyApplication.h"
 #include "Camera.h"
 #include "Rendering/Mesh.h"
+#include "ASFAMC/ASF.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -10,7 +11,75 @@ pa::MyApplication::MyApplication()
 
 	_pCamera = new Camera{};
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get());
+	std::wstring asfFilePath = _SOLUTIONDIR;
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	_pASF = new ASF{ asfFilePath.c_str() };
 
+
+
+	initializeGraphicsPipeline();
+}
+
+pa::MyApplication::~MyApplication()
+{
+	if (nullptr != _pCamera)
+		delete _pCamera;
+
+	if (nullptr != _pCubeMesh)
+		delete _pCubeMesh;
+
+	if (nullptr != _pASF)
+		delete _pASF;
+}
+
+void pa::MyApplication::OnUpdate()
+{
+	{
+		// Test for Clear rendertargetview
+		static int testFactor = 0;
+		_clearColor[0] = std::sinf(testFactor * 0.01f);
+		_clearColor[1] = std::sinf(testFactor * 0.02f);
+		_clearColor[2] = std::sinf(testFactor++ * 0.04f);
+	}
+
+	{
+		static int testFactor = 0;
+		using namespace DirectX;
+		_pCamera->updateEyePosition(XMVECTOR{
+			3.0f * std::cosf(0.01f * testFactor),
+			3.0f,
+			3.0f * std::sinf(0.01f * testFactor++),
+			1.0f, });
+	}
+	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
+	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
+}
+
+void pa::MyApplication::OnRender()
+{
+	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
+	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	_deviceContext->IASetInputLayout(_inputLayout.Get());
+
+	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+
+	_deviceContext->RSSetState(_rasterizerState.Get());
+	_deviceContext->RSSetViewports(1, &_viewport);
+
+	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
+
+	_pCubeMesh->setVertexIndexBuffers(_deviceContext.Get());
+	_deviceContext->DrawIndexed(_pCubeMesh->getIndexCount(), 0, 0);
+
+	_swapChain->Present(1, 0);
+}
+
+void pa::MyApplication::initializeGraphicsPipeline()
+{
 	{
 		ComPtr<ID3DBlob> vertexShaderBlob;
 #if defined(DEBUG) || defined(_DEBUG)
@@ -60,59 +129,4 @@ pa::MyApplication::MyApplication()
 		bufferDesc.MiscFlags = 0;
 		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_cameraConstantBuffer));
 	}
-}
-
-pa::MyApplication::~MyApplication()
-{
-	if (nullptr != _pCamera)
-		delete _pCamera;
-
-	if (nullptr != _pCubeMesh)
-		delete _pCubeMesh;
-}
-
-void pa::MyApplication::OnUpdate()
-{
-	{
-		// Test for Clear rendertargetview
-		static int testFactor = 0;
-		_clearColor[0] = std::sinf(testFactor * 0.01f);
-		_clearColor[1] = std::sinf(testFactor * 0.02f);
-		_clearColor[2] = std::sinf(testFactor++ * 0.04f);
-	}
-
-	{
-		static int testFactor = 0;
-		using namespace DirectX;
-		_pCamera->updateEyePosition(XMVECTOR{
-			3.0f * std::cosf(0.01f * testFactor),
-			3.0f,
-			3.0f * std::sinf(0.01f * testFactor++),
-			1.0f, });
-	}
-	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
-	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
-}
-
-void pa::MyApplication::OnRender()
-{
-	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
-	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	_deviceContext->IASetInputLayout(_inputLayout.Get());
-
-	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
-	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
-
-	_deviceContext->RSSetState(_rasterizerState.Get());
-	_deviceContext->RSSetViewports(1, &_viewport);
-
-	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
-
-	_pCubeMesh->setVertexIndexBuffers(_deviceContext.Get());
-	_deviceContext->DrawIndexed(_pCubeMesh->getIndexCount(), 0, 0);
-
-	_swapChain->Present(1, 0);
 }

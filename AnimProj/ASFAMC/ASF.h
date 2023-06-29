@@ -50,6 +50,11 @@ namespace pa
 		void	parseAxis(std::ifstream& stream, Bone& bone);
 		void	parseDOF(std::ifstream& stream, Bone& bone);
 
+		const std::vector<DirectX::XMFLOAT4X4> getGlobalBoneTransforms() const;
+
+	private:
+		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, Bone::AxisOrder order);
+
 	private:
 		float				_unitMass;
 		float				_unitLength;
@@ -61,6 +66,11 @@ namespace pa
 
 		std::unordered_map<std::string, int>	_boneNameMap;
 		std::vector<std::string>				_boneParentArray;
+
+		std::vector<std::string>				_dfsRoute;
+		std::vector<DirectX::XMFLOAT4X4>			_dfsBoneTransforms;
+
+
 	};
 }
 

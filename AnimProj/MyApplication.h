@@ -5,6 +5,7 @@ namespace pa
 {
 	class Camera;
 	class Mesh;
+	class ASF;
 
 	class MyApplication : public Win32D3D11Application
 	{
@@ -13,6 +14,9 @@ namespace pa
 		~MyApplication();
 		virtual void OnUpdate() override;
 		virtual void OnRender() override;
+	
+	private:
+		void initializeGraphicsPipeline();
 
 	private:
 		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
@@ -25,6 +29,7 @@ namespace pa
 
 		Camera* _pCamera;
 		Mesh* _pCubeMesh;
+		ASF* _pASF;
 	};
 }
 
