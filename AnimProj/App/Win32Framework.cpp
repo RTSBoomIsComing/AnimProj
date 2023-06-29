@@ -33,6 +33,18 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 
 	switch (message)
 	{
+	case WM_KEYDOWN:
+		if (nullptr != pApplication)
+			pApplication->OnKeyDown(static_cast<UINT8>(wParam));
+		
+		return 0;
+
+	case WM_KEYUP:
+		if (nullptr != pApplication)
+			pApplication->OnKeyUp(static_cast<UINT8>(wParam));
+	
+		return 0;
+
 	case WM_PAINT:
 		if (nullptr != pApplication)
 		{

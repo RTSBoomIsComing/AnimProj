@@ -32,7 +32,7 @@ namespace pa
 	class MeshFactory
 	{
 	public:
-		static Mesh* CreateCubeMesh(ID3D11Device* pDevice);
+		static Mesh* CreateCubeMesh(ID3D11Device* pDevice, float scale = 1.0f);
 		static Mesh* CreateSphereMesh(ID3D11Device* pDevice);
 	};
 }

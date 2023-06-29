@@ -10,7 +10,7 @@ pa::MyApplication::MyApplication()
 	using namespace DirectX;
 
 	_pCamera = new Camera{};
-	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get());
+	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	_pASF = new ASF{ asfFilePath.c_str() };

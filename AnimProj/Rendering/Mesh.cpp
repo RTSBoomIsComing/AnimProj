@@ -21,21 +21,22 @@ UINT pa::Mesh::getIndexCount() const
 	return _indexCount;
 }
 
-pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice)
+pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice, float scale)
 {
 	using namespace DirectX;
 	Mesh* cubeMesh = new Mesh{};
 
 	{
+		scale = scale * 0.5f;
 		XMVECTOR positions[] = {
-			-0.2, -0.2, -0.2, 1.0, //0
-			-0.2,  0.2, -0.2, 1.0, //1
-			 0.2,  0.2, -0.2, 1.0, //2
-			 0.2, -0.2, -0.2, 1.0, //3
-			-0.2, -0.2,  0.2, 1.0, //4
-			-0.2,  0.2,  0.2, 1.0, //5
-			 0.2,  0.2,  0.2, 1.0, //6
-			 0.2, -0.2,  0.2, 1.0, //7
+			-scale, -scale, -scale, 1.0, //0
+			-scale,  scale, -scale, 1.0, //1
+			 scale,  scale, -scale, 1.0, //2
+			 scale, -scale, -scale, 1.0, //3
+			-scale, -scale,  scale, 1.0, //4
+			-scale,  scale,  scale, 1.0, //5
+			 scale,  scale,  scale, 1.0, //6
+			 scale, -scale,  scale, 1.0, //7
 		};
 		cubeMesh->_vertexCount = ARRAYSIZE(positions);
 
@@ -55,14 +56,14 @@ pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice)
 	}
 	{
 		XMVECTOR colors[] = {
-			 0,  0,  0, 1, //0
-			 0,  0,  0, 1, //1
-			 0,  1,  0, 1, //2
-			 0,  1,  0, 1, //3
-			 1,  0,  0, 1, //4
-			 1,  0,  0, 1, //5
-			 1,  1,  0, 1, //6
-			 1,  1,  0, 1, //7
+			 1,  1,  1, 1, //0
+			 1,  1,  1, 1, //1
+			 0,  1,  1, 1, //2
+			 0,  1,  1, 1, //3
+			 1,  1,  1, 1, //4
+			 1,  1,  1, 1, //5
+			 0,  1,  1, 1, //6
+			 0,  1,  1, 1, //7
 		};
 
 		D3D11_BUFFER_DESC bufferDesc = {};

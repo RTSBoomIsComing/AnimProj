@@ -12,8 +12,9 @@ namespace pa
 	public:
 		MyApplication();
 		~MyApplication();
-		virtual void OnUpdate() override;
-		virtual void OnRender() override;
+		virtual void OnUpdate(void) override;
+		virtual void OnRender(void) override;
+	
 	
 	private:
 		void initializeGraphicsPipeline();

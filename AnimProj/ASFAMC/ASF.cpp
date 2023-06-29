@@ -77,7 +77,6 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 
 void pa::ASF::parseUnits(std::ifstream& stream)
 {
-	std::cout << "Parse Units\n";
 	for (int i = 0; i < 3; i++)
 	{
 		std::string unitName;
@@ -101,7 +100,6 @@ void pa::ASF::parseUnits(std::ifstream& stream)
 
 void pa::ASF::parseRoot(std::ifstream& stream)
 {
-	std::cout << "Parse Root\n";
 	_boneData.emplace_back();
 	_boneData.back().name = "root";
 	_boneNameMap["root"] = 0;
@@ -126,7 +124,6 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 
 void pa::ASF::parseBoneData(std::ifstream& stream)
 {
-	std::cout << "Parse BoneData\n";
 	std::string buffer;
 	while (stream)
 	{
@@ -150,7 +147,6 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 
 void pa::ASF::parseEachBone(std::ifstream& stream, int boneIndex)
 {
-	std::cout << "\t\tPars Each Bone\n";
 	Bone& bone = _boneData[boneIndex];
 
 	std::string buffer;
@@ -195,8 +191,6 @@ void pa::ASF::parseEachBone(std::ifstream& stream, int boneIndex)
 
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
-	std::cout << "Parse Hierarchy\n";
-	// TODO
 	_boneParentArray.resize(_boneData.size());
 	_dfsRoute.reserve(_boneData.size());
 	_dfsRoute.emplace_back("root");
@@ -232,7 +226,6 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 
 void pa::ASF::parseAMCRootDataOrder(std::ifstream& stream)
 {
-	std::cout << "\tParse AMC Root Data Order\n";
 	std::string buffer;
 	for (int i = 0; i < 6; i++)
 	{
@@ -303,7 +296,6 @@ void pa::ASF::parseAxis(std::ifstream& stream, Bone& bone)
 
 void pa::ASF::parseDOF(std::ifstream& stream, Bone& bone)
 {
-	std::cout << "\tParse DOF\n";
 	std::string buffer;
 	int dofId = 0;
 	while (stream)
