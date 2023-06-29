@@ -16,6 +16,7 @@ pa::MyApplication::MyApplication()
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	_pASF = new ASF{ asfFilePath.c_str() };
+	_boneConnectionIndices =_pASF->getBoneConnections();
 
 	initializeGraphicsPipeline();
 }
@@ -96,8 +97,8 @@ void pa::MyApplication::OnRender()
 
 	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
 
-	_pCubeMesh->setVertexIndexBuffers(_deviceContext.Get());
-	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), 31/*number of bones, hard coded, need fix*/, 0, 0, 0);
+	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
+	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), _pASF->getGlobalBoneTransforms().size(), 0, 0, 0);
 
 	_swapChain->Present(1, 0);
 }
@@ -181,4 +182,6 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		bufferDesc.MiscFlags = 0;
 		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_meshConstantBuffer));
 	}
+
+
 }

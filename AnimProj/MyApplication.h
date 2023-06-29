@@ -38,6 +38,7 @@ namespace pa
 		Camera* _pCamera;
 		Mesh* _pCubeMesh;
 		ASF* _pASF;
+		std::vector<std::uint32_t> _boneConnectionIndices;
 
 		bool keyState[4] = {};
 	};

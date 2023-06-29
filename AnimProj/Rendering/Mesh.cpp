@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "Mesh.h"
 
-void pa::Mesh::setVertexIndexBuffers(ID3D11DeviceContext* pDeviceContext)
+void pa::Mesh::setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext)
 {
 	ID3D11Buffer* const vertexBuffers[] = {
 		_vertexPositionBuffer.Get(),
 		_vertexColorBuffer.Get(),
 	};
+	pDeviceContext->IASetPrimitiveTopology(_primitiveTopology);
 	pDeviceContext->IASetVertexBuffers(0, ARRAYSIZE(vertexBuffers), vertexBuffers, _strides, _offsets);
 	pDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 }
@@ -25,6 +26,8 @@ pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice, float scale)
 {
 	using namespace DirectX;
 	Mesh* cubeMesh = new Mesh{};
+
+	cubeMesh->_primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	{
 		scale = scale * 0.5f;
@@ -56,14 +59,14 @@ pa::Mesh* pa::MeshFactory::CreateCubeMesh(ID3D11Device* pDevice, float scale)
 	}
 	{
 		XMVECTOR colors[] = {
-			 1,  1,  1, 1, //0
-			 1,  1,  1, 1, //1
-			 0,  1,  1, 1, //2
-			 0,  1,  1, 1, //3
-			 1,  1,  1, 1, //4
-			 1,  1,  1, 1, //5
-			 0,  1,  1, 1, //6
-			 0,  1,  1, 1, //7
+			 0,  0,  1, 1, //0
+			 1,  0,  0, 1, //1
+			 1,  0,  0, 1, //2
+			 0,  0,  1, 1, //3
+			 0,  0,  1, 1, //4
+			 1,  0,  0, 1, //5
+			 1,  0,  0, 1, //6
+			 0,  0,  1, 1, //7
 		};
 
 		D3D11_BUFFER_DESC bufferDesc = {};

@@ -28,7 +28,8 @@ namespace pa
 		ASF(const wchar_t* filePath);
 
 		bool	loadFromFile(const wchar_t* filePath);
-		const std::vector<DirectX::XMFLOAT4X4> getGlobalBoneTransforms() const;
+		const std::vector<DirectX::XMFLOAT4X4>	getGlobalBoneTransforms() const;
+		std::vector<std::uint32_t>				getBoneConnections();
 
 	private:
 		void	parseUnits(std::ifstream& stream);
@@ -58,9 +59,8 @@ namespace pa
 		std::unordered_map<std::string, std::string> _boneParentMap;
 
 		std::vector<std::string>				_dfsRoute;
+		std::unordered_map<std::string, int>	_dfsNameMap;
 		std::vector<DirectX::XMFLOAT4X4>		_dfsBoneTransforms;
-
-
 	};
 }
 

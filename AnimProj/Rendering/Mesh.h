@@ -11,16 +11,17 @@ namespace pa
 		Mesh() = default;
 		~Mesh() = default;
 
-		void setVertexIndexBuffers(ID3D11DeviceContext* pDeviceContext);
+		void setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext);
 
 	public:
 		UINT getVertexCount() const;
 		UINT getIndexCount() const;
 
 	private:
-		ComPtr<ID3D11Buffer>	_indexBuffer;
-		ComPtr<ID3D11Buffer>	_vertexPositionBuffer;
-		ComPtr<ID3D11Buffer>	_vertexColorBuffer;
+		D3D11_PRIMITIVE_TOPOLOGY	_primitiveTopology;
+		ComPtr<ID3D11Buffer>		_indexBuffer;
+		ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
+		ComPtr<ID3D11Buffer>		_vertexColorBuffer;
 
 		UINT _strides[2]	= {};
 		UINT _offsets[2]	= {};

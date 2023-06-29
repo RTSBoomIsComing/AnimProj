@@ -133,8 +133,8 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 	while (stream && stream.peek() != static_cast<int>(':'))
 	{
 		std::string buffer;
-		stream >> buffer;
-		if (0 != buffer.compare("begin"))
+		std::getline(stream, buffer);
+		if (buffer.find("begin") == std::string::npos)
 			break;
 
 		Bone bone = {};
@@ -175,6 +175,7 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
 	_dfsRoute.reserve(_boneData.size());
+	_dfsNameMap["root"] = 0;
 	_dfsRoute.emplace_back("root");
 
 	std::string buffer;
@@ -199,6 +200,7 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 				if (childBoneName.empty())
 					break;
 				_boneParentMap[childBoneName] = parentBoneName;
+				_dfsNameMap[childBoneName] = _dfsRoute.size();
 				_dfsRoute.push_back(childBoneName);
 			}
 		}
@@ -285,6 +287,20 @@ const std::vector<DirectX::XMFLOAT4X4> pa::ASF::getGlobalBoneTransforms() const
 	return _dfsBoneTransforms;
 }
 
+std::vector<std::uint32_t> pa::ASF::getBoneConnections()
+{
+	std::vector<std::uint32_t> indices;
+	for (int i = 0; i < _dfsRoute.size(); i++)
+	{
+		
+		indices.push_back(i);
+		const std::string& boneName = _dfsRoute[i];
+		const std::string& parentName = _boneParentMap[boneName];
+		indices.push_back(static_cast<std::uint32_t>(_dfsNameMap[parentName]));
+	}
+	return indices;
+}
+
 DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)
 {
 	using namespace DirectX;
@@ -308,5 +324,6 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const st
 	else if (0 == order.compare("ZYX"))
 		result = rotationZ * rotationY * rotationX;
 
-	return result;
+	//return result;
+	return XMMatrixIdentity();
 }
