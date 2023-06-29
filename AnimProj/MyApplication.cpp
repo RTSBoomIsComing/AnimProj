@@ -6,6 +6,8 @@
 #include "ASFAMC/ASF.h"
 
 pa::MyApplication::MyApplication()
+	: Win32Application()
+	, D3D11Application(GetHwnd())
 {
 	using namespace DirectX;
 
@@ -14,8 +16,6 @@ pa::MyApplication::MyApplication()
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	_pASF = new ASF{ asfFilePath.c_str() };
-
-
 
 	initializeGraphicsPipeline();
 }
@@ -35,15 +35,34 @@ pa::MyApplication::~MyApplication()
 void pa::MyApplication::OnUpdate()
 {
 	using namespace DirectX;
+
+	static auto lastTime = std::chrono::high_resolution_clock::now();
+	const auto currentTime = std::chrono::high_resolution_clock::now();
+	const auto deltaTime = std::chrono::duration<float>(currentTime - lastTime);
+	lastTime = currentTime;
+
 	{
-		static int testFactor = 0;
 		float cameraDistance = 10.f;
-		_pCamera->updateEyePosition(XMVECTOR{
-			cameraDistance * std::cosf(-XM_PIDIV2 + _cameraHorizontalMovement),
-			cameraDistance * std::sinf(_cameraVerticalMovement),
-			cameraDistance * std::sinf(-XM_PIDIV2 + _cameraHorizontalMovement),
-			1.0f, });
+		if (keyState[0])
+			_cameraRotationFactor += deltaTime.count();
+		if (keyState[2])
+			_cameraRotationFactor -= deltaTime.count();
+		if (keyState[1])
+			_cameraHeight += deltaTime.count();
+		if (keyState[3])
+			_cameraHeight -= deltaTime.count();
+
+
+		
+		XMVECTOR newEyePosition = XMVECTOR{
+			cameraDistance * std::cosf(-XM_PIDIV2 + _cameraRotationFactor * 3),
+			_cameraHeight * 15,
+			cameraDistance * std::sinf(-XM_PIDIV2 + _cameraRotationFactor * 3),
+			1.0f };
+
+		_pCamera->updateEyePosition(newEyePosition);
 	}
+
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
@@ -85,26 +104,16 @@ void pa::MyApplication::OnRender()
 
 void pa::MyApplication::OnKeyDown(UINT8 key)
 {
-	constexpr float cameraMovementScale = 0.05f;
-	switch (key)
-	{
-	case 'W':
-		_cameraVerticalMovement += cameraMovementScale;
-		break;
-	case 'S':
-		_cameraVerticalMovement -= cameraMovementScale;
-		break;
-	case 'A':
-		_cameraHorizontalMovement -= cameraMovementScale;
-		break;
-	case 'D':
-		_cameraHorizontalMovement += cameraMovementScale;
-		break;
-	}
+	// left  : 37
+	// up    : 38
+	// right : 39
+	// down  : 40
+	keyState[key - 37] = true;
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
 {
+	keyState[key - 37] = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

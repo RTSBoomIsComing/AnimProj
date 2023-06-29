@@ -1,13 +1,12 @@
 // author: Changwan Yu
 #include "pch.h"
-#include "Win32D3D11Application.h"
+#include "D3D11Application.h"
 
-
-pa::Win32D3D11Application::Win32D3D11Application()
+pa::D3D11Application::D3D11Application(HWND hWnd)
 {
-	initializeD3D11Devices();
+	initialize(hWnd);
 }
-void pa::Win32D3D11Application::initializeD3D11Devices()
+void pa::D3D11Application::initialize(HWND hWnd)
 {
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;
@@ -18,7 +17,7 @@ void pa::Win32D3D11Application::initializeD3D11Devices()
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.OutputWindow = GetHwnd();
+	swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.Windowed = TRUE;
@@ -37,21 +36,19 @@ void pa::Win32D3D11Application::initializeD3D11Devices()
 	checkResult(_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
 	checkResult(_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &_renderTargetView));
 
-	_viewport = {};
-	_viewport.TopLeftX = 0;
-	_viewport.TopLeftY = 0;
-	_viewport.Width = static_cast<FLOAT>(getWidth());
-	_viewport.Height = static_cast<FLOAT>(getHeight());
-	_viewport.MinDepth = 0.0f;
-	_viewport.MaxDepth = 1.0f;
+
+	_viewport = CD3D11_VIEWPORT{ backBuffer.Get(), _renderTargetView.Get() };
 
 	{
-		// Create the depth stencil texture
-		ComPtr<ID3D11Texture2D> depthStencilBuffer{};
-		CD3D11_TEXTURE2D_DESC textureDesc{ 
-			DXGI_FORMAT_D24_UNORM_S8_UINT, static_cast<UINT>(getWidth()), static_cast<UINT>(getHeight()),
+		// Create the depth stencil buffer
+		D3D11_TEXTURE2D_DESC backBufferDesc;
+		backBuffer->GetDesc(&backBufferDesc);
+		CD3D11_TEXTURE2D_DESC depthStencilBufferDesc{
+			DXGI_FORMAT_D24_UNORM_S8_UINT, backBufferDesc.Width, backBufferDesc.Height,
 			1, 0, D3D11_BIND_DEPTH_STENCIL };
-		checkResult(_device->CreateTexture2D(&textureDesc, nullptr, &depthStencilBuffer));
+
+		ComPtr<ID3D11Texture2D> depthStencilBuffer{};
+		checkResult(_device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &depthStencilBuffer));
 
 		// Create the main depth stencil view
 		CD3D11_DEPTH_STENCIL_VIEW_DESC dsviewDesc{ D3D11_DSV_DIMENSION_TEXTURE2D };

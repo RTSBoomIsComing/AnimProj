@@ -31,8 +31,6 @@ pa::Win32Application::Win32Application()
 
     _hWnd = ::CreateWindowW(WindowClassName, windowName, WS_OVERLAPPEDWINDOW, 100, 100,
         adjustedWidth, adjustedHeight, NULL, NULL, GetModuleHandle(NULL), NULL);
-
-    //::ShowWindow(_hWnd, SW_SHOWDEFAULT);
 }
 
 pa::Win32Application::~Win32Application()

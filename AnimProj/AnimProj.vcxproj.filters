@@ -21,7 +21,7 @@
     <ClInclude Include="App\Win32Framework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="app\Win32D3D11Application.h">
+    <ClInclude Include="app\D3D11Application.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="MyApplication.h">
@@ -56,7 +56,7 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="app\Win32D3D11Application.cpp">
+    <ClCompile Include="app\D3D11Application.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MyApplication.cpp">

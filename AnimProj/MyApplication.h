@@ -1,13 +1,15 @@
 // author: Changwan Yu
 #pragma once
-#include "App/Win32D3D11Application.h"
+#include "App/Win32Application.h"
+#include "App/D3D11Application.h"
+
 namespace pa
 {
 	class Camera;
 	class Mesh;
 	class ASF;
 
-	class MyApplication : public Win32D3D11Application
+	class MyApplication : public Win32Application, public D3D11Application
 	{
 	public:
 		MyApplication();
@@ -16,15 +18,15 @@ namespace pa
 		virtual void OnRender(void) override;
 		virtual void OnKeyDown(UINT8 key) override;
 		virtual void OnKeyUp(UINT8 key) override;
-	
-	
+
+
 	private:
 		void initializeGraphicsPipeline();
 
 	private:
 		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
-		float	_cameraVerticalMovement = 0;
-		float	_cameraHorizontalMovement = 0;
+		float	_cameraRotationFactor = 0.0f;
+		float	_cameraHeight = 0.0f;
 
 		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
 		ComPtr<ID3D11Buffer>			_meshConstantBuffer;
@@ -36,6 +38,8 @@ namespace pa
 		Camera* _pCamera;
 		Mesh* _pCubeMesh;
 		ASF* _pASF;
+
+		bool keyState[4] = {};
 	};
 }
 
