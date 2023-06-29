@@ -109,7 +109,7 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 void pa::ASF::parseEachBone(std::ifstream& stream, int boneIndex)
 {
 	std::cout << "\t\tPars Each Bone\n";
-	Bone bone = _boneData[boneIndex];
+	Bone& bone = _boneData[boneIndex];
 
 	std::string buffer;
 	while (stream)
