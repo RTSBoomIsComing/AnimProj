@@ -45,14 +45,27 @@ void pa::MyApplication::OnUpdate()
 	{
 		static int testFactor = 0;
 		using namespace DirectX;
+		float cameraDistance = 10.f;
 		_pCamera->updateEyePosition(XMVECTOR{
-			3.0f * std::cosf(0.01f * testFactor),
-			3.0f,
-			3.0f * std::sinf(0.01f * testFactor++),
+			cameraDistance * std::cosf(0.01f * testFactor),
+			cameraDistance,
+			cameraDistance * std::sinf(0.01f * testFactor++),
 			1.0f, });
 	}
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
+
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
+
+		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		//  Update the vertex buffer here.
+		auto& transforms = _pASF->getGlobalBoneTransforms();
+		memcpy(mappedResource.pData, transforms.data(), sizeof(DirectX::XMMATRIX) * transforms.size());
+		//  Reenable GPU access to the vertex buffer data.
+		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
+		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
+	}
 }
 
 void pa::MyApplication::OnRender()
@@ -73,7 +86,7 @@ void pa::MyApplication::OnRender()
 	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
 
 	_pCubeMesh->setVertexIndexBuffers(_deviceContext.Get());
-	_deviceContext->DrawIndexed(_pCubeMesh->getIndexCount(), 0, 0);
+	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), 31/*number of bones, hard coded, need fix*/, 0, 0, 0);
 
 	_swapChain->Present(1, 0);
 }
@@ -128,5 +141,15 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		bufferDesc.CPUAccessFlags = 0;
 		bufferDesc.MiscFlags = 0;
 		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_cameraConstantBuffer));
+	}
+	{
+		// Create mesh constant buffer
+		D3D11_BUFFER_DESC bufferDesc;
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.ByteWidth = sizeof(DirectX::XMFLOAT4X4) * 100;
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDesc.MiscFlags = 0;
+		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_meshConstantBuffer));
 	}
 }

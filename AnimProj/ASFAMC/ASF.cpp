@@ -12,12 +12,12 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 	std::unordered_map<std::string, XMMATRIX> parentTransforms;
 	parentTransforms["root"] = XMMatrixIdentity();
-	
+
 	_dfsBoneTransforms.resize(_dfsRoute.size());
 	{
-		XMMATRIX translation = 
-			XMMatrixScaling(_unitLength, _unitLength, _unitLength) *
-			XMMatrixTranslationFromVector(XMLoadFloat4(&_rootPosition));
+		XMMATRIX translation =
+			XMMatrixTranslationFromVector(
+				XMLoadFloat4(&_rootPosition) * XMVECTOR{ _unitLength, _unitLength, _unitLength, 0.0f });
 
 		XMMATRIX rotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
 		XMStoreFloat4x4(&_dfsBoneTransforms[0], rotation * translation);
@@ -34,9 +34,9 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 		// TODO
 		const float translationScale = _unitLength * bone.length;
-		XMMATRIX translation =
-			XMMatrixScaling(translationScale, translationScale, translationScale) *
-			XMMatrixTranslationFromVector(XMLoadFloat4(&bone.direction));
+		XMMATRIX translation = XMMatrixTranslationFromVector(
+			XMLoadFloat4(&bone.direction) * XMVECTOR{ translationScale, translationScale, translationScale, 0.0f }
+		);
 
 		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
 

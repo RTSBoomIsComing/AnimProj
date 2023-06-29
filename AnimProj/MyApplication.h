@@ -22,6 +22,7 @@ namespace pa
 		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
 
 		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
+		ComPtr<ID3D11Buffer>			_meshConstantBuffer;
 		ComPtr<ID3D11InputLayout>		_inputLayout;
 		ComPtr<ID3D11VertexShader>		_vertexShader;
 		ComPtr<ID3D11PixelShader>		_pixelShader;

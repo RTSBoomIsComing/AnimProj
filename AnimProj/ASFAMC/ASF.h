@@ -37,6 +37,7 @@ namespace pa
 		ASF(const wchar_t* filePath);
 
 		bool	loadFromFile(const wchar_t* filePath);
+		const std::vector<DirectX::XMFLOAT4X4> getGlobalBoneTransforms() const;
 
 	private:
 		void	parseUnits(std::ifstream& stream);
@@ -49,8 +50,6 @@ namespace pa
 		void	parseAxisOrder(std::ifstream& stream, Bone& bone);
 		void	parseAxis(std::ifstream& stream, Bone& bone);
 		void	parseDOF(std::ifstream& stream, Bone& bone);
-
-		const std::vector<DirectX::XMFLOAT4X4> getGlobalBoneTransforms() const;
 
 	private:
 		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, Bone::AxisOrder order);

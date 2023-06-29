@@ -22,12 +22,16 @@ struct VertexShaderOutput
 	float4 color	: COLOR;
 };
 
-VertexShaderOutput main(VertexShaderInput vsInput)
+VertexShaderOutput main(VertexShaderInput vsInput, uint instanceID : SV_InstanceID)
 {
 	VertexShaderOutput vsOut = (VertexShaderOutput)0;
 
+
 	const float4x4 matrixViewProjection = mul(Projection, View);
-	vsOut.position = mul(matrixViewProjection, vsInput.position);
+
+	vsOut.position = vsInput.position;
+	vsOut.position = mul(World[instanceID], vsOut.position);
+	vsOut.position = mul(matrixViewProjection, vsOut.position);
 
 	vsOut.color = vsInput.color;
 	return vsOut;
