@@ -100,6 +100,15 @@ void pa::MyApplication::OnRender()
 	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
 	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), _pASF->getGlobalBoneTransforms().size(), 0, 0, 0);
 
+	// Render bone connection 
+	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	_deviceContext->IASetIndexBuffer(_boneConnectionIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	UINT strides = 8;
+	UINT offsets = 0;
+	_deviceContext->IASetVertexBuffers(0, 1, _boneConnectionVertexBuffer.GetAddressOf(), &strides, &offsets);
+	_deviceContext->DrawIndexedInstanced(2, _boneConnectionIndices.size(), 0, 0, 0);
+
 	_swapChain->Present(1, 0);
 }
 
@@ -183,5 +192,46 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_meshConstantBuffer));
 	}
 
+	using namespace DirectX;
+	
+	{
+		XMVECTOR positions[] = {
+			0.0, 0.0, 0.0, 1.0, //0
+			0.0,  0.0, 0.0, 1.0, //1
+		};
+
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = sizeof(positions);
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA initData = {};
+		initData.pSysMem = positions;
+		initData.SysMemPitch = 0;
+		initData.SysMemSlicePitch = 0;
+
+		checkResult(_device->CreateBuffer(&bufferDesc, &initData, &_boneConnectionVertexBuffer));
+	}
+
+
+	{
+		// Supply the actual index data.
+
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = sizeof(std::uint32_t) * _boneConnectionIndices.size();
+		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA initData = {};
+		initData.pSysMem = _boneConnectionIndices.data();
+		initData.SysMemPitch = 0;
+		initData.SysMemSlicePitch = 0;
+
+		checkResult(_device->CreateBuffer(&bufferDesc, &initData, &_boneConnectionIndexBuffer));
+	}
 
 }
