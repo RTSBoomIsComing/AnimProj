@@ -14,7 +14,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 	parentTransforms["root"] = XMMatrixIdentity();
 
 	_dfsBoneTransforms.resize(_dfsRoute.size());
-	XMMATRIX rootRotation = EulerRotation(_boneData[0].axis, _boneData[0].axisOrder);
+	XMMATRIX rootRotation = EulerRotation(_boneData["root"].axis, _boneData["root"].axisOrder);
 	XMMATRIX rootRotationInverse = XMMatrixInverse(nullptr, rootRotation);
 	{
 		XMVECTOR vectorScale{ _unit.length, _unit.length, _unit.length, 0.0f };
@@ -28,10 +28,9 @@ pa::ASF::ASF(const wchar_t* filePath)
 	for (int i = 1; i < _dfsRoute.size(); i++)
 	{
 		const std::string& boneName = _dfsRoute[i];
-		const int boneIndex = _boneNameMap[boneName];
-		Bone& bone = _boneData[boneIndex];
+		Bone& bone = _boneData[boneName];
 
-		const std::string& parentName = _boneParentArray[boneIndex];
+		const std::string& parentName = _boneParentMap[boneName];
 		const XMMATRIX& parentTransform = parentTransforms[parentName];
 
 		const float vectorScaleFactor = _unit.length * bone.length;
@@ -99,98 +98,82 @@ void pa::ASF::parseUnits(std::ifstream& stream)
 
 void pa::ASF::parseRoot(std::ifstream& stream)
 {
-	_boneData.emplace_back();
-	_boneData.back().name = "root";
-	_boneNameMap["root"] = 0;
-
-	std::string buffer;
-	for (int i = 0; i < 4; i++)
+	Bone bone = {};
+	bone.name = "root";
+	
+	while (stream && stream.peek() != static_cast<int>(':'))
 	{
-		stream >> buffer;
+		std::string line;
+		std::getline(stream, line);
+		std::istringstream subStream{ line };
+		
+		std::string buffer;
+		subStream >> buffer;
+
 		if (0 == buffer.compare("order"))
-			parseAMCRootDataOrder(stream);
+			parseAMCRootDataOrder(subStream);
+	
+		else if (0 == buffer.compare("axis"))
+			subStream >> bone.axisOrder;
+	
+		else if (0 == buffer.compare("position"))
+			subStream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
 
-		if (0 == buffer.compare("axis"))
-			parseAxisOrder(stream, _boneData[0]);
-
-		if (0 == buffer.compare("position"))
-			parseRootPosition(stream);
-
-		if (0 == buffer.compare("orientation"))
-			parseAxis(stream, _boneData[0]);
+		else if (0 == buffer.compare("orientation"))
+			subStream >> bone.axis.x >> bone.axis.y >> bone.axis.z;
+	
 	}
+
+	_boneData["root"] = bone;
 }
 
 void pa::ASF::parseBoneData(std::ifstream& stream)
 {
-	std::string buffer;
-	while (stream)
+	
+	while (stream && stream.peek() != static_cast<int>(':'))
 	{
-		auto rollBackPosition = stream.tellg();
+		std::string buffer;
 		stream >> buffer;
-		if (0 == buffer.compare("begin"))
-		{
-			int boneIndex = static_cast<int>(_boneData.size());
-			_boneData.emplace_back();
-			parseEachBone(stream, boneIndex);
-		}
-		else
-		{
-			stream.seekg(rollBackPosition);
-			stream.seekg(-1, std::ios::cur);
+		if (0 != buffer.compare("begin"))
 			break;
-		}
-	}
 
-}
-
-void pa::ASF::parseEachBone(std::ifstream& stream, int boneIndex)
-{
-	Bone& bone = _boneData[boneIndex];
-
-	std::string buffer;
-	while (stream)
-	{
-		stream >> buffer;
-
-		if (buffer.find("name") != std::string::npos)
+		Bone bone = {};
+		while (stream)
 		{
-			stream >> bone.name;
-			_boneNameMap[bone.name] = boneIndex;
+			std::string line;
+			getline(stream, line);
+			std::istringstream subStream{ line };
+
+			std::string keyword;
+			subStream >> keyword;
+			if (0 == keyword.compare("id"))
+				subStream >> bone.id;
+
+			else if (0 == keyword.compare("name"))
+				subStream >> bone.name;
+
+			else if (0 == keyword.compare("direction"))
+				subStream >> bone.direction.x >> bone.direction.y >> bone.direction.z;
+
+			else if (0 == keyword.compare("length"))
+				subStream >> bone.length;
+
+			else if (0 == keyword.compare("axis"))
+				subStream >> bone.axis.x >> bone.axis.y >> bone.axis.z >> bone.axisOrder;
+
+			else if (0 == keyword.compare("dof"))
+				parseDOF(subStream, bone);
+
+			else if (0 == keyword.compare("end"))
+				break;
 		}
 
-		if (buffer.find("direction") != std::string::npos)
-		{
-			float direction[4] = {};
-			for (int i = 0; i < 3; i++)
-			{
-				stream >> direction[i];
-			}
-			bone.direction = DirectX::XMFLOAT4{ direction };
-		}
-
-		if (buffer.find("length") != std::string::npos)
-			stream >> bone.length;
-
-		if (buffer.find("axis") != std::string::npos)
-		{
-			parseAxis(stream, bone);
-			parseAxisOrder(stream, bone);
-		}
-
-		if (buffer.find("dof") != std::string::npos)
-		{
-			parseDOF(stream, bone);
-		}
-
-		if (buffer.find("end") != std::string::npos)
-			break;
+		_boneData[bone.name] = bone;
 	}
 }
 
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
-	_boneParentArray.resize(_boneData.size());
 	_dfsRoute.reserve(_boneData.size());
 	_dfsRoute.emplace_back("root");
 
@@ -215,7 +198,7 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 				lineStream >> childBoneName;
 				if (childBoneName.empty())
 					break;
-				_boneParentArray[_boneNameMap[childBoneName]] = parentBoneName;
+				_boneParentMap[childBoneName] = parentBoneName;
 				_dfsRoute.push_back(childBoneName);
 			}
 		}
@@ -223,77 +206,53 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 
 }
 
-void pa::ASF::parseAMCRootDataOrder(std::ifstream& stream)
+void pa::ASF::parseAMCRootDataOrder(std::istringstream& stream)
 {
-	std::string buffer;
+	
 	for (int i = 0; i < 6; i++)
 	{
+		std::string buffer;
 		stream >> buffer;
 		if (0 == buffer.compare("TX"))
+		{
 			_rootOrder[0] = Bone::DOF::TX;
+			continue;
+		}
 
 		if (0 == buffer.compare("TY"))
+		{
 			_rootOrder[1] = Bone::DOF::TY;
+			continue;
+		}
 
 		if (0 == buffer.compare("TZ"))
+		{
 			_rootOrder[2] = Bone::DOF::TZ;
+			continue;
+		}
 
 		if (0 == buffer.compare("RX"))
+		{
 			_rootOrder[3] = Bone::DOF::RX;
+			continue;
+		}
 
 		if (0 == buffer.compare("RY"))
+		{
 			_rootOrder[4] = Bone::DOF::RY;
+			continue;
+		}
 
 		if (0 == buffer.compare("RZ"))
+		{
 			_rootOrder[5] = Bone::DOF::RZ;
+			continue;
+		}
 	}
 
 }
 
-void pa::ASF::parseAxisOrder(std::ifstream& stream, Bone& bone)
-{
-	std::string buffer;
-	stream >> buffer;
-	if (0 == buffer.compare("XYZ"))
-		bone.axisOrder = Bone::AxisOrder::XYZ;
-
-	if (0 == buffer.compare("XZY"))
-		bone.axisOrder = Bone::AxisOrder::XZY;
-
-	if (0 == buffer.compare("YZX"))
-		bone.axisOrder = Bone::AxisOrder::YZX;
-
-	if (0 == buffer.compare("YXZ"))
-		bone.axisOrder = Bone::AxisOrder::YXZ;
-
-	if (0 == buffer.compare("ZXY"))
-		bone.axisOrder = Bone::AxisOrder::ZXY;
-
-	if (0 == buffer.compare("ZYX"))
-		bone.axisOrder = Bone::AxisOrder::ZYX;
-}
-
-void pa::ASF::parseRootPosition(std::ifstream& stream)
-{
-	float position[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	for (int i = 0; i < 3; i++)
-	{
-		stream >> position[i];
-	}
-	_rootPosition = DirectX::XMFLOAT4{ position };
-}
-
-void pa::ASF::parseAxis(std::ifstream& stream, Bone& bone)
-{
-	float axis[4] = { 0.0f, 0.0f, 0.0f, 0.0f/*not used*/ };
-	for (int i = 0; i < 3; i++)
-	{
-		stream >> axis[i];
-	}
-	bone.axis = DirectX::XMFLOAT4{ axis };
-}
-
-void pa::ASF::parseDOF(std::ifstream& stream, Bone& bone)
+void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 {
 	std::string buffer;
 	int dofId = 0;
@@ -326,7 +285,7 @@ const std::vector<DirectX::XMFLOAT4X4> pa::ASF::getGlobalBoneTransforms() const
 	return _dfsBoneTransforms;
 }
 
-DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, Bone::AxisOrder order)
+DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)
 {
 	using namespace DirectX;
 	// Use row major matrix
@@ -335,27 +294,19 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, Bone::Ax
 	const XMMATRIX rotationZ = XMMatrixRotationX(axis.z * _unit.angle);
 
 	XMMATRIX result = {};
-	switch (order)
-	{
-	case Bone::AxisOrder::XYZ:
+	
+	if (0 == order.compare("XYZ"))
 		result = rotationX * rotationY * rotationZ;
-		break;
-	case Bone::AxisOrder::XZY:
+	else if (0 == order.compare("XZY"))
 		result = rotationX * rotationZ * rotationY;
-		break;
-	case Bone::AxisOrder::YZX:
+	else if (0 == order.compare("YZX"))
 		result = rotationY * rotationZ * rotationX;
-		break;
-	case Bone::AxisOrder::YXZ:
+	else if (0 == order.compare("YXZ"))
 		result = rotationY * rotationX * rotationZ;
-		break;
-	case Bone::AxisOrder::ZXY:
+	else if (0 == order.compare("ZXY"))
 		result = rotationZ * rotationX * rotationY;
-		break;
-	case Bone::AxisOrder::ZYX:
+	else if (0 == order.compare("ZYX"))
 		result = rotationZ * rotationY * rotationX;
-		break;
-	}
 
 	return result;
 }

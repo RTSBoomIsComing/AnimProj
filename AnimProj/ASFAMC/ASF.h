@@ -4,22 +4,19 @@ namespace pa
 {
 	struct Bone
 	{
-		enum class AxisOrder : std::uint8_t
-		{
-			XYZ, XZY, YZX, YXZ, ZXY, ZYX,
-		};
-
 		enum class DOF : std::uint8_t
 		{
 			RX, RY, RZ, LN /* length */,
 			TX, TY, TZ, None
 		};
 
+		int					id = 0;
+		std::string			name;
+
 		DirectX::XMFLOAT4	axis = {};
 		DirectX::XMFLOAT4	direction = {};
-		std::string			name;
 		float				length = 0.0f;
-		AxisOrder			axisOrder = AxisOrder::XYZ;
+		char				axisOrder[4] = {}; // XYZ with \0
 		DOF					dof[4] = { DOF::None, DOF::None, DOF::None, DOF::None };
 	};
 
@@ -38,15 +35,11 @@ namespace pa
 		void	parseRoot(std::ifstream& stream);
 		void	parseBoneData(std::ifstream& stream);
 		void	parseHierarchy(std::ifstream& stream);
-		void	parseAMCRootDataOrder(std::ifstream& stream);
-		void	parseRootPosition(std::ifstream& stream);
-		void	parseEachBone(std::ifstream& stream, int boneIndex);
-		void	parseAxisOrder(std::ifstream& stream, Bone& bone);
-		void	parseAxis(std::ifstream& stream, Bone& bone);
-		void	parseDOF(std::ifstream& stream, Bone& bone);
+		void	parseAMCRootDataOrder(std::istringstream& stream);
+		void	parseDOF(std::istringstream& stream, Bone& bone);
 
 	private:
-		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, Bone::AxisOrder order);
+		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order);
 
 	private:
 		struct Unit
@@ -56,13 +49,13 @@ namespace pa
 			float	angle = 1.0f;
 		} _unit;
 
-		std::vector<Bone>	_boneData;	// Root is also treated as bone.
+		//std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
 		Bone::DOF			_rootOrder[6];
 		DirectX::XMFLOAT4	_rootPosition;
 
-		std::unordered_map<std::string, int>	_boneNameMap;
-		std::vector<std::string>				_boneParentArray;
+		std::unordered_map<std::string, Bone>	_boneData;
+		std::unordered_map<std::string, std::string> _boneParentMap;
 
 		std::vector<std::string>				_dfsRoute;
 		std::vector<DirectX::XMFLOAT4X4>		_dfsBoneTransforms;
