@@ -63,6 +63,8 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 {
 	std::cout << "Parse Root\n";
 	_boneData.emplace_back();
+	_boneData.back().name = "root";
+	_boneNameMap["root"] = 0;
 
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
@@ -91,8 +93,9 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 		stream >> buffer;
 		if (buffer.find("begin") != std::string::npos)
 		{
+			int boneIndex = static_cast<int>(_boneData.size());
 			_boneData.emplace_back();
-			parseEachBone(stream, _boneData.back());
+			parseEachBone(stream, boneIndex);
 		}
 		else
 		{
@@ -103,9 +106,11 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 
 }
 
-void pa::ASF::parseEachBone(std::ifstream& stream, Bone& bone)
+void pa::ASF::parseEachBone(std::ifstream& stream, int boneIndex)
 {
 	std::cout << "\t\tPars Each Bone\n";
+	Bone bone = _boneData[boneIndex];
+
 	std::string buffer;
 	while (stream)
 	{
@@ -114,6 +119,7 @@ void pa::ASF::parseEachBone(std::ifstream& stream, Bone& bone)
 		if (buffer.find("name") != std::string::npos)
 		{
 			stream >> bone.name;
+			_boneNameMap[bone.name] = boneIndex;
 		}
 
 		if (buffer.find("direction") != std::string::npos)
@@ -148,6 +154,9 @@ void pa::ASF::parseEachBone(std::ifstream& stream, Bone& bone)
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
 	std::cout << "Parse Hierarchy\n";
+	// TODO
+
+
 }
 
 void pa::ASF::parseAMCRootDataOrder(std::ifstream& stream)

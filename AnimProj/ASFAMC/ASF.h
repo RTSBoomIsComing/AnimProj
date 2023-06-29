@@ -42,10 +42,10 @@ namespace pa
 		void	parseUnits(std::ifstream& stream);
 		void	parseRoot(std::ifstream& stream);
 		void	parseBoneData(std::ifstream& stream);
-		void	parseEachBone(std::ifstream& stream, Bone& bone);
 		void	parseHierarchy(std::ifstream& stream);
 		void	parseAMCRootDataOrder(std::ifstream& stream);
 		void	parseRootPosition(std::ifstream& stream);
+		void	parseEachBone(std::ifstream& stream, int boneIndex);
 		void	parseAxisOrder(std::ifstream& stream, Bone& bone);
 		void	parseAxis(std::ifstream& stream, Bone& bone);
 		void	parseDOF(std::ifstream& stream, Bone& bone);
@@ -58,6 +58,10 @@ namespace pa
 
 		Bone::DOF			_rootOrder[6];
 		DirectX::XMFLOAT4	_rootPosition;
+
+		std::unordered_map<std::string, int> _boneNameMap;
+
+
 	};
 }
 
