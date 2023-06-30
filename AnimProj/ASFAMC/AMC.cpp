@@ -15,8 +15,10 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 	if (stream.fail())
 		return false;
 
+	// boneCount will be provided by Skeleton
+	// int boneCount;
+
 	int frameCount = 0;
-	int boneCount = 0;
 	char line[200] = {};
 	char boneName[100] = {};
 	while (stream.getline(line, sizeof(line), '\n'))
@@ -35,20 +37,17 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 
 		std::stringstream subStream{ line };
 
-		subStream.getline(boneName, sizeof(boneName), ' ');
-		boneCount++;
+		subStream >> boneName;
 		// TODO
-		std::cout << boneName << std::endl;
+		//std::cout << boneName << std::endl;
 
-		char buffer[50] = {};
-		while (subStream.getline(buffer, sizeof(buffer), ' '))
+		float buffer;
+		while (subStream >> buffer)
 		{
 			// TODO
-			//std::cout << line << std::endl;
+			//std::cout << buffer << std::endl;
 		}
 	}
-
-	boneCount /= frameCount;
 
 	return true;
 }
