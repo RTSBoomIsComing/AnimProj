@@ -8,8 +8,6 @@ pa::Win32Framework::Win32Framework(Win32Application* pApplication)
 	::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApplication));
 	::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 	::ShowWindow(hWnd, SW_SHOWDEFAULT);
-	//::RedrawWindow(hWnd, nullptr, NULL, RDW_INVALIDATE);
-	//::UpdateWindow(hWnd);
 }
 
 int pa::Win32Framework::Run() noexcept

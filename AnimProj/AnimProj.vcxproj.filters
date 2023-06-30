@@ -45,6 +45,9 @@
     <ClInclude Include="ASFAMC\AMC.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Skeleton.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\Win32Application.cpp">
@@ -78,6 +81,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ASFAMC\AMC.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Skeleton.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

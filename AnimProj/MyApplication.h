@@ -8,6 +8,7 @@ namespace pa
 	class Camera;
 	class Mesh;
 	class ASF;
+	class AMC;
 
 	class MyApplication : public Win32Application, public D3D11Application
 	{
@@ -40,6 +41,7 @@ namespace pa
 		Camera* _pCamera;
 		Mesh* _pCubeMesh;
 		ASF* _pASF;
+		AMC* _pAMC;
 		std::vector<std::uint32_t> _boneConnectionIndices;
 
 		bool keyState[4] = {};

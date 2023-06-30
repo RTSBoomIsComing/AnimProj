@@ -4,14 +4,10 @@
 
 pa::ASF::ASF(const wchar_t* filePath)
 {
-	if (false == loadFromFile(filePath))
+	if (loadFromFile(filePath) != true)
 		DebugBreak();
 
 	using namespace DirectX;
-
-
-	std::unordered_map<std::string, XMMATRIX> parentTransforms;
-	parentTransforms["root"] = XMMatrixIdentity();
 
 	_dfsBoneTransforms.resize(_dfsRoute.size());
 	XMMATRIX rootRotation = EulerRotation(_boneData["root"].axis, _boneData["root"].axisOrder);
@@ -25,25 +21,30 @@ pa::ASF::ASF(const wchar_t* filePath)
 		XMStoreFloat4x4(&_dfsBoneTransforms[0], rootRotation * translation);
 	}
 
+	std::unordered_map<std::string, XMMATRIX> globalTransformsbyName;
+	globalTransformsbyName["root"] = XMMatrixIdentity();
+
 	for (int i = 1; i < _dfsRoute.size(); i++)
 	{
 		const std::string& boneName = _dfsRoute[i];
 		Bone& bone = _boneData[boneName];
 
-		const std::string& parentName = _boneParentMap[boneName];
-		const XMMATRIX& parentTransform = parentTransforms[parentName];
+		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
+		XMMATRIX rotationInverse = XMMatrixInverse(nullptr, rotation);
 
 		const float vectorScaleFactor = _unit.length * bone.length;
 		XMVECTOR vectorScale{ vectorScaleFactor, vectorScaleFactor, vectorScaleFactor, 0.0f };
-
-		XMMATRIX translation = XMMatrixTranslationFromVector(
-			XMLoadFloat4(&bone.direction) * vectorScale);
-
-		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
-
+		XMVECTOR scaledDirection =
+			XMVector4Transform(XMLoadFloat4(&bone.direction), rotationInverse) * vectorScale;
+		XMMATRIX translation = XMMatrixTranslationFromVector(XMVector4Transform(scaledDirection, rotation));
 		XMMATRIX boneLocalTransform = rootRotationInverse * rotation * rootRotation * translation;
-		XMMATRIX boneGobalTransfrom = boneLocalTransform * parentTransform;
-		parentTransforms[boneName] = boneGobalTransfrom;
+
+
+		const std::string& parentName = _boneParentMap[boneName];
+		const XMMATRIX& parentGlobalTransform = globalTransformsbyName[parentName];
+
+		XMMATRIX boneGobalTransfrom = boneLocalTransform * parentGlobalTransform;
+		globalTransformsbyName[boneName] = boneGobalTransfrom;
 		XMStoreFloat4x4(&_dfsBoneTransforms[i], boneGobalTransfrom);
 	}
 }
@@ -54,9 +55,9 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 	if (false == stream.is_open())
 		return false;
 
-	std::string line;
 	while (stream)
 	{
+		std::string line;
 		std::getline(stream, line);
 
 		if (0 == line.compare(":units"))
@@ -324,7 +325,7 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const st
 	else if (0 == order.compare("ZYX"))
 		result = rotationZ * rotationY * rotationX;
 
-	return XMMatrixIdentity();
-	//return result;
+	return result;
+	//return XMMatrixIdentity();
 	//return XMMatrixInverse(nullptr, result);
 }
