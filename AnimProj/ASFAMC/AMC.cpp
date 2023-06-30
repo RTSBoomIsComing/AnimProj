@@ -15,9 +15,10 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 	if (stream.fail())
 		return false;
 
+	int frameCount = 0;
+	int boneCount = 0;
 	char line[200] = {};
 	char boneName[100] = {};
-
 	while (stream.getline(line, sizeof(line), '\n'))
 	{
 		if ('#' == line[0])
@@ -27,11 +28,15 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 			continue;
 
 		if (std::isdigit(line[0]))
+		{
+			frameCount++;
 			continue;	// start motion data by frame
+		}
 
 		std::stringstream subStream{ line };
 
 		subStream.getline(boneName, sizeof(boneName), ' ');
+		boneCount++;
 		// TODO
 		std::cout << boneName << std::endl;
 
@@ -42,6 +47,8 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 			//std::cout << line << std::endl;
 		}
 	}
+
+	boneCount /= frameCount;
 
 	return true;
 }
