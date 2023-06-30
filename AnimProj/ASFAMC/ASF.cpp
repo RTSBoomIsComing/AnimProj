@@ -52,7 +52,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 bool pa::ASF::loadFromFile(const wchar_t* filePath)
 {
 	std::ifstream stream{ filePath };
-	if (false == stream.is_open())
+	if (stream.fail())
 		return false;
 
 	while (stream)

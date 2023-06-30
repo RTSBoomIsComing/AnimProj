@@ -12,32 +12,34 @@ pa::AMC::AMC(const wchar_t* filePath)
 bool pa::AMC::loadFromFile(const wchar_t* filePath)
 {
 	std::ifstream stream{ filePath };
-	if (stream.is_open() != true)
+	if (stream.fail())
 		return false;
 
-	while (stream)
+	char line[200] = {};
+	char boneName[100] = {};
+
+	while (stream.getline(line, sizeof(line), '\n'))
 	{
-		std::string line;
-		std::getline(stream, line);
-		if (std::isdigit(stream.peek()))
+		if ('#' == line[0])
+			continue;
+
+		if (':' == line[0])
+			continue;
+
+		if (std::isdigit(line[0]))
+			continue;	// start motion data by frame
+
+		std::stringstream subStream{ line };
+
+		subStream.getline(boneName, sizeof(boneName), ' ');
+		// TODO
+		std::cout << boneName << std::endl;
+
+		char buffer[50] = {};
+		while (subStream.getline(buffer, sizeof(buffer), ' '))
 		{
-			std::string line;
-			std::getline(stream, line); // Discard frameIndex
-			while (stream && std::isdigit(stream.peek()) != true)
-			{
-				std::getline(stream, line);
-
-				std::istringstream subStream{ line };
-
-				std::string boneName;
-				subStream >> boneName;
-				std::cout << boneName << std::endl;
-				float val{};
-				while (subStream >> val)
-				{
-					//std::cout << val << std::endl;
-				}
-			}
+			// TODO
+			//std::cout << line << std::endl;
 		}
 	}
 
