@@ -10,7 +10,7 @@ bool pa::checkResult(HRESULT result)
 		_com_error error(result);
 		LPCTSTR errorMessage = error.ErrorMessage();
 		::OutputDebugString(errorMessage);
-		exit(-1);
+		DebugBreak();
 		return false;
 	}
 	return true;

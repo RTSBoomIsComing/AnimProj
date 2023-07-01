@@ -1,7 +1,6 @@
 // author: Changwan Yu
 #pragma once
 #include "App/Win32Application.h"
-#include "App/D3D11Application.h"
 
 namespace pa
 {
@@ -10,7 +9,7 @@ namespace pa
 	class ASF;
 	class AMC;
 
-	class MyApplication : public Win32Application, public D3D11Application
+	class MyApplication : public Win32Application
 	{
 	public:
 		MyApplication();
@@ -19,6 +18,18 @@ namespace pa
 		virtual void OnRender(void) override;
 		virtual void OnKeyDown(UINT8 key) override;
 		virtual void OnKeyUp(UINT8 key) override;
+
+	protected:
+		ComPtr<ID3D11Device>				_device;
+		ComPtr<ID3D11DeviceContext>			_deviceContext;
+		ComPtr<IDXGISwapChain>				_swapChain;
+		ComPtr<ID3D11RenderTargetView>		_renderTargetView;
+		ComPtr<ID3D11DepthStencilView>		_depthStencilView;
+		ComPtr<ID3D11DepthStencilState>		_depthStencilState;
+		D3D11_VIEWPORT						_viewport;
+
+	private:
+		void initialize(HWND hWnd);
 
 
 	private:

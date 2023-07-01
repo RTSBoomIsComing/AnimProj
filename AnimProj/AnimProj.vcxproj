@@ -89,7 +89,6 @@
     <ClInclude Include="ASFAMC\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
-    <ClInclude Include="app\D3D11Application.h" />
     <ClInclude Include="ASFAMC\ASF.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
@@ -102,7 +101,6 @@
     <ClCompile Include="ASFAMC\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />
-    <ClCompile Include="app\D3D11Application.cpp" />
     <ClCompile Include="ASFAMC\ASF.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
