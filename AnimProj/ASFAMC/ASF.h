@@ -36,7 +36,6 @@ namespace pa
 		void	parseRoot(std::ifstream& stream);
 		void	parseBoneData(std::ifstream& stream);
 		void	parseHierarchy(std::ifstream& stream);
-		void	parseAMCRootDataOrder(std::istream& stream);
 		void	parseDOF(std::istringstream& stream, Bone& bone);
 
 	private:
@@ -52,7 +51,7 @@ namespace pa
 
 		//std::vector<Bone>	_boneData;	// Root is also treated as bone.
 
-		Bone::DOF			_rootOrder[6];
+		char				_rootOrders[6][3];
 		DirectX::XMFLOAT4	_rootPosition;
 
 		std::unordered_map<std::string, Bone>	_boneData;

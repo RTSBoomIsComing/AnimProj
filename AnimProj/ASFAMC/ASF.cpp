@@ -65,16 +65,21 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 	while (std::getline(stream, line))
 	{
 		if (0 == line.compare(":units"))
+		{
 			parseUnits(stream);
-
+		}
 		else if (0 == line.compare(":root"))
+		{
 			parseRoot(stream);
-
+		}
 		else if (0 == line.compare(":bonedata"))
+		{
 			parseBoneData(stream);
-
+		}
 		else if (0 == line.compare(":hierarchy"))
+		{
 			parseHierarchy(stream);
+		}
 	}
 
 	return true;
@@ -108,51 +113,47 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 	Bone bone = {};
 	bone.name = "root";
 
-	//std::string line;
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
 	{
-		//std::getline(stream, line);
-		//std::istringstream subStream(line);
-
-		//subStream >> buffer;
 		stream >> buffer;
-		stream.ignore();
-
 		if (0 == buffer.compare("order"))
 		{
-			parseAMCRootDataOrder(stream);
+			for (int j = 0; j < 6; j++)
+			{
+				stream >> _rootOrders[j];
+			}
 		}
-
 		else if (0 == buffer.compare("axis"))
 		{
 			stream >> bone.axisOrder;
-			stream.ignore();
 		}
-
 		else if (0 == buffer.compare("position"))
 		{
 			stream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
-			stream.ignore();
 		}
-
 		else if (0 == buffer.compare("orientation"))
 		{
 			stream >> bone.axis.x >> bone.axis.y >> bone.axis.z;
-			stream.ignore();
 		}
-
 	}
+
+	stream.ignore();
 
 	_boneData["root"] = bone;
 }
 
 void pa::ASF::parseBoneData(std::ifstream& stream)
 {
-
-	while (stream && stream.peek() != static_cast<int>(':'))
+	std::string buffer;
+	while (stream && stream.peek() != ':')
 	{
-		std::string buffer;
+		if (stream.peek() == ' ' || stream.peek() == '\n' || stream.peek() == '\t')
+		{
+			stream.ignore();
+			continue;
+		}
+
 		std::getline(stream, buffer);
 		if (buffer.find("begin") == std::string::npos)
 			break;
@@ -167,23 +168,29 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			std::string keyword;
 			subStream >> keyword;
 			if (0 == keyword.compare("id"))
+			{
 				subStream >> bone.id;
-
+			}
 			else if (0 == keyword.compare("name"))
+			{
 				subStream >> bone.name;
-
+			}
 			else if (0 == keyword.compare("direction"))
+			{
 				subStream >> bone.direction.x >> bone.direction.y >> bone.direction.z;
-
+			}
 			else if (0 == keyword.compare("length"))
+			{
 				subStream >> bone.length;
-
+			}
 			else if (0 == keyword.compare("axis"))
+			{
 				subStream >> bone.axis.x >> bone.axis.y >> bone.axis.z >> bone.axisOrder;
-
+			}
 			else if (0 == keyword.compare("dof"))
+			{
 				parseDOF(subStream, bone);
-
+			}
 			else if (0 == keyword.compare("end"))
 				break;
 		}
@@ -223,52 +230,6 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 				_dfsNameMap[childBoneName] = static_cast<int>(_dfsRoute.size());
 				_dfsRoute.push_back(childBoneName);
 			}
-		}
-	}
-
-}
-
-void pa::ASF::parseAMCRootDataOrder(std::istream& stream)
-{
-
-	for (int i = 0; i < 6; i++)
-	{
-		std::string buffer;
-		stream >> buffer;
-		if (0 == buffer.compare("TX"))
-		{
-			_rootOrder[0] = Bone::DOF::TX;
-			continue;
-		}
-
-		if (0 == buffer.compare("TY"))
-		{
-			_rootOrder[1] = Bone::DOF::TY;
-			continue;
-		}
-
-		if (0 == buffer.compare("TZ"))
-		{
-			_rootOrder[2] = Bone::DOF::TZ;
-			continue;
-		}
-
-		if (0 == buffer.compare("RX"))
-		{
-			_rootOrder[3] = Bone::DOF::RX;
-			continue;
-		}
-
-		if (0 == buffer.compare("RY"))
-		{
-			_rootOrder[4] = Bone::DOF::RY;
-			continue;
-		}
-
-		if (0 == buffer.compare("RZ"))
-		{
-			_rootOrder[5] = Bone::DOF::RZ;
-			continue;
 		}
 	}
 
