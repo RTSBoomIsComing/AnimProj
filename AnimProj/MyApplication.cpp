@@ -106,7 +106,9 @@ void pa::MyApplication::OnRender()
 	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
 
 	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
-	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), _pASF->getGlobalBoneTransforms().size(), 0, 0, 0);
+
+	UINT instanceCount = static_cast<UINT>(_pASF->getGlobalBoneTransforms().size());
+	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), instanceCount, 0, 0, 0);
 
 	// Render bone connection 
 	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -139,14 +141,13 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
-{
+{	
 	{
+		std::wstring csoFilePath = _OUTDIR;
+		csoFilePath.append(L"BasicVertexShader.cso");
+
 		ComPtr<ID3DBlob> vertexShaderBlob;
-#if defined(DEBUG) || defined(_DEBUG)
-		checkResult(D3DReadFileToBlob(L"../X64/Debug/BasicVertexShader.cso", &vertexShaderBlob));
-#else
-		checkResult(D3DReadFileToBlob(L"../X64/Release/BasicVertexShader.cso", &vertexShaderBlob));
-#endif
+		checkResult(D3DReadFileToBlob(csoFilePath.c_str(), &vertexShaderBlob));
 		checkResult(_device->CreateVertexShader(
 			vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), nullptr, &_vertexShader));
 
@@ -161,12 +162,11 @@ void pa::MyApplication::initializeGraphicsPipeline()
 }
 
 	{
+		std::wstring csoFilePath = _OUTDIR;
+		csoFilePath.append(L"BasicPixelShader.cso");
+
 		ComPtr<ID3DBlob> pixelShaderBlob;
-#if defined(DEBUG) || defined(_DEBUG)
-		checkResult(D3DReadFileToBlob(L"../X64/Debug/BasicPixelShader.cso", &pixelShaderBlob));
-#else
-		checkResult(D3DReadFileToBlob(L"../X64/Release/BasicPixelShader.cso", &pixelShaderBlob));
-#endif
+		checkResult(D3DReadFileToBlob(csoFilePath.c_str(), &pixelShaderBlob));
 		checkResult(_device->CreatePixelShader(
 			pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), nullptr, &_pixelShader));
 	}
