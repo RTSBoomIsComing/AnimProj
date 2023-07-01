@@ -30,9 +30,6 @@ namespace pa
 
 	private:
 		void initialize(HWND hWnd);
-
-
-	private:
 		void initializeGraphicsPipeline();
 
 	private:
@@ -49,11 +46,11 @@ namespace pa
 		ComPtr<ID3D11Buffer>			_boneConnectionIndexBuffer;
 		ComPtr<ID3D11Buffer>			_boneConnectionVertexBuffer;
 
-		Camera* _pCamera;
-		Mesh* _pCubeMesh;
-		ASF* _pASF;
-		AMC* _pAMC;
-		std::vector<std::uint32_t> _boneConnectionIndices;
+		Camera*							_pCamera;
+		Mesh*							_pCubeMesh;
+		ASF*							_pASF;
+		AMC*							_pAMC;
+		std::vector<std::uint32_t>		_boneConnectionIndices;
 
 		bool keyState[4] = {};
 	};

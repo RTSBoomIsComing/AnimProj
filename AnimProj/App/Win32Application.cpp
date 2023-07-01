@@ -39,7 +39,7 @@ pa::Win32Application::~Win32Application()
     ::UnregisterClassW(WindowClassName, GetModuleHandle(NULL));
 }
 
-HWND pa::Win32Application::GetHwnd() const
+HWND pa::Win32Application::getHwnd() const
 {
     return _hWnd;
 }

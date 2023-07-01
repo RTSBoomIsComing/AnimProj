@@ -7,24 +7,23 @@
 #include "ASFAMC/AMC.h"
 
 pa::MyApplication::MyApplication()
-	: Win32Application()
 {
 	using namespace DirectX;
 
-	initialize(GetHwnd());
+	initialize(getHwnd());
 
-	_pCamera = new Camera{};
+	_pCamera = new Camera();
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 
-	_pASF = new ASF{ asfFilePath.c_str() };
+	_pASF = new ASF(asfFilePath.c_str());
 	_boneConnectionIndices =_pASF->getBoneConnections();
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	_pAMC = new AMC{ amcFilePath.c_str() };
+	_pAMC = new AMC(amcFilePath.c_str());
 
 	initializeGraphicsPipeline();
 }
@@ -39,6 +38,9 @@ pa::MyApplication::~MyApplication()
 
 	if (nullptr != _pASF)
 		delete _pASF;
+
+	if (nullptr != _pAMC)
+		delete _pAMC;
 }
 
 void pa::MyApplication::OnUpdate()

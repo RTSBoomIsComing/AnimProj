@@ -14,7 +14,7 @@ namespace pa
 		virtual void OnKeyDown(UINT8 key) abstract;
 		virtual void OnKeyUp(UINT8 key) abstract;
 
-		HWND	GetHwnd()	const;
+		HWND	getHwnd()	const;
 		int		getWidth()	const;
 		int		getHeight()	const;
 
