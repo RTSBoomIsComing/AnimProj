@@ -108,26 +108,39 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 	Bone bone = {};
 	bone.name = "root";
 
-	std::string line;
-	while (stream && stream.peek() != ':')
+	//std::string line;
+	std::string buffer;
+	for (int i = 0; i < 4; i++)
 	{
-		std::getline(stream, line);
-		std::istringstream subStream(line);
+		//std::getline(stream, line);
+		//std::istringstream subStream(line);
 
-		std::string buffer;
-		subStream >> buffer;
+		//subStream >> buffer;
+		stream >> buffer;
+		stream.ignore();
 
 		if (0 == buffer.compare("order"))
-			parseAMCRootDataOrder(subStream);
+		{
+			parseAMCRootDataOrder(stream);
+		}
 
 		else if (0 == buffer.compare("axis"))
-			subStream >> bone.axisOrder;
+		{
+			stream >> bone.axisOrder;
+			stream.ignore();
+		}
 
 		else if (0 == buffer.compare("position"))
-			subStream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
+		{
+			stream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
+			stream.ignore();
+		}
 
 		else if (0 == buffer.compare("orientation"))
-			subStream >> bone.axis.x >> bone.axis.y >> bone.axis.z;
+		{
+			stream >> bone.axis.x >> bone.axis.y >> bone.axis.z;
+			stream.ignore();
+		}
 
 	}
 
@@ -215,7 +228,7 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 
 }
 
-void pa::ASF::parseAMCRootDataOrder(std::istringstream& stream)
+void pa::ASF::parseAMCRootDataOrder(std::istream& stream)
 {
 
 	for (int i = 0; i < 6; i++)

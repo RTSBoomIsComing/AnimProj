@@ -36,7 +36,7 @@ namespace pa
 		void	parseRoot(std::ifstream& stream);
 		void	parseBoneData(std::ifstream& stream);
 		void	parseHierarchy(std::ifstream& stream);
-		void	parseAMCRootDataOrder(std::istringstream& stream);
+		void	parseAMCRootDataOrder(std::istream& stream);
 		void	parseDOF(std::istringstream& stream, Bone& bone);
 
 	private:
