@@ -236,9 +236,8 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 	{
 		while (stream)
 		{
-			std::string lineBuffer;
-			std::getline(stream, lineBuffer);
-			std::stringstream lineStream{ lineBuffer };
+			std::getline(stream, buffer);
+			std::stringstream lineStream(buffer);
 
 			lineStream >> buffer;
 			if (0 == buffer.compare("end"))

@@ -35,17 +35,18 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 			continue;	// start motion data by frame
 		}
 
-		std::stringstream subStream{ line };
+		std::stringstream subStream(line);
 
+		// the motion data order of each frame is same
+		// so when read data of first frame, get the names of the bones
 		subStream >> boneName;
-		// TODO
-		//std::cout << boneName << std::endl;
+		if (1 == frameCount)
+			_dataOrder.push_back(boneName);
 
 		float buffer;
 		while (subStream >> buffer)
 		{
-			// TODO
-			//std::cout << buffer << std::endl;
+			_data.push_back(buffer);
 		}
 	}
 

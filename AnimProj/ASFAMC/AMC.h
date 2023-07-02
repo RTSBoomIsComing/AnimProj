@@ -12,6 +12,8 @@ namespace pa
 
 		bool	loadFromFile(const wchar_t* filePath);
 	private:
+		std::vector<float>				_data;
+		std::vector<std::string>		_dataOrder;
 	};
 }
 
