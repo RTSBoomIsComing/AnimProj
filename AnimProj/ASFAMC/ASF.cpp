@@ -16,6 +16,10 @@ pa::ASF::ASF(const wchar_t* filePath)
 	// 그리고 global_T 는 본의 모든 부모로부터 재귀적으로 global_relative_T 를 누적한 것이다.
 	// global_T = global_relative_T * (부모의 global_relative_T * (부모의 global_relative_T * ...))
 
+	// 그러나 모션을 적용하는 경우, 결국 로컬 좌표계에서의 Transltation 이 필요하다.
+	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
+	// 이는 dir 에 부모 본의 Rotation 의 반대(역)를 적용하면 된다.
+
 	std::unordered_map<std::string, XMMATRIX> globalTranslationbyName;
 
 	_dfsBoneTransforms.resize(_dfsRoute.size());
@@ -39,9 +43,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
 
-		const float vectorScaleFactor = _unit.length * bone.length;
-		XMVECTOR vectorScale{ vectorScaleFactor, vectorScaleFactor, vectorScaleFactor, 0.0f };
-		XMVECTOR scaledDirection = XMLoadFloat4(&bone.direction) * vectorScale;
+		XMVECTOR scaledDirection = XMLoadFloat4(&bone.direction) * _unit.length * bone.length;
 		XMMATRIX translation = XMMatrixTranslationFromVector(scaledDirection);
 		//XMMATRIX boneLocalTransform = rootRotationInverse * rotation * rootRotation * translation;
 
