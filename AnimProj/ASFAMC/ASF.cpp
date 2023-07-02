@@ -53,7 +53,6 @@ pa::ASF::ASF(const wchar_t* filePath)
 		globalRotationsByName[boneName] = globalRotation;
 
 		// Adjust dir on global to local
-		const XMMATRIX globalRotationInverse = XMMatrixInverse(nullptr, globalRotation);
 		const XMVECTOR adjustedDirection = XMVector4Transform(
 			XMLoadFloat4(&bone.direction), parentGlobalRotationInverse);
 
