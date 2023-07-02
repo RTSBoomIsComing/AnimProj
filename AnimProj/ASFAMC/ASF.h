@@ -49,9 +49,9 @@ namespace pa
 		DirectX::XMFLOAT4	_rootPosition;
 		std::vector<std::string>				_boneNameList;
 		std::vector<int>						_boneParentList;
-		std::vector<Bone>						_boneData2;
+		std::vector<Bone>						_boneData;
 
-		std::vector<int>						_dfsRoute2;
+		std::vector<int>						_dfsRoute;
 
 		std::vector<DirectX::XMMATRIX>			_globalTransforms;
 		std::vector<DirectX::XMMATRIX>			_globalRotations;

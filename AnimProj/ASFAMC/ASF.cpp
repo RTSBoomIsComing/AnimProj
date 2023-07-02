@@ -20,11 +20,11 @@ pa::ASF::ASF(const wchar_t* filePath)
 	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
 	// 이는 dir 에 부모 본의 global_R 의 반대(역)를 적용하면 된다.
 
-	_globalTransforms.resize(_dfsRoute2.size());
-	_globalRotations.resize(_dfsRoute2.size());
+	_globalTransforms.resize(_dfsRoute.size());
+	_globalRotations.resize(_dfsRoute.size());
 	{
 		constexpr int rootBoneIndex = 0;
-		XMMATRIX rotation = EulerRotation(_boneData2[rootBoneIndex].axis, _boneData2[rootBoneIndex].axisOrder);
+		XMMATRIX rotation = EulerRotation(_boneData[rootBoneIndex].axis, _boneData[rootBoneIndex].axisOrder);
 		XMMATRIX translation = XMMatrixTranslationFromVector(
 			XMLoadFloat4(&_rootPosition) * _unit.length);
 
@@ -34,10 +34,10 @@ pa::ASF::ASF(const wchar_t* filePath)
 		_globalRotations[rootBoneIndex] = rotation;
 	}
 
-	for (int i = 1; i < _dfsRoute2.size(); i++)
+	for (int i = 1; i < _dfsRoute.size(); i++)
 	{
-		const int boneIndex = _dfsRoute2[i];
-		Bone& bone = _boneData2[boneIndex];
+		const int boneIndex = _dfsRoute[i];
+		Bone& bone = _boneData[boneIndex];
 
 		const int parentBoneIndex = _boneParentList[boneIndex];
 		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, _globalRotations[parentBoneIndex]);
@@ -150,7 +150,7 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 	}
 
 	stream.ignore();
-	_boneData2.push_back(bone);
+	_boneData.push_back(bone);
 	_boneNameList.push_back("root");
 }
 
@@ -211,22 +211,22 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			else if (0 == keyword.compare("end"))
 				break;
 		}
-		_boneData2.push_back(bone);
+		_boneData.push_back(bone);
 	}
 }
 
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
-	_dfsRoute2.reserve(_boneData2.size());
-	_boneParentList.resize(_boneData2.size(), -1);
+	_dfsRoute.reserve(_boneData.size());
+	_boneParentList.resize(_boneData.size(), -1);
 
 	{
 		auto it = std::find(_boneNameList.begin(), _boneNameList.end(), "root");
 		if (_boneNameList.end() == it)
 			DebugBreak();
 
-		const int rootBoneIndex = it - _boneNameList.begin();
-		_dfsRoute2.push_back(rootBoneIndex);
+		const size_t rootBoneIndex = it - _boneNameList.begin();
+		_dfsRoute.push_back(static_cast<int>(rootBoneIndex));
 		_boneParentList[rootBoneIndex] = -1;
 	}
 
@@ -253,7 +253,7 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 			if (_boneNameList.end() == it)
 				DebugBreak();
 
-			const int parentBoneIndex = it - _boneNameList.begin();
+			const size_t parentBoneIndex = it - _boneNameList.begin();
 
 			std::string childBoneName;
 			while (lineStream)
@@ -268,9 +268,9 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 				if (_boneNameList.end() == it)
 					DebugBreak();
 
-				const int childBoneIndex = it - _boneNameList.begin();
-				_dfsRoute2.push_back(childBoneIndex);
-				_boneParentList[childBoneIndex] = parentBoneIndex;
+				const size_t childBoneIndex = it - _boneNameList.begin();
+				_dfsRoute.push_back(static_cast<int>(childBoneIndex));
+				_boneParentList[childBoneIndex] = static_cast<int>(parentBoneIndex);
 			}
 		}
 	}
