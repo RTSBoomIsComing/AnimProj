@@ -43,14 +43,11 @@ namespace pa
 		ComPtr<ID3D11VertexShader>		_vertexShader;
 		ComPtr<ID3D11PixelShader>		_pixelShader;
 		ComPtr<ID3D11RasterizerState>	_rasterizerState;
-		ComPtr<ID3D11Buffer>			_boneConnectionIndexBuffer;
-		ComPtr<ID3D11Buffer>			_boneConnectionVertexBuffer;
 
 		Camera*							_pCamera;
 		Mesh*							_pCubeMesh;
 		ASF*							_pASF;
 		AMC*							_pAMC;
-		std::vector<std::uint32_t>		_boneConnectionIndices;
 
 		bool keyState[4] = {};
 	};

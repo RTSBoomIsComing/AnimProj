@@ -18,7 +18,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 	// 그러나 모션을 적용하는 경우, 결국 로컬 좌표계에서의 Transltation 이 필요하다.
 	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
-	// 이는 dir 에 부모 본의 Rotation 의 반대(역)를 적용하면 된다.
+	// 이는 dir 에 부모 본의 global_R 의 반대(역)를 적용하면 된다.
 
 	// These are helper map, need to be deprecated
 	std::unordered_map<std::string, XMMATRIX> globalTranformsbyName;
@@ -274,7 +274,7 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 			dof = Bone::DOF::RY;
 		else if (0 == buffer.compare("rz"))
 			dof = Bone::DOF::RZ;
-		else if (0 == buffer.compare("ln"))
+		else if (0 == buffer.compare("l"))
 			dof = Bone::DOF::LN;
 		else
 		{
@@ -290,20 +290,6 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 const std::vector<DirectX::XMFLOAT4X4> pa::ASF::getGlobalBoneTransforms() const
 {
 	return _dfsBoneTransforms;
-}
-
-std::vector<std::uint32_t> pa::ASF::getBoneConnections()
-{
-	std::vector<std::uint32_t> indices;
-	for (int i = 0; i < _dfsRoute.size(); i++)
-	{
-
-		indices.push_back(i);
-		const std::string& boneName = _dfsRoute[i];
-		const std::string& parentName = _boneParentMap[boneName];
-		indices.push_back(static_cast<std::uint32_t>(_dfsNameMap[parentName]));
-	}
-	return indices;
 }
 
 DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)
@@ -330,6 +316,4 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const st
 		result = rotationZ * rotationY * rotationX;
 
 	return result;
-	//return XMMatrixIdentity();
-	//return XMMatrixInverse(nullptr, result);
 }

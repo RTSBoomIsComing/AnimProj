@@ -29,7 +29,6 @@ namespace pa
 
 		bool	loadFromFile(const wchar_t* filePath);
 		const std::vector<DirectX::XMFLOAT4X4>	getGlobalBoneTransforms() const;
-		std::vector<std::uint32_t>				getBoneConnections();
 
 	private:
 		void	parseUnits(std::ifstream& stream);
