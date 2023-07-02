@@ -20,40 +20,59 @@ pa::ASF::ASF(const wchar_t* filePath)
 	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
 	// 이는 dir 에 부모 본의 Rotation 의 반대(역)를 적용하면 된다.
 
-	std::unordered_map<std::string, XMMATRIX> globalTranslationbyName;
+	// These are helper map, need to be deprecated
+	std::unordered_map<std::string, XMMATRIX> globalTranformsbyName;
+	std::unordered_map<std::string, XMMATRIX> globalRotationsByName;
 
 	_dfsBoneTransforms.resize(_dfsRoute.size());
-	XMMATRIX rootRotation = EulerRotation(_boneData["root"].axis, _boneData["root"].axisOrder);
-	XMMATRIX rootRotationInverse = XMMatrixInverse(nullptr, rootRotation);
 	{
-		XMVECTOR vectorScale{ _unit.length, _unit.length, _unit.length, 0.0f };
-		XMMATRIX translation =
-			XMMatrixTranslationFromVector(
-				XMLoadFloat4(&_rootPosition) * vectorScale);
-		globalTranslationbyName["root"] = translation;
+		XMMATRIX rotation = EulerRotation(_boneData["root"].axis, _boneData["root"].axisOrder);
 
-		XMStoreFloat4x4(&_dfsBoneTransforms[0], rootRotation * translation);
+		XMMATRIX translation = XMMatrixTranslationFromVector(
+			XMLoadFloat4(&_rootPosition) * _unit.length);
+
+		XMMATRIX transform = rotation * translation;
+		XMStoreFloat4x4(&_dfsBoneTransforms[0], transform);
+
+		// Helper map
+		globalTranformsbyName["root"] = transform;
+		globalRotationsByName["root"] = rotation;
 	}
-
 
 	for (int i = 1; i < _dfsRoute.size(); i++)
 	{
 		const std::string& boneName = _dfsRoute[i];
 		Bone& bone = _boneData[boneName];
 
-		XMMATRIX rotation = EulerRotation(bone.axis, bone.axisOrder);
-
-		XMVECTOR scaledDirection = XMLoadFloat4(&bone.direction) * _unit.length * bone.length;
-		XMMATRIX translation = XMMatrixTranslationFromVector(scaledDirection);
-		//XMMATRIX boneLocalTransform = rootRotationInverse * rotation * rootRotation * translation;
-
-
 		const std::string& parentName = _boneParentMap[boneName];
-		const XMMATRIX& parentGlobalTranslation = globalTranslationbyName[parentName];
-		XMMATRIX boneGlobalTranslation = translation * parentGlobalTranslation;
-		globalTranslationbyName[boneName] = boneGlobalTranslation;
+		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, globalRotationsByName[parentName]);
+		const XMMATRIX& parentTransform = globalTranformsbyName[parentName];
 
-		XMStoreFloat4x4(&_dfsBoneTransforms[i], rotation * parentGlobalTranslation);
+		const XMMATRIX globalRotation = EulerRotation(bone.axis, bone.axisOrder);
+		// Helper map
+		globalRotationsByName[boneName] = globalRotation;
+
+		// Adjust dir on global to local
+		const XMMATRIX globalRotationInverse = XMMatrixInverse(nullptr, globalRotation);
+		const XMVECTOR adjustedDirection = XMVector4Transform(
+			XMLoadFloat4(&bone.direction), parentGlobalRotationInverse);
+
+		XMStoreFloat4(&bone.direction, adjustedDirection);
+
+		const XMMATRIX translation = XMMatrixTranslationFromVector(
+			XMLoadFloat4(&bone.direction) * _unit.length * bone.length);
+
+		// Adjust rotation from parent rotation
+		const XMMATRIX rotation = globalRotation * parentGlobalRotationInverse;
+
+		XMMATRIX transform = rotation * translation;
+
+
+		XMMATRIX globalTransform = transform * parentTransform;
+		XMStoreFloat4x4(&_dfsBoneTransforms[i], globalTransform);
+
+		// Helper map
+		globalTranformsbyName[boneName] = globalTransform;
 	}
 }
 
@@ -180,6 +199,8 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			else if (0 == keyword.compare("direction"))
 			{
 				subStream >> bone.direction.x >> bone.direction.y >> bone.direction.z;
+				// right handed coordinate to left handed coordinate
+				bone.direction.z *= -1;
 			}
 			else if (0 == keyword.compare("length"))
 			{
@@ -188,6 +209,9 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			else if (0 == keyword.compare("axis"))
 			{
 				subStream >> bone.axis.x >> bone.axis.y >> bone.axis.z >> bone.axisOrder;
+				// right handed coordinate to left handed coordinate
+				bone.axis.x *= -1;
+				bone.axis.y *= -1;
 			}
 			else if (0 == keyword.compare("dof"))
 			{
@@ -289,8 +313,8 @@ DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const st
 	using namespace DirectX;
 	// Use row major matrix
 	const XMMATRIX rotationX = XMMatrixRotationX(axis.x * _unit.angle);
-	const XMMATRIX rotationY = XMMatrixRotationX(axis.y * _unit.angle);
-	const XMMATRIX rotationZ = XMMatrixRotationX(axis.z * _unit.angle);
+	const XMMATRIX rotationY = XMMatrixRotationY(axis.y * _unit.angle);
+	const XMMATRIX rotationZ = XMMatrixRotationZ(axis.z * _unit.angle);
 
 	XMMATRIX result = {};
 
