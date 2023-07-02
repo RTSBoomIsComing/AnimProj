@@ -284,8 +284,10 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 	while (stream)
 	{
 		stream >> buffer;
+		stream.ignore();
 
-		Bone::DOF dof = {};
+		Bone::DOF dof = Bone::DOF::None;
+
 		if (0 == buffer.compare("rx"))
 			dof = Bone::DOF::RX;
 		else if (0 == buffer.compare("ry"))

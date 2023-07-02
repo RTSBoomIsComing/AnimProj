@@ -24,6 +24,8 @@ pa::MyApplication::MyApplication()
 	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	_pAMC = new AMC(amcFilePath.c_str());
 
+	_pAMC->generateAnimation(_pASF);
+
 	initializeGraphicsPipeline();
 }
 

@@ -19,6 +19,7 @@ namespace pa
 
 	class ASF
 	{
+		friend class AMC;
 	public:
 		ASF() = default;
 		~ASF() = default;

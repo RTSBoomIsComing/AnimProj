@@ -3,6 +3,11 @@
 
 namespace pa
 {
+	struct AnimationSheet
+	{
+		std::vector<DirectX::XMMATRIX> rotations;
+	};
+
 	class ASF;
 	class AMC
 	{
@@ -12,10 +17,13 @@ namespace pa
 		~AMC() = default;
 
 		bool	loadFromFile(const wchar_t* filePath);
-		//void	createMotion(const ASF* pASF, );
+		void	generateAnimation(const ASF* pASF);
 	private:
+		int								_frameCount;
 		std::vector<float>				_data;
 		std::vector<std::string>		_dataOrder;
+		std::vector<AnimationSheet>		_animationSheets;
+		
 	};
 }
 
