@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "MyApplication.h"
-#include "Camera.h"
+#include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
@@ -224,27 +224,27 @@ void pa::MyApplication::initialize(HWND hWnd)
 	checkResult(_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &_renderTargetView));
 
 
-	_viewport = CD3D11_VIEWPORT{ backBuffer.Get(), _renderTargetView.Get() };
+	_viewport = CD3D11_VIEWPORT(backBuffer.Get(), _renderTargetView.Get());
 
 	{
 		// Create the depth stencil buffer
 		D3D11_TEXTURE2D_DESC backBufferDesc;
 		backBuffer->GetDesc(&backBufferDesc);
-		CD3D11_TEXTURE2D_DESC depthStencilBufferDesc{
+		CD3D11_TEXTURE2D_DESC depthStencilBufferDesc(
 			DXGI_FORMAT_D24_UNORM_S8_UINT, backBufferDesc.Width, backBufferDesc.Height,
-			1, 0, D3D11_BIND_DEPTH_STENCIL };
+			1, 0, D3D11_BIND_DEPTH_STENCIL );
 
-		ComPtr<ID3D11Texture2D> depthStencilBuffer{};
+		ComPtr<ID3D11Texture2D> depthStencilBuffer;
 		checkResult(_device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &depthStencilBuffer));
 
 		// Create the main depth stencil view
-		CD3D11_DEPTH_STENCIL_VIEW_DESC dsviewDesc{ D3D11_DSV_DIMENSION_TEXTURE2D };
+		CD3D11_DEPTH_STENCIL_VIEW_DESC dsviewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
 		checkResult(_device->CreateDepthStencilView(depthStencilBuffer.Get(), &dsviewDesc, &_depthStencilView));
 	}
 
 	{
 		// Create depth stencil state
-		CD3D11_DEPTH_STENCIL_DESC depthStencilDesc{ D3D11_DEFAULT };
+		CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
 		checkResult(_device->CreateDepthStencilState(&depthStencilDesc, &_depthStencilState));
 	}
 }

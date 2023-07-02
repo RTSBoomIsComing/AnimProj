@@ -86,23 +86,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Rendering\Animation.h" />
     <ClInclude Include="ASFAMC\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
     <ClInclude Include="ASFAMC\ASF.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Rendering\Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
     <ClInclude Include="Rendering\Mesh.h" />
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="Common\pch.h" />
-    <ClInclude Include="Skeleton.h" />
+    <ClInclude Include="Rendering\Skeleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Rendering\Animation.cpp" />
     <ClCompile Include="ASFAMC\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />
     <ClCompile Include="ASFAMC\ASF.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Rendering\Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Rendering\Mesh.cpp" />
@@ -111,7 +113,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="Rendering\Skeleton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

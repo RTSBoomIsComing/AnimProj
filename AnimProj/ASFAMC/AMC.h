@@ -3,6 +3,7 @@
 
 namespace pa
 {
+	class ASF;
 	class AMC
 	{
 	public:
@@ -11,6 +12,7 @@ namespace pa
 		~AMC() = default;
 
 		bool	loadFromFile(const wchar_t* filePath);
+		//void	createMotion(const ASF* pASF, );
 	private:
 		std::vector<float>				_data;
 		std::vector<std::string>		_dataOrder;

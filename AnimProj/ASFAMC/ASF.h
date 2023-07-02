@@ -10,9 +10,6 @@ namespace pa
 			TX, TY, TZ, None
 		};
 
-		int					id = 0;
-		std::string			name;
-
 		DirectX::XMFLOAT4	axis = {};
 		DirectX::XMFLOAT4	direction = {};
 		float				length = 0.0f;
@@ -28,7 +25,7 @@ namespace pa
 		ASF(const wchar_t* filePath);
 
 		bool	loadFromFile(const wchar_t* filePath);
-		const std::vector<DirectX::XMFLOAT4X4>	getGlobalBoneTransforms() const;
+		const	std::vector<DirectX::XMMATRIX>	getGlobalBoneTransforms() const;
 
 	private:
 		void	parseUnits(std::ifstream& stream);
@@ -48,17 +45,16 @@ namespace pa
 			float	angle = 1.0f;
 		} _unit;
 
-		//std::vector<Bone>	_boneData;	// Root is also treated as bone.
-
 		char				_rootOrders[6][3];
 		DirectX::XMFLOAT4	_rootPosition;
+		std::vector<std::string>				_boneNameList;
+		std::vector<int>						_boneParentList;
+		std::vector<Bone>						_boneData2;
 
-		std::unordered_map<std::string, Bone>	_boneData;
-		std::unordered_map<std::string, std::string> _boneParentMap;
+		std::vector<int>						_dfsRoute2;
 
-		std::vector<std::string>				_dfsRoute;
-		std::unordered_map<std::string, int>	_dfsNameMap;
-		std::vector<DirectX::XMFLOAT4X4>		_dfsBoneTransforms;
+		std::vector<DirectX::XMMATRIX>			_globalTransforms;
+		std::vector<DirectX::XMMATRIX>			_globalRotations;
 	};
 }
 

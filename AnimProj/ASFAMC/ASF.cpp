@@ -20,37 +20,32 @@ pa::ASF::ASF(const wchar_t* filePath)
 	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
 	// 이는 dir 에 부모 본의 global_R 의 반대(역)를 적용하면 된다.
 
-	// These are helper map, need to be deprecated
-	std::unordered_map<std::string, XMMATRIX> globalTranformsbyName;
-	std::unordered_map<std::string, XMMATRIX> globalRotationsByName;
-
-	_dfsBoneTransforms.resize(_dfsRoute.size());
+	_globalTransforms.resize(_dfsRoute2.size());
+	_globalRotations.resize(_dfsRoute2.size());
 	{
-		XMMATRIX rotation = EulerRotation(_boneData["root"].axis, _boneData["root"].axisOrder);
-
+		constexpr int rootBoneIndex = 0;
+		XMMATRIX rotation = EulerRotation(_boneData2[rootBoneIndex].axis, _boneData2[rootBoneIndex].axisOrder);
 		XMMATRIX translation = XMMatrixTranslationFromVector(
 			XMLoadFloat4(&_rootPosition) * _unit.length);
 
 		XMMATRIX transform = rotation * translation;
-		XMStoreFloat4x4(&_dfsBoneTransforms[0], transform);
 
-		// Helper map
-		globalTranformsbyName["root"] = transform;
-		globalRotationsByName["root"] = rotation;
+		_globalTransforms[rootBoneIndex] = transform;
+		_globalRotations[rootBoneIndex] = rotation;
 	}
 
-	for (int i = 1; i < _dfsRoute.size(); i++)
+	for (int i = 1; i < _dfsRoute2.size(); i++)
 	{
-		const std::string& boneName = _dfsRoute[i];
-		Bone& bone = _boneData[boneName];
+		const int boneIndex = _dfsRoute2[i];
+		Bone& bone = _boneData2[boneIndex];
 
-		const std::string& parentName = _boneParentMap[boneName];
-		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, globalRotationsByName[parentName]);
-		const XMMATRIX& parentTransform = globalTranformsbyName[parentName];
+		const int parentBoneIndex = _boneParentList[boneIndex];
+		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, _globalRotations[parentBoneIndex]);
+		const XMMATRIX& parentTransform = _globalTransforms[parentBoneIndex];
 
 		const XMMATRIX globalRotation = EulerRotation(bone.axis, bone.axisOrder);
-		// Helper map
-		globalRotationsByName[boneName] = globalRotation;
+
+		_globalRotations[boneIndex] = globalRotation;
 
 		// Adjust dir on global to local
 		const XMVECTOR adjustedDirection = XMVector4Transform(
@@ -68,10 +63,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 
 		XMMATRIX globalTransform = transform * parentTransform;
-		XMStoreFloat4x4(&_dfsBoneTransforms[i], globalTransform);
-
-		// Helper map
-		globalTranformsbyName[boneName] = globalTransform;
+		_globalTransforms[boneIndex] = globalTransform;
 	}
 }
 
@@ -131,7 +123,6 @@ void pa::ASF::parseUnits(std::ifstream& stream)
 void pa::ASF::parseRoot(std::ifstream& stream)
 {
 	Bone bone = {};
-	bone.name = "root";
 
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
@@ -159,8 +150,8 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 	}
 
 	stream.ignore();
-
-	_boneData["root"] = bone;
+	_boneData2.push_back(bone);
+	_boneNameList.push_back("root");
 }
 
 void pa::ASF::parseBoneData(std::ifstream& stream)
@@ -189,11 +180,12 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			subStream >> keyword;
 			if (0 == keyword.compare("id"))
 			{
-				subStream >> bone.id;
+				subStream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			}
 			else if (0 == keyword.compare("name"))
 			{
-				subStream >> bone.name;
+				subStream >> buffer;
+				_boneNameList.push_back(buffer);
 			}
 			else if (0 == keyword.compare("direction"))
 			{
@@ -219,40 +211,66 @@ void pa::ASF::parseBoneData(std::ifstream& stream)
 			else if (0 == keyword.compare("end"))
 				break;
 		}
-
-		_boneData[bone.name] = bone;
+		_boneData2.push_back(bone);
 	}
 }
 
 void pa::ASF::parseHierarchy(std::ifstream& stream)
 {
-	_dfsRoute.reserve(_boneData.size());
-	_dfsNameMap["root"] = 0;
-	_dfsRoute.emplace_back("root");
+	_dfsRoute2.reserve(_boneData2.size());
+	_boneParentList.resize(_boneData2.size(), -1);
+
+	{
+		auto it = std::find(_boneNameList.begin(), _boneNameList.end(), "root");
+		if (_boneNameList.end() == it)
+			DebugBreak();
+
+		const int rootBoneIndex = it - _boneNameList.begin();
+		_dfsRoute2.push_back(rootBoneIndex);
+		_boneParentList[rootBoneIndex] = -1;
+	}
 
 	std::string buffer;
 	stream >> buffer;
-	if (0 == buffer.compare("begin"))
+	stream.ignore();
+
+	if ("begin" == buffer)
 	{
 		while (stream)
 		{
+			
 			std::getline(stream, buffer);
-			std::stringstream lineStream(buffer);
+			std::istringstream lineStream(buffer);
 
 			lineStream >> buffer;
+			lineStream.ignore();
+
 			if (0 == buffer.compare("end"))
 				break;
 
-			std::string parentBoneName = buffer;
+			const std::string& parentBoneName = buffer;
+			auto it = std::find(_boneNameList.begin(), _boneNameList.end(), parentBoneName);
+			if (_boneNameList.end() == it)
+				DebugBreak();
+
+			const int parentBoneIndex = it - _boneNameList.begin();
+
+			std::string childBoneName;
 			while (lineStream)
 			{
-				std::string childBoneName;
 				lineStream >> childBoneName;
+				lineStream.ignore();
+
 				if (childBoneName.empty())
 					break;
-				_boneParentMap[childBoneName] = parentBoneName;
-				_dfsNameMap[childBoneName] = static_cast<int>(_dfsRoute.size());
-				_dfsRoute.push_back(childBoneName);
+
+				auto it = std::find(_boneNameList.begin(), _boneNameList.end(), childBoneName);
+				if (_boneNameList.end() == it)
+					DebugBreak();
+
+				const int childBoneIndex = it - _boneNameList.begin();
+				_dfsRoute2.push_back(childBoneIndex);
+				_boneParentList[childBoneIndex] = parentBoneIndex;
 			}
 		}
 	}
@@ -287,9 +305,9 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 	}
 }
 
-const std::vector<DirectX::XMFLOAT4X4> pa::ASF::getGlobalBoneTransforms() const
+const std::vector<DirectX::XMMATRIX> pa::ASF::getGlobalBoneTransforms() const
 {
-	return _dfsBoneTransforms;
+	return _globalTransforms;
 }
 
 DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)
