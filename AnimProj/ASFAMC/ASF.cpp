@@ -61,10 +61,10 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const XMMATRIX translation = XMMatrixTranslationFromVector(
 			XMLoadFloat4(&bone.direction) * _unit.length * bone.length);
 
+
 		// Adjust rotation from parent rotation
 		const XMMATRIX rotation = globalRotation * parentGlobalRotationInverse;
-
-		XMMATRIX transform = rotation * translation;
+		const XMMATRIX transform = rotation * translation;
 
 
 		XMMATRIX globalTransform = transform * parentTransform;
