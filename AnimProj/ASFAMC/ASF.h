@@ -25,8 +25,9 @@ namespace pa
 		~ASF() = default;
 		ASF(const wchar_t* filePath);
 
-		bool	loadFromFile(const wchar_t* filePath);
-		const	std::vector<DirectX::XMMATRIX>	getGlobalBoneTransforms() const;
+		bool			loadFromFile(const wchar_t* filePath);
+		const			std::vector<DirectX::XMMATRIX>&	getGlobalBoneTransforms() const;
+		std::size_t		getBoneCount() const;
 
 	private:
 		void	parseUnits(std::ifstream& stream);
@@ -49,17 +50,17 @@ namespace pa
 		char				_rootOrders[6][3];
 		DirectX::XMFLOAT4	_rootPosition;
 		std::vector<std::string>				_boneNameList;
-		std::vector<int>						_boneParentList;
 		std::vector<Bone>						_boneData;
-
-		std::vector<int>						_dfsRoute;
-
 		std::vector<DirectX::XMMATRIX>			_globalTransforms;
-		std::vector<DirectX::XMMATRIX>			_globalRotations;
+
+
 
 	public:
 		// Temporarily open these members to public.
 		// TODO: Close these members to private and provide public functions.
+		std::vector<int>						_boneParentList;
+		std::vector<int>						_dfsRoute;
+		std::vector<DirectX::XMMATRIX>			_globalRotations;
 		std::vector<DirectX::XMMATRIX>			_boneLocalTranslations;
 		std::vector<DirectX::XMMATRIX>			_boneLocalRotations;
 	};

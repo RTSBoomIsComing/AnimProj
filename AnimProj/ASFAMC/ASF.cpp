@@ -316,9 +316,14 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 	}
 }
 
-const std::vector<DirectX::XMMATRIX> pa::ASF::getGlobalBoneTransforms() const
+const std::vector<DirectX::XMMATRIX>& pa::ASF::getGlobalBoneTransforms() const
 {
 	return _globalTransforms;
+}
+
+std::size_t pa::ASF::getBoneCount() const
+{
+	return _globalTransforms.size();
 }
 
 DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)

@@ -23,7 +23,6 @@ pa::MyApplication::MyApplication()
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	_pAMC = new AMC(amcFilePath.c_str());
-
 	_pAMC->generateAnimation(_pASF);
 
 	initializeGraphicsPipeline();
@@ -78,13 +77,43 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
+	static std::size_t frameNumber = 0;
+	if (frameNumber >= _pAMC->_animationSheets.size())
+		frameNumber = 0;
+
+	frameNumber += 1;
+
+	std::vector<XMMATRIX> worldTransforms(_pASF->getBoneCount());
+	for (const int boneIndex : _pASF->_dfsRoute)
+	{
+
+		// get current bone data
+		const XMMATRIX& originalBoneLocalRotation = _pASF->_boneLocalRotations[boneIndex];
+		const XMMATRIX& relativeBoneLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
+		//const XMMATRIX& relativeBoneLocalRotation = XMMatrixIdentity();
+
+		// Get parent bone data
+		const int parentBoneIndex = _pASF->_boneParentList[boneIndex];
+		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
+
+		// apply animation
+		const XMMATRIX boneLocalRotation = relativeBoneLocalRotation * originalBoneLocalRotation;
+
+		const XMMATRIX& boneLocalTranslation = _pASF->_boneLocalTranslations[boneIndex];
+		const XMMATRIX boneLocalTransform = boneLocalRotation * boneLocalTranslation;
+
+
+		worldTransforms[boneIndex] = boneLocalTransform * parentWorldTransform;
+	}
+
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 
 		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
 		//  Update the vertex buffer here.
-		auto& transforms = _pASF->getGlobalBoneTransforms();
-		memcpy(mappedResource.pData, transforms.data(), sizeof(DirectX::XMMATRIX) * transforms.size());
+		std::memcpy(mappedResource.pData, worldTransforms.data(), sizeof(DirectX::XMMATRIX) * worldTransforms.size());
+
 		//  Reenable GPU access to the vertex buffer data.
 		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
 		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
@@ -135,7 +164,7 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
-{	
+{
 	{
 		std::wstring csoFilePath = _OUTDIR;
 		csoFilePath.append(L"BasicVertexShader.cso");
@@ -153,7 +182,7 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		checkResult(_device->CreateInputLayout(
 			inputElementDescs, ARRAYSIZE(inputElementDescs),
 			vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), &_inputLayout));
-}
+	}
 
 	{
 		std::wstring csoFilePath = _OUTDIR;
@@ -234,7 +263,7 @@ void pa::MyApplication::initialize(HWND hWnd)
 		backBuffer->GetDesc(&backBufferDesc);
 		CD3D11_TEXTURE2D_DESC depthStencilBufferDesc(
 			DXGI_FORMAT_D24_UNORM_S8_UINT, backBufferDesc.Width, backBufferDesc.Height,
-			1, 0, D3D11_BIND_DEPTH_STENCIL );
+			1, 0, D3D11_BIND_DEPTH_STENCIL);
 
 		ComPtr<ID3D11Texture2D> depthStencilBuffer;
 		checkResult(_device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &depthStencilBuffer));

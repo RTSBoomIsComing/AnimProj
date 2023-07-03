@@ -71,7 +71,7 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 	size_t dataIndex = 0;
 	for (int frameID = 0; frameID < _frameCount; frameID++)
 	{
-		_animationSheets[frameID].rotations.resize(pASF->_boneData.size());
+		_animationSheets[frameID].rotations.resize(pASF->_boneData.size(), XMMatrixIdentity());
 		for (const int boneIndex : orderMatch)
 		{
 			// Skip processing root bone
@@ -93,7 +93,7 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 				if (Bone::DOF::None == dof)
 					break;
 
-				channels[static_cast<int>(dof)] = _data[dataIndex++];
+				channels[static_cast<int>(dof)] = _data[dataIndex++] * pASF->_unit.angle;
 			}
 			// Ignore AxisOrder, just calculate rotation in order of X, Y, Z
 			// TODO: Need to process AxisOrder
