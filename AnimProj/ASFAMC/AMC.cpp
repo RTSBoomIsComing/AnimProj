@@ -76,14 +76,22 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 		{
 			// Skip processing root bone
 			// TODO: need to fix, root bone also should be processed in this block
+			float channels[4] = {};
 			if (0 == boneIndex)
 			{
-				_animationSheets[frameID].rotations[0] = XMMatrixIdentity();
-				dataIndex += 6;
+				_animationSheets[frameID].rootPosition.x = _data[dataIndex++] * pASF->_unit.length;
+				_animationSheets[frameID].rootPosition.y = _data[dataIndex++] * pASF->_unit.length;
+				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unit.length;
+
+				// TODO : Remove hard coding, make it use root order.
+				channels[0] = _data[dataIndex++] * pASF->_unit.angle;
+				channels[1] = _data[dataIndex++] * pASF->_unit.angle;
+				channels[2] = _data[dataIndex++] * pASF->_unit.angle;
+				_animationSheets[frameID].rotations[0] = 
+					XMMatrixRotationX(-channels[0]) * XMMatrixRotationY(-channels[1]) * XMMatrixRotationZ(channels[2]);
 				continue;
 			}
 
-			float channels[4] = {};
 			for (int j = 0; j < 4; j++)
 			{
 				const Bone::DOF& dof = pASF->_boneData[boneIndex].dof[j];

@@ -5,6 +5,7 @@ namespace pa
 {
 	struct AnimationSheet
 	{
+		DirectX::XMFLOAT4 rootPosition;
 		std::vector<DirectX::XMMATRIX> rotations;
 	};
 
