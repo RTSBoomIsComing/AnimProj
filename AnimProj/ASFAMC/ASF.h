@@ -11,7 +11,7 @@ namespace pa
 		};
 
 		DirectX::XMFLOAT4	axis = {};
-		DirectX::XMFLOAT4	direction = {};
+		DirectX::XMFLOAT4	direction = {};	// in global coordinate
 		float				length = 0.0f;
 		char				axisOrder[4] = {}; // XYZ with \0
 		DOF					dof[4] = { DOF::None, DOF::None, DOF::None, DOF::None };
@@ -26,7 +26,6 @@ namespace pa
 		ASF(const wchar_t* filePath);
 
 		bool			loadFromFile(const wchar_t* filePath);
-		const			std::vector<DirectX::XMMATRIX>&	getGlobalBoneTransforms() const;
 		std::size_t		getBoneCount() const;
 
 	private:

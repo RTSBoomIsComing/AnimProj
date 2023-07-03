@@ -59,10 +59,8 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const XMVECTOR adjustedDirection = XMVector4Transform(
 			XMLoadFloat4(&bone.direction), parentGlobalRotationInverse);
 
-		XMStoreFloat4(&bone.direction, adjustedDirection);
-
 		const XMMATRIX translation = XMMatrixTranslationFromVector(
-			XMLoadFloat4(&bone.direction) * _unit.length * bone.length);
+			adjustedDirection * _unit.length * bone.length);
 
 		// Adjust rotation from parent rotation
 		const XMMATRIX rotation = globalRotation * parentGlobalRotationInverse;
@@ -316,14 +314,9 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 	}
 }
 
-const std::vector<DirectX::XMMATRIX>& pa::ASF::getGlobalBoneTransforms() const
-{
-	return _globalTransforms;
-}
-
 std::size_t pa::ASF::getBoneCount() const
 {
-	return _globalTransforms.size();
+	return _boneData.size();
 }
 
 DirectX::XMMATRIX pa::ASF::EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order)

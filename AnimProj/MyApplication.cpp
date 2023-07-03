@@ -92,8 +92,6 @@ void pa::MyApplication::OnUpdate()
 	std::vector<XMMATRIX> worldTransforms(_pASF->getBoneCount());
 	for (const int boneIndex : _pASF->_dfsRoute)
 	{
-
-		
 		// Get parent bone data
 		const int parentBoneIndex = _pASF->_boneParentList[boneIndex];
 		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
@@ -101,6 +99,7 @@ void pa::MyApplication::OnUpdate()
 		// get current bone data
 		const XMMATRIX boneLocalRotation = _pASF->_boneLocalRotations[boneIndex];;
 		const XMMATRIX& boneLocalTranslation = _pASF->_boneLocalTranslations[boneIndex];
+
 		const XMMATRIX originalBoneGlobalRotation = _pASF->_globalRotations[boneIndex];
 		const XMMATRIX originalBoneGlobalRotationInverse = XMMatrixInverse(nullptr, originalBoneGlobalRotation);
 
@@ -148,7 +147,7 @@ void pa::MyApplication::OnRender()
 
 	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
 
-	UINT instanceCount = static_cast<UINT>(_pASF->getGlobalBoneTransforms().size());
+	UINT instanceCount = static_cast<UINT>(_pASF->getBoneCount());
 	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), instanceCount, 0, 0, 0);
 
 	_swapChain->Present(1, 0);
