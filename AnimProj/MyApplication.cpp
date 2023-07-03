@@ -16,12 +16,18 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-
-	_pASF = new ASF(asfFilePath.c_str());
+	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
-	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+
+	_pASF = new ASF(asfFilePath.c_str());
 	_pAMC = new AMC(amcFilePath.c_str());
 	_pAMC->generateAnimation(_pASF);
 
@@ -77,11 +83,11 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
-	static std::size_t frameNumber = 0;
-	if (frameNumber >= _pAMC->_animationSheets.size())
-		frameNumber = 0;
+	static std::size_t frameNumber = -1;
+	if (frameNumber >= _pAMC->_animationSheets.size() - 1)
+		frameNumber = -1;
 
-	frameNumber += 1;
+	frameNumber++;	
 
 	std::vector<XMMATRIX> worldTransforms(_pASF->getBoneCount());
 	for (const int boneIndex : _pASF->_dfsRoute)
