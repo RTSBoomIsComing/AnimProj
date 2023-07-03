@@ -39,6 +39,15 @@ namespace pa
 		DirectX::XMMATRIX	EulerRotation(const DirectX::XMFLOAT4& axis, const std::string& order);
 
 	private:
+
+		char				_rootOrders[6][3];
+		DirectX::XMFLOAT4	_rootPosition;
+		std::vector<std::string>				_boneNameList;
+		std::vector<DirectX::XMMATRIX>			_globalTransforms;
+		std::vector<DirectX::XMMATRIX>			_boneLocalTranslations;
+		std::vector<DirectX::XMMATRIX>			_boneLocalRotations;
+
+	public:
 		struct Unit
 		{
 			float	mass = 1.0f;
@@ -46,22 +55,12 @@ namespace pa
 			float	angle = 1.0f;
 		} _unit;
 
-		char				_rootOrders[6][3];
-		DirectX::XMFLOAT4	_rootPosition;
-		std::vector<std::string>				_boneNameList;
-		std::vector<Bone>						_boneData;
-		std::vector<DirectX::XMMATRIX>			_globalTransforms;
-
-
-
-	public:
 		// Temporarily open these members to public.
 		// TODO: Close these members to private and provide public functions.
+		std::vector<Bone>						_boneData;
 		std::vector<int>						_boneParentList;
 		std::vector<int>						_dfsRoute;
 		std::vector<DirectX::XMMATRIX>			_globalRotations;
-		std::vector<DirectX::XMMATRIX>			_boneLocalTranslations;
-		std::vector<DirectX::XMMATRIX>			_boneLocalRotations;
 	};
 }
 

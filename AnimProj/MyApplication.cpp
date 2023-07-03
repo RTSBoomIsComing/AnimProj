@@ -97,21 +97,18 @@ void pa::MyApplication::OnUpdate()
 		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
 
 		// get current bone data
-		const XMMATRIX boneLocalRotation = _pASF->_boneLocalRotations[boneIndex];;
-		const XMMATRIX& boneLocalTranslation = _pASF->_boneLocalTranslations[boneIndex];
+		const Bone& bone = _pASF->_boneData[boneIndex];
+		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction) * bone.length * _pASF->_unit.length;
 
-		const XMMATRIX originalBoneGlobalRotation = _pASF->_globalRotations[boneIndex];
-		const XMMATRIX originalBoneGlobalRotationInverse = XMMatrixInverse(nullptr, originalBoneGlobalRotation);
+		const XMMATRIX originalRotation = _pASF->_globalRotations[boneIndex];
+		const XMMATRIX originalRotationInverse = XMMatrixInverse(nullptr, originalRotation);
 
 		// apply animation data
-		const XMMATRIX& relativeBoneLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
-		const XMMATRIX animationTransform = originalBoneGlobalRotationInverse * relativeBoneLocalRotation * originalBoneGlobalRotation;
+		const XMMATRIX& animationLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
+		const XMMATRIX globalRotation = originalRotationInverse * animationLocalRotation * originalRotation;
+		const XMVECTOR globalPosition = XMVector4Transform(originalDirection, globalRotation);
 		
-
-
-		const XMMATRIX boneLocalTransform = boneLocalRotation * boneLocalTranslation * animationTransform;
-
-		worldTransforms[boneIndex] = boneLocalTransform * parentWorldTransform;
+		worldTransforms[boneIndex] = globalRotation * XMMatrixTranslationFromVector(globalPosition) * parentWorldTransform;
 	}
 
 	{
