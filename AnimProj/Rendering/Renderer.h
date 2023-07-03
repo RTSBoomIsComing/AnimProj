@@ -1,5 +1,5 @@
+// author: Changwan Yu
 #pragma once
-#include "Rendering.h"
 
 namespace pa
 {
@@ -7,7 +7,7 @@ namespace pa
 	{
 	public:
 		Renderer() = default;
-		virtual ~Renderer();
+		~Renderer() = default;
 	};
 }
 

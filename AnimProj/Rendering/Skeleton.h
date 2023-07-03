@@ -6,10 +6,8 @@ namespace pa
 	public:
 		struct Bone
 		{
-			std::string			name;
-
-			DirectX::XMFLOAT4	rotation = {};
-			DirectX::XMFLOAT4	translation = {};
+			DirectX::XMFLOAT4	rotation	= { 0.0f, 0.0f, 0.0f, 1.0f };	// quaternion;
+			DirectX::XMFLOAT4	direction	= {};	// direction * length * unit_length;
 		};
 
 
