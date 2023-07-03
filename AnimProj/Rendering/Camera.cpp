@@ -54,16 +54,6 @@ void pa::Camera::calculateMatrices()
 	_dirtyBit = false;
 }
 
-const DirectX::XMFLOAT4& pa::Camera::getEyePosition() const
-{
-	return _eyePosition;
-}
-
-const DirectX::XMFLOAT4& pa::Camera::getFocusPosition() const
-{
-	return _focusPosition;
-}
-
 const pa::Camera::Matrices& pa::Camera::getMatrices(void)
 {
 	calculateMatrices();

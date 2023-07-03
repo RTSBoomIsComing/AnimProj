@@ -21,13 +21,10 @@ namespace pa
 		void updateEyePosition(const DirectX::XMVECTOR& eyePosition);
 		void updateFocusPosition(const DirectX::XMVECTOR& focusPosition);
 
-		const DirectX::XMFLOAT4& getEyePosition() const;
-		const DirectX::XMFLOAT4& getFocusPosition() const;
 		const Matrices& getMatrices(void);
 
 	private:
 		void calculateMatrices();
-
 
 	private:
 		Matrices			_matrices;
