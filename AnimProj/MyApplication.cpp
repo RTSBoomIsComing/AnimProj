@@ -16,16 +16,16 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
-	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 	_pASF = new ASF(asfFilePath.c_str());
 	_pAMC = new AMC(amcFilePath.c_str());
@@ -103,7 +103,7 @@ void pa::MyApplication::OnUpdate()
 
 		// Apply animation
 		const XMMATRIX& relativeRotationOnBoneSpace = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
-		
+
 		// NOTE
 		// 1. originalRotation is on global space 
 		// 2. relativeRotation is on bone local space
@@ -111,7 +111,7 @@ void pa::MyApplication::OnUpdate()
 		// 4. originalDirection * Inverse(originalRotation) is direction on bone local space
 		// 5. direction on bone local space * relativeRotation is adjusted direction on bone local space
 		// 6. adjusted direction on bone local space * originalRotation is adjusted direction on global space
-		const XMMATRIX globalRotation = 
+		const XMMATRIX globalRotation =
 			XMMatrixInverse(nullptr, originalRotation) * relativeRotationOnBoneSpace * originalRotation;
 
 		const XMVECTOR globalPosition = XMVector4Transform(originalDirection, globalRotation);
@@ -165,7 +165,8 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 	// up    : 38
 	// right : 39
 	// down  : 40
-	keyState[key - 37] = true;
+	if (37 <= key)
+		keyState[key - 37] = true;
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
@@ -174,7 +175,8 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 	// up    : 38
 	// right : 39
 	// down  : 40
-	keyState[key - 37] = false;
+	if (37 <= key)
+		keyState[key - 37] = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
