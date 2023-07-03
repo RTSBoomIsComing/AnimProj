@@ -56,6 +56,12 @@ namespace pa
 
 		std::vector<DirectX::XMMATRIX>			_globalTransforms;
 		std::vector<DirectX::XMMATRIX>			_globalRotations;
+
+	public:
+		// Temporarily open these members to public.
+		// TODO: Close these members to private and provide public functions.
+		std::vector<DirectX::XMMATRIX>			_boneLocalTranslations;
+		std::vector<DirectX::XMMATRIX>			_boneLocalRotations;
 	};
 }
 

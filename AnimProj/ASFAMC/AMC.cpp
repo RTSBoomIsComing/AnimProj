@@ -98,7 +98,9 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 			// Ignore AxisOrder, just calculate rotation in order of X, Y, Z
 			// TODO: Need to process AxisOrder
 			XMMATRIX rotation = 
-				XMMatrixRotationX(channels[0])* XMMatrixRotationY(channels[1])* XMMatrixRotationZ(channels[2]);
+				// For converting coordiate system right handed to left handed,
+				// amounts of rotation by X, Y axis would be revert.
+				XMMatrixRotationX(-channels[0])* XMMatrixRotationY(-channels[1])* XMMatrixRotationZ(channels[2]);
 			_animationSheets[frameID].rotations[boneIndex] = rotation;
 		}
 	}

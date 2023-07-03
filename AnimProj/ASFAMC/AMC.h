@@ -25,6 +25,7 @@ namespace pa
 	public:
 
 		// temporarily open member to public
+		// TODO: close this member to private and open with public function
 		std::vector<AnimationSheet>		_animationSheets;
 		
 	};

@@ -20,8 +20,12 @@ pa::ASF::ASF(const wchar_t* filePath)
 	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
 	// 이는 dir 에 부모 본의 global_R 의 반대(역)를 적용하면 된다.
 
-	_globalTransforms.resize(_dfsRoute.size());
-	_globalRotations.resize(_dfsRoute.size());
+	_boneLocalTranslations.resize(_boneData.size());
+	_boneLocalRotations.resize(_boneData.size());
+
+	_globalRotations.resize(_boneData.size());
+	_globalTransforms.resize(_boneData.size());
+
 	{
 		constexpr int rootBoneIndex = 0;
 		XMMATRIX rotation = EulerRotation(_boneData[rootBoneIndex].axis, _boneData[rootBoneIndex].axisOrder);
@@ -30,8 +34,12 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 		XMMATRIX transform = rotation * translation;
 
-		_globalTransforms[rootBoneIndex] = transform;
+		_boneLocalTranslations[rootBoneIndex] = translation;
+		_boneLocalRotations[rootBoneIndex] = rotation;
+
 		_globalRotations[rootBoneIndex] = rotation;
+		_globalTransforms[rootBoneIndex] = transform;
+
 	}
 
 	for (int i = 1; i < _dfsRoute.size(); i++)
@@ -41,7 +49,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 
 		const int parentBoneIndex = _boneParentList[boneIndex];
 		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, _globalRotations[parentBoneIndex]);
-		const XMMATRIX& parentTransform = _globalTransforms[parentBoneIndex];
+		const XMMATRIX& parentGlobalTransform = _globalTransforms[parentBoneIndex];
 
 		const XMMATRIX globalRotation = EulerRotation(bone.axis, bone.axisOrder);
 
@@ -56,13 +64,14 @@ pa::ASF::ASF(const wchar_t* filePath)
 		const XMMATRIX translation = XMMatrixTranslationFromVector(
 			XMLoadFloat4(&bone.direction) * _unit.length * bone.length);
 
-
 		// Adjust rotation from parent rotation
 		const XMMATRIX rotation = globalRotation * parentGlobalRotationInverse;
-		const XMMATRIX transform = rotation * translation;
 
+		_boneLocalTranslations[boneIndex] = translation;
+		_boneLocalRotations[boneIndex] = rotation;
 
-		XMMATRIX globalTransform = transform * parentTransform;
+		const XMMATRIX boneLocalTransform = rotation * translation;
+		const XMMATRIX globalTransform = boneLocalTransform * parentGlobalTransform;
 		_globalTransforms[boneIndex] = globalTransform;
 	}
 }
@@ -238,7 +247,7 @@ void pa::ASF::parseHierarchy(std::ifstream& stream)
 	{
 		while (stream)
 		{
-			
+
 			std::getline(stream, buffer);
 			std::istringstream lineStream(buffer);
 
