@@ -13,7 +13,7 @@ namespace pa
 		DirectX::XMFLOAT4	axis = {};
 		DirectX::XMFLOAT4	direction = {};	// in global coordinate
 		float				length = 0.0f;
-		char				axisOrder[4] = {}; // XYZ with \0
+		char				axisOrder[4] = "XYZ"; // XYZ with \0
 		DOF					dof[4] = { DOF::None, DOF::None, DOF::None, DOF::None };
 	};
 
@@ -43,9 +43,6 @@ namespace pa
 		char				_rootOrders[6][3];
 		DirectX::XMFLOAT4	_rootPosition;
 		std::vector<std::string>				_boneNameList;
-		std::vector<DirectX::XMMATRIX>			_globalTransforms;
-		std::vector<DirectX::XMMATRIX>			_boneLocalTranslations;
-		std::vector<DirectX::XMMATRIX>			_boneLocalRotations;
 
 	public:
 		struct Unit

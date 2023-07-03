@@ -7,70 +7,16 @@ pa::ASF::ASF(const wchar_t* filePath)
 	if (loadFromFile(filePath) != true)
 		DebugBreak();
 
-	using namespace DirectX;
-
-	// 각 본의 최종적인 트랜스폼: M 은 결과적으로 
-	// M = global_S * global_R * global_T 이다.
-	// asf 파일에서 파싱한 정보는 각 본의 global_R 과 
-	// global 좌표에서 부모 본으로부터 상대적인 T : global_relative_T 이다.
-	// 그리고 global_T 는 본의 모든 부모로부터 재귀적으로 global_relative_T 를 누적한 것이다.
-	// global_T = global_relative_T * (부모의 global_relative_T * (부모의 global_relative_T * ...))
-
-	// 그러나 모션을 적용하는 경우, 결국 로컬 좌표계에서의 Transltation 이 필요하다.
-	// 따라서 global_relative_T 를 local_relative_T 로 변환하는 작업을 진행한다.
-	// 이는 dir 에 부모 본의 global_R 의 반대(역)를 적용하면 된다.
-
-	_boneLocalTranslations.resize(_boneData.size());
-	_boneLocalRotations.resize(_boneData.size());
-
 	_globalRotations.resize(_boneData.size());
-	_globalTransforms.resize(_boneData.size());
-
+	for (int i = 0; i < _dfsRoute.size(); i++)
 	{
-		constexpr int rootBoneIndex = 0;
-		XMMATRIX rotation = EulerRotation(_boneData[rootBoneIndex].axis, _boneData[rootBoneIndex].axisOrder);
-		XMMATRIX translation = XMMatrixTranslationFromVector(
-			XMLoadFloat4(&_rootPosition) * _unit.length);
+		using namespace DirectX;
 
-		XMMATRIX transform = rotation * translation;
-
-		_boneLocalTranslations[rootBoneIndex] = translation;
-		_boneLocalRotations[rootBoneIndex] = rotation;
-
-		_globalRotations[rootBoneIndex] = rotation;
-		_globalTransforms[rootBoneIndex] = transform;
-
-	}
-
-	for (int i = 1; i < _dfsRoute.size(); i++)
-	{
 		const int boneIndex = _dfsRoute[i];
 		Bone& bone = _boneData[boneIndex];
 
-		const int parentBoneIndex = _boneParentList[boneIndex];
-		const XMMATRIX parentGlobalRotationInverse = XMMatrixInverse(nullptr, _globalRotations[parentBoneIndex]);
-		const XMMATRIX& parentGlobalTransform = _globalTransforms[parentBoneIndex];
-
 		const XMMATRIX globalRotation = EulerRotation(bone.axis, bone.axisOrder);
-
 		_globalRotations[boneIndex] = globalRotation;
-
-		// Adjust dir on global to local
-		const XMVECTOR adjustedDirection = XMVector4Transform(
-			XMLoadFloat4(&bone.direction), parentGlobalRotationInverse);
-
-		const XMMATRIX translation = XMMatrixTranslationFromVector(
-			adjustedDirection * _unit.length * bone.length);
-
-		// Adjust rotation from parent rotation
-		const XMMATRIX rotation = globalRotation * parentGlobalRotationInverse;
-
-		_boneLocalTranslations[boneIndex] = translation;
-		_boneLocalRotations[boneIndex] = rotation;
-
-		const XMMATRIX boneLocalTransform = rotation * translation;
-		const XMMATRIX globalTransform = boneLocalTransform * parentGlobalTransform;
-		_globalTransforms[boneIndex] = globalTransform;
 	}
 }
 
