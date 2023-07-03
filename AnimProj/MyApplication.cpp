@@ -16,15 +16,15 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
-	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 	_pASF = new ASF(asfFilePath.c_str());
@@ -96,18 +96,27 @@ void pa::MyApplication::OnUpdate()
 		const int parentBoneIndex = _pASF->_boneParentList[boneIndex];
 		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
 
-		// get current bone data
+		// Get current bone data
 		const Bone& bone = _pASF->_boneData[boneIndex];
 		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction) * bone.length * _pASF->_unit.length;
-
 		const XMMATRIX originalRotation = _pASF->_globalRotations[boneIndex];
-		const XMMATRIX originalRotationInverse = XMMatrixInverse(nullptr, originalRotation);
 
-		// apply animation data
-		const XMMATRIX& animationLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
-		const XMMATRIX globalRotation = originalRotationInverse * animationLocalRotation * originalRotation;
-		const XMVECTOR globalPosition = XMVector4Transform(originalDirection, globalRotation);
+		// Apply animation
+		const XMMATRIX& relativeRotationOnBoneSpace = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
 		
+		// NOTE
+		// 1. originalRotation is on global space 
+		// 2. relativeRotation is on bone local space
+		// 3. originalDirection is on golbal space
+		// 4. originalDirection * Inverse(originalRotation) is direction on bone local space
+		// 5. direction on bone local space * relativeRotation is adjusted direction on bone local space
+		// 6. adjusted direction on bone local space * originalRotation is adjusted direction on global space
+		const XMMATRIX globalRotation = 
+			XMMatrixInverse(nullptr, originalRotation) * relativeRotationOnBoneSpace * originalRotation;
+
+		const XMVECTOR globalPosition = XMVector4Transform(originalDirection, globalRotation);
+
+		// Store world transform for rendering
 		worldTransforms[boneIndex] = globalRotation * XMMatrixTranslationFromVector(globalPosition) * parentWorldTransform;
 	}
 

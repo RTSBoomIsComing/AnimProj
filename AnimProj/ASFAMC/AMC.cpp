@@ -81,7 +81,7 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 			{
 				_animationSheets[frameID].rootPosition.x = _data[dataIndex++] * pASF->_unit.length;
 				_animationSheets[frameID].rootPosition.y = _data[dataIndex++] * pASF->_unit.length;
-				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unit.length;
+				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unit.length * -1; // right handed to left handed coordinate
 
 				// TODO : Remove hard coding, make it use root order.
 				channels[0] = _data[dataIndex++] * pASF->_unit.angle;
