@@ -17,15 +17,15 @@ pa::MyApplication::MyApplication()
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 	_pASF = new ASF(asfFilePath.c_str());
 	_pAMC = new AMC(amcFilePath.c_str());
@@ -87,27 +87,30 @@ void pa::MyApplication::OnUpdate()
 	if (frameNumber >= _pAMC->_animationSheets.size() - 1)
 		frameNumber = -1;
 
-	frameNumber++;	
+	frameNumber++;
 
 	std::vector<XMMATRIX> worldTransforms(_pASF->getBoneCount());
 	for (const int boneIndex : _pASF->_dfsRoute)
 	{
 
-		// get current bone data
-		const XMMATRIX& originalBoneLocalRotation = _pASF->_boneLocalRotations[boneIndex];
-		const XMMATRIX& relativeBoneLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
-		//const XMMATRIX& relativeBoneLocalRotation = XMMatrixIdentity();
-
+		
 		// Get parent bone data
 		const int parentBoneIndex = _pASF->_boneParentList[boneIndex];
 		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
 
-		// apply animation
-		const XMMATRIX boneLocalRotation = relativeBoneLocalRotation * originalBoneLocalRotation;
-
+		// get current bone data
+		const XMMATRIX boneLocalRotation = _pASF->_boneLocalRotations[boneIndex];;
 		const XMMATRIX& boneLocalTranslation = _pASF->_boneLocalTranslations[boneIndex];
-		const XMMATRIX boneLocalTransform = boneLocalRotation * boneLocalTranslation;
+		const XMMATRIX originalBoneGlobalRotation = _pASF->_globalRotations[boneIndex];
+		const XMMATRIX originalBoneGlobalRotationInverse = XMMatrixInverse(nullptr, originalBoneGlobalRotation);
 
+		// apply animation data
+		const XMMATRIX& relativeBoneLocalRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
+		const XMMATRIX animationTransform = originalBoneGlobalRotationInverse * relativeBoneLocalRotation * originalBoneGlobalRotation;
+		
+
+
+		const XMMATRIX boneLocalTransform = boneLocalRotation * boneLocalTranslation * animationTransform;
 
 		worldTransforms[boneIndex] = boneLocalTransform * parentWorldTransform;
 	}
