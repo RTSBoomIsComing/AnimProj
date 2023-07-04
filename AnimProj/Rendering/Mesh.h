@@ -18,7 +18,7 @@ namespace pa
 		UINT getIndexCount() const;
 
 	private:
-		D3D11_PRIMITIVE_TOPOLOGY	_primitiveTopology;
+		D3D11_PRIMITIVE_TOPOLOGY	_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		ComPtr<ID3D11Buffer>		_indexBuffer;
 		ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
 		ComPtr<ID3D11Buffer>		_vertexColorBuffer;

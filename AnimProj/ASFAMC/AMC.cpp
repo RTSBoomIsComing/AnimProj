@@ -79,14 +79,14 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 			float channels[4] = {};
 			if (0 == boneIndex)
 			{
-				_animationSheets[frameID].rootPosition.x = _data[dataIndex++] * pASF->_unit.length;
-				_animationSheets[frameID].rootPosition.y = _data[dataIndex++] * pASF->_unit.length;
-				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unit.length * -1; // right handed to left handed coordinate
+				_animationSheets[frameID].rootPosition.x = _data[dataIndex++] * pASF->_unitLength;
+				_animationSheets[frameID].rootPosition.y = _data[dataIndex++] * pASF->_unitLength;
+				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unitLength * -1; // right handed to left handed coordinate
 
 				// TODO : Remove hard coding, make it use root order.
-				channels[0] = _data[dataIndex++] * pASF->_unit.angle * -1;
-				channels[1] = _data[dataIndex++] * pASF->_unit.angle * -1;
-				channels[2] = _data[dataIndex++] * pASF->_unit.angle;
+				channels[0] = _data[dataIndex++] * pASF->_unitAngle * -1;
+				channels[1] = _data[dataIndex++] * pASF->_unitAngle * -1;
+				channels[2] = _data[dataIndex++] * pASF->_unitAngle;
 				_animationSheets[frameID].rotations[0] = 
 					XMMatrixRotationX(channels[0]) * XMMatrixRotationY(channels[1]) * XMMatrixRotationZ(channels[2]);
 				continue;
