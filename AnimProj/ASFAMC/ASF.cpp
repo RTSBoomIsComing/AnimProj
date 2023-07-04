@@ -1,13 +1,19 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "ASF.h"
+#include "../Rendering/Skeleton.h"
 
-pa::ASF::ASF(const wchar_t* filePath)
+pa::ASF::ASF(pa::Skeleton* pSkeleton)
+	: pSkeleton(pSkeleton)
+{}
+
+pa::ASF::ASF(const wchar_t* filePath, pa::Skeleton* pSkeleton)
+	: pSkeleton(pSkeleton)
 {
-	if (loadFromFile(filePath) != true)
+	if (loadFromFile(filePath, pSkeleton) != true)
 		DebugBreak();
 
-	_globalRotations.resize(_boneData.size());
+	_globalRotations.resize(_boneCount);
 	for (int i = 0; i < _dfsRoute.size(); i++)
 	{
 		using namespace DirectX;
@@ -20,7 +26,7 @@ pa::ASF::ASF(const wchar_t* filePath)
 	}
 }
 
-bool pa::ASF::loadFromFile(const wchar_t* filePath)
+bool pa::ASF::loadFromFile(const wchar_t* filePath, pa::Skeleton* pSkeleton)
 {
 	std::ifstream stream{ filePath };
 	if (stream.fail())
@@ -29,19 +35,19 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 	std::string line;
 	while (std::getline(stream, line))
 	{
-		if (0 == line.compare(":units"))
+		if (":units" == line)
 		{
 			parseUnits(stream);
 		}
-		else if (0 == line.compare(":root"))
+		else if (":root" == line)
 		{
 			parseRoot(stream);
 		}
-		else if (0 == line.compare(":bonedata"))
+		else if (":bonedata" == line)
 		{
 			parseBoneData(stream);
 		}
-		else if (0 == line.compare(":hierarchy"))
+		else if (":hierarchy" == line)
 		{
 			parseHierarchy(stream);
 		}
@@ -52,58 +58,76 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath)
 
 void pa::ASF::parseUnits(std::ifstream& stream)
 {
-	std::string buffer;
+	std::string line;
 	for (int i = 0; i < 3; i++)
 	{
-		stream >> buffer;
-		if (0 == buffer.compare("mass"))
+		std::getline(stream, line);
+
+		std::size_t findPos;
+		findPos = line.find("mass");
+		if (findPos != std::string::npos)
 		{
-			stream >> _unit.mass;
+			_unitMass = std::stof(line.substr(findPos + sizeof("mass")));
+			continue;
 		}
-		else if (0 == buffer.compare("length"))
+
+		findPos = line.find("length");
+		if (findPos != std::string::npos)
 		{
-			stream >> _unit.length;
+			_unitLength = std::stof(line.substr(findPos + sizeof("length")));
+			continue;
 		}
-		else if (0 == buffer.compare("angle"))
+
+
+		findPos = line.find("angle");
+		if (findPos != std::string::npos)
 		{
-			stream >> buffer;
-			_unit.angle = (0 == buffer.compare("deg")) ? (DirectX::XM_PI / 180) : 1.0f;
+			_unitAngle = ("deg" == line.substr(findPos + sizeof("angle"))) ? (DirectX::XM_PI / 180) : 1.0f;
+			continue;
 		}
 	}
-	stream.ignore();
 }
 
 void pa::ASF::parseRoot(std::ifstream& stream)
 {
-	Bone bone = {};
-
+	
+	float orientation[3] = {};
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
 	{
 		stream >> buffer;
-		if (0 == buffer.compare("order"))
+		if ("order" == buffer)
 		{
+			std::string order;
+			Channel dof[6] = {};
 			for (int j = 0; j < 6; j++)
 			{
-				stream >> _rootOrders[j];
+				stream >> order;
+				dof[j] = getChannel(order);
 			}
+			_DOF.push_back(dof);
 		}
-		else if (0 == buffer.compare("axis"))
+		else if ("axis" == buffer)
 		{
-			stream >> bone.axisOrder;
+			char axis[3];
+			stream >> axis;
+			_axisOrder.push_back(axis);
 		}
-		else if (0 == buffer.compare("position"))
+		else if ("position" == buffer)
 		{
 			stream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
 		}
-		else if (0 == buffer.compare("orientation"))
+		else if ("orientation" == buffer)
 		{
-			stream >> bone.axis.x >> bone.axis.y >> bone.axis.z;
+			stream >> orientation[0] >> orientation[1] >> orientation[2];
 		}
 	}
 
-	stream.ignore();
-	_boneData.push_back(bone);
+	using namespace DirectX;
+	Skeleton::Bone bone;
+
+	//bone.rotation = XMQuaternionRotationMatrix();
+	//_boneData.push_back(bone);
 	_boneNameList.push_back("root");
 }
 
@@ -259,6 +283,21 @@ void pa::ASF::parseDOF(std::istringstream& stream, Bone& bone)
 		dofId++;
 	}
 }
+
+pa::ASF::Channel pa::ASF::getChannel(std::string channelName) const
+{
+	std::string channelNames = "rxryrztxtytzl";
+
+	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
+	
+	std::size_t findPos = channelNames.find(channelName);
+	if (findPos != std::string::npos)
+		return static_cast<Channel>(findPos / 2);
+
+	return Channel::None;
+}
+
+
 
 std::size_t pa::ASF::getBoneCount() const
 {

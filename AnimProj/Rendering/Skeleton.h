@@ -3,6 +3,7 @@ namespace pa
 {
 	class Skeleton
 	{
+		friend class ASF;
 	public:
 		struct Bone
 		{
@@ -23,6 +24,9 @@ namespace pa
 	private:
 		// contain bone data
 		std::vector<Skeleton::Bone>	_boneList;
+
+		// indices of parent bone
+		std::vector<std::uint8_t>	_parentList;
 
 		// sorted indices of bone along depth first search
 		std::vector<std::uint8_t>	_DFSPath;
