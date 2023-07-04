@@ -90,8 +90,11 @@ void pa::ASF::parseUnits(std::ifstream& stream)
 
 void pa::ASF::parseRoot(std::ifstream& stream)
 {
-	
-	float orientation[3] = {};
+	using namespace DirectX;
+
+	char axisOrder[3];
+	XMFLOAT4 orientation = {};
+
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
 	{
@@ -109,7 +112,6 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 		}
 		else if ("axis" == buffer)
 		{
-			char axis[3];
 			stream >> axis;
 			_axisOrder.push_back(axis);
 		}
@@ -119,16 +121,16 @@ void pa::ASF::parseRoot(std::ifstream& stream)
 		}
 		else if ("orientation" == buffer)
 		{
-			stream >> orientation[0] >> orientation[1] >> orientation[2];
+			stream >> orientation.x >> orientation.y >> orientation.z;
 		}
 	}
-
-	using namespace DirectX;
-	Skeleton::Bone bone;
-
-	//bone.rotation = XMQuaternionRotationMatrix();
-	//_boneData.push_back(bone);
 	_boneNameList.push_back("root");
+
+	Skeleton::Bone bone = {};
+	const XMMATRIX rotation = EulerRotation(orientation, axisOrder);
+	XMStoreFloat4(&bone.rotation, XMQuaternionRotationMatrix(rotation));
+
+	//_boneData.push_back(bone);
 }
 
 void pa::ASF::parseBoneData(std::ifstream& stream)
