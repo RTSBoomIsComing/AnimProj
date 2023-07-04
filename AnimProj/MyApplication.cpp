@@ -102,22 +102,17 @@ void pa::MyApplication::OnUpdate()
 		const XMMATRIX originalRotation = _pASF->_globalRotations[boneIndex];
 
 		// Apply animation
-		const XMMATRIX& relativeRotationOnBoneSpace = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
+		const XMMATRIX& relativeRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
 
-		// NOTE
-		// 1. originalRotation is on global space 
-		// 2. relativeRotation is on bone local space
-		// 3. originalDirection is on golbal space
-		// 4. originalDirection * Inverse(originalRotation) is direction on bone local space
-		// 5. direction on bone local space * relativeRotation is adjusted direction on bone local space
-		// 6. adjusted direction on bone local space * originalRotation is adjusted direction on global space
-		const XMMATRIX globalRotation =
-			XMMatrixInverse(nullptr, originalRotation) * relativeRotationOnBoneSpace * originalRotation;
+		const XMMATRIX localRotation =
+			XMMatrixInverse(nullptr, originalRotation) * relativeRotation * originalRotation;
 
-		const XMVECTOR globalPosition = XMVector4Transform(originalDirection, globalRotation);
+		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, localRotation);
+		const XMMATRIX localTranslation = XMMatrixTranslationFromVector(relativePosition);
+		const XMMATRIX localTransform = localRotation * localTranslation;
 
 		// Store world transform for rendering
-		worldTransforms[boneIndex] = globalRotation * XMMatrixTranslationFromVector(globalPosition) * parentWorldTransform;
+		worldTransforms[boneIndex] = localTransform * parentWorldTransform;
 	}
 
 	{
