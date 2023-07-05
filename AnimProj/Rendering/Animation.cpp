@@ -1,3 +1,4 @@
+// author: Changwan Yu
 #include "pch.h"
 #include "Animation.h"
 

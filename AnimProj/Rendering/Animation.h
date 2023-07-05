@@ -28,10 +28,6 @@ namespace pa
 		// 1. frame index
 		// 2. bone index
 		std::vector<DirectX::XMFLOAT4> _rotations; // quarternion
-
-		// represent two dimensional array from
-		// 1. frame index
-		// 2. bone index
 		std::vector<DirectX::XMFLOAT4> _positions;
 	};
 }
