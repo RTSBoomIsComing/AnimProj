@@ -3,6 +3,7 @@
 // Compress quaternion
 // quantize 32bit float to 15bit
 // total structure size is 48bit
+// This 48-bit quantization of quaternions guarantees a numerical precision of 0.000043
 #pragma once
 
 namespace pa

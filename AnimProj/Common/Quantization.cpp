@@ -26,7 +26,7 @@ pa::Quantization::Quantization(const DirectX::XMFLOAT4& quaternion)
 	{
 		for (size_t i{}; i < 3; i++)
 		{
-			_data ^= 0x1 << (44 * (-15 * i));
+			_data ^= 1ui64 << (44 * (-15 * i));
 		}
 	}
 }
@@ -39,8 +39,14 @@ DirectX::XMVECTOR pa::Quantization::deQuantize()
 
 int16_t pa::Quantization::quantizeFloat(float value) const
 {
-	constexpr int16_t	maxQuantizeValue = 16383; // 2^14 - 1;
-	constexpr float		sqrt2 = 1.41421356237309504880f; // sqrt(2)
+	constexpr int16_t	maxQuantizeValue = 16383;			// 2^14 - 1;
+	constexpr float		sqrt2 = 1.41421356237309504880f;	// sqrt(2)
+
+	// NOTE
+	// if the value is sqrt(2) then result is 16383
+	// guarantees a numerical precision of 0.000043
+	// that value has been acquired from 
+	// 1 /(16383 * sqrt(2)) = 4.3161007213974700872907548196597e-5
 
 	return   maxQuantizeValue * (sqrt2 * value);
 }
