@@ -86,7 +86,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Common\floatingPoint15.h" />
+    <ClInclude Include="Common\Quantization.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="Rendering\Animation.h" />
     <ClInclude Include="ASFAMC\AMC.h" />
@@ -101,6 +101,7 @@
     <ClInclude Include="Rendering\Skeleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Common\Quantization.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Rendering\Animation.cpp" />
     <ClCompile Include="ASFAMC\AMC.cpp" />
