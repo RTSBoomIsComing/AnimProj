@@ -35,26 +35,27 @@ namespace pa
 		ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath);
 
 		bool			loadFromFile(const wchar_t* filePath, class pa::Skeleton* pSkeleton);
-		size_t			getBoneCount() const;
+
+	public:
+		inline size_t	getBoneCount() const { return _boneNameList.size(); }
 
 	private:
 		void			parseUnits(std::istream& stream);
 		void			parseRoot(std::istream& stream);
 		void			parseBoneData(std::istream& stream);
 		void			parseHierarchy(std::istream& stream);
-		//void	parseDOF(std::istream& stream, Bone& bone);
 
 		Channel	getChannel(std::string channelName) const;
 		std::size_t getBoneIndexFromName(const std::string& boneName) const;
 
 	private:
-		DirectX::XMMATRIX	eulerRotation(const float axis[3], const std::string& order);
+		// TODO: Need to extract it to common math header
+		static DirectX::XMMATRIX				eulerRotation(const float axis[3], const std::string& order);
 
 	private:
 		pa::Skeleton*							_pSkeleton;
-		DirectX::XMFLOAT4						_rootPosition;
+		DirectX::XMFLOAT4						_rootPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
 		std::vector<std::string>				_boneNameList;
-		std::uint8_t							_boneCount;
 
 	public:
 		float									_unitMass		= 1.0f;

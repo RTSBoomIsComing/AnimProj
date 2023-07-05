@@ -5,30 +5,34 @@ namespace pa
 {
 	class Animation
 	{
+		friend class AMC;
 	public:
 		Animation() = default;
 		~Animation() = default;
 
 	public:
-		inline std::size_t getFrameCount() const { return _rotations.size(); };
-		inline std::size_t getBoneCount() const { return _boneCount; };
-
-		// TODO: implement this function
-		DirectX::XMFLOAT4 getRotation(std::size_t frameIndex, std::size_t boneIndex);
+		void						initialize(size_t frameCount, size_t boneCount);
+		inline std::size_t			getFrameCount() const { return _frameCount; };
+		inline std::size_t			getBoneCount() const { return _boneCount; };
+		
+		DirectX::XMFLOAT4 const&	getRotation(std::size_t frameIndex, std::size_t boneIndex) const;
+		DirectX::XMFLOAT4 const&	getPosition(std::size_t frameIndex, std::size_t boneIndex) const;
+		DirectX::XMFLOAT4&			getRotation(std::size_t frameIndex, std::size_t boneIndex);
+		DirectX::XMFLOAT4&			getPosition(std::size_t frameIndex, std::size_t boneIndex);
 
 	private:
-		// quaternion 
-		// two dimensions, firstly frame index then secondly bone index
-		std::vector<DirectX::XMFLOAT4> _rotations;
+		size_t _boneCount	= 0;
+		size_t _frameCount	= 0;
 
-		// one dimension, per frame
-		std::vector<DirectX::XMFLOAT4> _rootPositions;
+		// represent two dimensional array from
+		// 1. frame index
+		// 2. bone index
+		std::vector<DirectX::XMFLOAT4> _rotations; // quarternion
 
-		// count of bones that of skeleton binded
-		// if need to get bone count, dont use this directly
-		// rather use getBoneCount()
-		std::size_t _boneCount;
-
+		// represent two dimensional array from
+		// 1. frame index
+		// 2. bone index
+		std::vector<DirectX::XMFLOAT4> _positions;
 	};
 }
 

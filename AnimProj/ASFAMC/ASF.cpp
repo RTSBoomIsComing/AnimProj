@@ -124,6 +124,9 @@ void pa::ASF::parseRoot(std::istream& stream)
 		else if ("orientation" == buffer)
 		{
 			stream >> orientation[0] >> orientation[1] >> orientation[2];
+			orientation[0] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
+			orientation[1] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
+			orientation[2] *= _unitAngle;
 		}
 	}
 	_boneNameList.push_back("root");
@@ -178,9 +181,10 @@ void pa::ASF::parseBoneData(std::istream& stream)
 			else if ("axis" == buffer)
 			{
 				line >> axis[0] >> axis[1] >> axis[2] >> axisOrder;
-				// right handed coordinate to left handed coordinate
-				axis[0] *= -1;
-				axis[1] *= -1;
+				
+				axis[0] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
+				axis[1] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
+				axis[2] *= _unitAngle;
 			}
 			else if ("dof" == buffer)
 			{
@@ -273,20 +277,13 @@ std::size_t pa::ASF::getBoneIndexFromName(const std::string& boneName) const
 	return it - _boneNameList.begin();
 }
 
-
-
-std::size_t pa::ASF::getBoneCount() const
-{
-	return _boneNameList.size();
-}
-
 DirectX::XMMATRIX pa::ASF::eulerRotation(const float axis[3], const std::string& order)
 {
 	using namespace DirectX;
 	// Use row major matrix
-	const XMMATRIX rotationX = XMMatrixRotationX(axis[0] * _unitAngle);
-	const XMMATRIX rotationY = XMMatrixRotationY(axis[1] * _unitAngle);
-	const XMMATRIX rotationZ = XMMatrixRotationZ(axis[2] * _unitAngle);
+	const XMMATRIX rotationX = XMMatrixRotationX(axis[0]);
+	const XMMATRIX rotationY = XMMatrixRotationY(axis[1]);
+	const XMMATRIX rotationZ = XMMatrixRotationZ(axis[2]);
 
 	XMMATRIX result = {};
 
@@ -302,6 +299,8 @@ DirectX::XMMATRIX pa::ASF::eulerRotation(const float axis[3], const std::string&
 		result = rotationZ * rotationX * rotationY;
 	else if (0 == order.compare("ZYX"))
 		result = rotationZ * rotationY * rotationX;
+	else
+		result = rotationX * rotationY * rotationZ;
 
 	return result;
 }

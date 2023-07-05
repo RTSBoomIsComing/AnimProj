@@ -4,6 +4,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Skeleton.h"
+#include "Rendering/Animation.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 
@@ -31,9 +32,10 @@ pa::MyApplication::MyApplication()
 
 	_pSkeleton = new Skeleton();
 	ASF asf(_pSkeleton, asfFilePath.c_str());
+	AMC amc(amcFilePath.c_str());
 
-	_pAMC = new AMC(amcFilePath.c_str());
-	_pAMC->generateAnimation(&asf);
+	_pAnimation = new Animation();
+	amc.generateAnimation(&asf, _pAnimation);
 
 	initializeGraphicsPipeline();
 }
@@ -49,8 +51,8 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pSkeleton)
 		delete _pSkeleton;
 
-	if (nullptr != _pAMC)
-		delete _pAMC;
+	if (nullptr != _pAnimation)
+		delete _pAnimation;
 }
 
 void pa::MyApplication::OnUpdate()
@@ -88,7 +90,7 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
 	static std::size_t frameNumber = -1;
-	if (frameNumber >= _pAMC->_animationSheets.size() - 1)
+	if (frameNumber >= _pAnimation->getFrameCount() - 1)
 		frameNumber = -1;
 
 	frameNumber++;
@@ -103,10 +105,14 @@ void pa::MyApplication::OnUpdate()
 		// Get current bone data
 		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
 		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
+
+		// TODO : EVOKE LOGICAL ERROR
 		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
 
 		// Apply animation
-		const XMMATRIX& relativeRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
+		const XMMATRIX& relativeRotation = XMMatrixRotationQuaternion(
+			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+		
 
 		const XMMATRIX localRotation =
 			XMMatrixInverse(nullptr, originalRotation) * relativeRotation * originalRotation;

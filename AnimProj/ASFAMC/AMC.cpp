@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "AMC.h"
 #include "ASF.h"
+#include "../Rendering/Animation.h"
 
 pa::AMC::AMC(const wchar_t* filePath)
 {
@@ -53,10 +54,10 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 	return true;
 }
 
-void pa::AMC::generateAnimation(const ASF* pASF)
+void pa::AMC::generateAnimation(const ASF* pASF, Animation* pAnimation)
 {
 	using namespace DirectX;
-	// Match order
+
 	std::vector<int> orderMatch;
 	orderMatch.reserve(_dataOrder.size());
 
@@ -67,32 +68,17 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 		orderMatch.push_back(static_cast<int>(index));
 	}
 
-	_animationSheets.resize(_frameCount);
+	pAnimation->initialize(_frameCount, pASF->getBoneCount());
+
 	size_t dataIndex = 0;
 	for (int frameID = 0; frameID < _frameCount; frameID++)
 	{
-		_animationSheets[frameID].rotations.resize(pASF->getBoneCount(), XMMatrixIdentity());
+		//_animationSheets[frameID].rotations.resize(pASF->getBoneCount(), XMMatrixIdentity());
 		for (const int boneIndex : orderMatch)
 		{
-			// Skip processing root bone
-			// TODO: need to fix, root bone also should be processed in this block
-			float channels[4] = {};
-			if (0 == boneIndex)
-			{
-				_animationSheets[frameID].rootPosition.x = _data[dataIndex++] * pASF->_unitLength;
-				_animationSheets[frameID].rootPosition.y = _data[dataIndex++] * pASF->_unitLength;
-				_animationSheets[frameID].rootPosition.z = _data[dataIndex++] * pASF->_unitLength * -1; // right handed to left handed coordinate
-
-				// TODO : Remove hard coding, make it use root order.
-				channels[0] = _data[dataIndex++] * pASF->_unitAngle * -1;
-				channels[1] = _data[dataIndex++] * pASF->_unitAngle * -1;
-				channels[2] = _data[dataIndex++] * pASF->_unitAngle;
-				_animationSheets[frameID].rotations[0] = 
-					XMMatrixRotationX(channels[0]) * XMMatrixRotationY(channels[1]) * XMMatrixRotationZ(channels[2]);
-				continue;
-			}
-
-			for (int j = 0; j < 4; j++)
+			// rx, ry, rz, tx, ty, tz, l
+			float dataBuffer[7] = {};
+			for (int j = 0; j < 7; j++)
 			{
 				const ASF::Channel& channel = pASF->_DOFs[boneIndex].channels[j];
 				if (ASF::Channel::LN == channel)
@@ -101,15 +87,23 @@ void pa::AMC::generateAnimation(const ASF* pASF)
 				if (ASF::Channel::None == channel)
 					break;
 
-				channels[static_cast<int>(channel)] = _data[dataIndex++] * pASF->_unitAngle;
+				dataBuffer[static_cast<size_t>(channel)] = _data[dataIndex++]; //* pASF->_unitAngle;
 			}
-			// Ignore AxisOrder, just calculate rotation in order of X, Y, Z
-			// TODO: Need to process AxisOrder
-			XMMATRIX rotation = 
-				// For converting coordiate system right handed to left handed,
-				// amounts of rotation by X, Y axis would be revert.
-				XMMatrixRotationX(-channels[0])* XMMatrixRotationY(-channels[1])* XMMatrixRotationZ(channels[2]);
-			_animationSheets[frameID].rotations[boneIndex] = rotation;
+
+			dataBuffer[0] *= pASF->_unitAngle	* -1;	// rx
+			dataBuffer[1] *= pASF->_unitAngle	* -1;	// ry
+			dataBuffer[2] *= pASF->_unitAngle;			// rz
+
+			dataBuffer[3] *= pASF->_unitLength;			// tx
+			dataBuffer[4] *= pASF->_unitLength;			// ty
+			dataBuffer[5] *= pASF->_unitLength	* -1;	// tz
+
+			dataBuffer[6] *= pASF->_unitLength;			// l (length)
+
+			XMMATRIX rotation = ASF::eulerRotation(dataBuffer, pASF->_axisOrders[boneIndex]);
+			XMVECTOR quaternion = XMQuaternionRotationMatrix(rotation);
+			XMStoreFloat4(&pAnimation->getRotation(frameID, boneIndex), quaternion);
+			pAnimation->getPosition(frameID, boneIndex) = XMFLOAT4(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
 		}
 	}
 }
