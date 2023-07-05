@@ -7,8 +7,8 @@ namespace pa
 	struct Bone
 	{
 
-		DirectX::XMFLOAT4	direction = {};	// in global coordinate
-		float				length = 0.0f;
+		DirectX::XMFLOAT4	direction	= {};	// in global coordinate
+		float				length		= 0.0f;
 	};
 	
 	
@@ -17,9 +17,14 @@ namespace pa
 		friend class AMC;
 
 	public:
-		enum class Channel : std::uint8_t
+		enum class Channel : uint8_t
 		{
 			RX, RY, RZ, TX, TY, TZ, LN, None,
+		};
+
+		struct DOF
+		{
+			Channel channels[6] = { Channel::None, Channel::None, Channel::None, Channel::None, Channel::None, Channel::None };
 		};
 
 
@@ -27,23 +32,23 @@ namespace pa
 	public:
 		ASF(pa::Skeleton* pSkeleton);
 		~ASF() = default;
-		ASF(const wchar_t* filePath, pa::Skeleton* pSkeleton);
+		ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath);
 
 		bool			loadFromFile(const wchar_t* filePath, class pa::Skeleton* pSkeleton);
-		std::size_t		getBoneCount() const;
+		size_t			getBoneCount() const;
 
 	private:
-		void	parseUnits(std::istream& stream);
-		void	parseRoot(std::istream& stream);
-		void	parseBoneData(std::istream& stream);
-		void	parseHierarchy(std::istream& stream);
+		void			parseUnits(std::istream& stream);
+		void			parseRoot(std::istream& stream);
+		void			parseBoneData(std::istream& stream);
+		void			parseHierarchy(std::istream& stream);
 		//void	parseDOF(std::istream& stream, Bone& bone);
 
 		Channel	getChannel(std::string channelName) const;
 		std::size_t getBoneIndexFromName(const std::string& boneName) const;
 
 	private:
-		DirectX::XMMATRIX	EulerRotation(const float axis[3], const std::string& order);
+		DirectX::XMMATRIX	eulerRotation(const float axis[3], const std::string& order);
 
 	private:
 		pa::Skeleton*							_pSkeleton;
@@ -52,11 +57,11 @@ namespace pa
 		std::uint8_t							_boneCount;
 
 	public:
-		float									_unitMass = 1.0f;
-		float									_unitLength = 1.0f;
-		float									_unitAngle = 1.0f;
-		std::vector<Channel[6]>					_DOF;
-		std::vector<const char*>				_axisOrder;
+		float									_unitMass		= 1.0f;
+		float									_unitLength		= 1.0f;
+		float									_unitAngle		= 1.0f;
+		std::vector<DOF>						_DOFs;
+		std::vector<const char*>				_axisOrders;
 	};
 }
 

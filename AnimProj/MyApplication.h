@@ -6,7 +6,8 @@ namespace pa
 {
 	class Camera;
 	class Mesh;
-	class ASF;
+	class Skeleton;
+	//class ASF;
 	class AMC;
 
 	class MyApplication : public Win32Application
@@ -46,7 +47,7 @@ namespace pa
 
 		Camera*							_pCamera;
 		Mesh*							_pCubeMesh;
-		ASF*							_pASF;
+		Skeleton*						_pSkeleton;
 		AMC*							_pAMC;
 
 		bool keyState[4] = {};

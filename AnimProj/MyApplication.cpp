@@ -3,6 +3,7 @@
 #include "MyApplication.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
+#include "Rendering/Skeleton.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 
@@ -27,9 +28,12 @@ pa::MyApplication::MyApplication()
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
 	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
-	_pASF = new ASF(asfFilePath.c_str());
+
+	_pSkeleton = new Skeleton();
+	ASF asf(_pSkeleton, asfFilePath.c_str());
+
 	_pAMC = new AMC(amcFilePath.c_str());
-	_pAMC->generateAnimation(_pASF);
+	_pAMC->generateAnimation(&asf);
 
 	initializeGraphicsPipeline();
 }
@@ -42,8 +46,8 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pCubeMesh)
 		delete _pCubeMesh;
 
-	if (nullptr != _pASF)
-		delete _pASF;
+	if (nullptr != _pSkeleton)
+		delete _pSkeleton;
 
 	if (nullptr != _pAMC)
 		delete _pAMC;
@@ -89,17 +93,17 @@ void pa::MyApplication::OnUpdate()
 
 	frameNumber++;
 
-	std::vector<XMMATRIX> worldTransforms(_pASF->getBoneCount());
-	for (const int boneIndex : _pASF->_dfsRoute)
+	std::vector<XMMATRIX> worldTransforms(_pSkeleton->getBoneCount());
+	for (const uint8_t boneIndex : _pSkeleton->_DFSPath)
 	{
 		// Get parent bone data
-		const int parentBoneIndex = _pASF->_boneParentList[boneIndex];
-		const XMMATRIX& parentWorldTransform = (parentBoneIndex < 0) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
+		const uint8_t parentBoneIndex = _pSkeleton->_parentList[boneIndex];
+		const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
 
 		// Get current bone data
-		const Bone& bone = _pASF->_boneData[boneIndex];
-		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction) * bone.length * _pASF->_unit.length;
-		const XMMATRIX originalRotation = _pASF->_globalRotations[boneIndex];
+		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
+		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
+		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
 
 		// Apply animation
 		const XMMATRIX& relativeRotation = _pAMC->_animationSheets[frameNumber].rotations[boneIndex];
@@ -148,7 +152,7 @@ void pa::MyApplication::OnRender()
 
 	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
 
-	UINT instanceCount = static_cast<UINT>(_pASF->getBoneCount());
+	UINT instanceCount = static_cast<UINT>(_pSkeleton->getBoneCount());
 	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), instanceCount, 0, 0, 0);
 
 	_swapChain->Present(1, 0);

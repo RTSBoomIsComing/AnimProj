@@ -4,6 +4,7 @@ namespace pa
 	class Skeleton
 	{
 		friend class ASF;
+		friend class MyApplication;
 	public:
 		struct Bone
 		{
@@ -18,10 +19,13 @@ namespace pa
 		Skeleton() = default;
 		~Skeleton() = default;
 
-		inline const Skeleton::Bone& getBone(std::size_t index) { return _boneList[index]; }
+		inline const Skeleton::Bone& getBone(std::size_t index) const { return _boneList[index]; }
+		inline size_t getBoneCount() const { return _boneList.size(); }
 
 
 	private:
+		DirectX::XMFLOAT4			_rootPosition;
+
 		// contain bone data
 		std::vector<Skeleton::Bone>	_boneList;
 
