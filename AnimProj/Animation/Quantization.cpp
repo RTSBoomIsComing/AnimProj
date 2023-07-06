@@ -1,40 +1,6 @@
 #include "pch.h"
 #include "Quantization.h"
 
-pa::Quantization::Quantization(const DirectX::XMFLOAT4& vector4)
-{
-	using namespace DirectX;
-	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
-
-	const float*		floats	= &vector4.x;
-	size_t				discard = std::numeric_limits<size_t>::max();
-
-	_data = 0;
-
-	size_t index = 0;
-	for (size_t i = 0; i < 4; i++)
-	{
-		if (std::fabs(floats[i]) >= sqrt1_2)
-		{
-			discard = i;
-			continue;
-		}
-		_data |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
-	}
-
-	assert(discard < 4 && "there was no discard");
-
-	_data |= discard << 45;
-
-	if (floats[discard] < 0)
-		_data |= 1ui64 << 47;
-}
-
-DirectX::XMVECTOR pa::Quantization::deQuantize()
-{
-	return deQuantize(_data);
-}
-
 DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
 {
 	using namespace DirectX;
@@ -56,6 +22,37 @@ DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
 	floats[discard] = std::sqrtf(1.0f - squareSum) * (discardSign ? -1 : 1);
 
 	return XMLoadFloat(floats);
+}
+
+uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& vector4)
+{
+	using namespace DirectX;
+	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
+
+	const float* floats = &vector4.x;
+	size_t				discard = std::numeric_limits<size_t>::max();
+
+	uint64_t quantized = 0;
+
+	size_t index = 0;
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (std::fabs(floats[i]) >= sqrt1_2)
+		{
+			discard = i;
+			continue;
+		}
+		quantized |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
+	}
+
+	assert(discard < 4 && "there was no discard");
+
+	quantized |= discard << 45;
+
+	if (floats[discard] < 0)
+		quantized |= 1ui64 << 47;
+
+	return quantized;
 }
 
 uint16_t pa::Quantization::quantizeFloat(float value)
