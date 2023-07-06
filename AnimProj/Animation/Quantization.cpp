@@ -29,23 +29,34 @@ uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& vector4)
 	using namespace DirectX;
 	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
 
-	const float* floats = &vector4.x;
+	const float*		floats = &vector4.x;
 	size_t				discard = std::numeric_limits<size_t>::max();
+	float				max = 0.0f;
 
-	uint64_t quantized = 0;
-
-	size_t index = 0;
+	// find index to be discarded
 	for (size_t i = 0; i < 4; i++)
 	{
-		if (std::fabs(floats[i]) >= sqrt1_2)
+		if (std::fabs(floats[i] > max))
 		{
 			discard = i;
-			continue;
+			max = floats[i];
 		}
-		quantized |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
 	}
 
 	assert(discard < 4 && "there was no discard");
+
+
+	uint64_t	quantized	= 0;
+	size_t		index		= 0;
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (discard == i)
+			continue;
+	
+		quantized |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
+	}
+
 
 	quantized |= discard << 45;
 

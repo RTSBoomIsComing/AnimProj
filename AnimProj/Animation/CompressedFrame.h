@@ -17,7 +17,7 @@ namespace pa
 		ChannelType		getChannelType()					const;
 
 		void			setJointIndex(uint16_t jointIndex);
-		std::uint16_t	getJointIndex()						const;
+		uint16_t		getJointIndex()						const;
 
 		void			setKeyTime(uint16_t keyTime);
 		uint16_t		getKeyTime()						const;

@@ -37,7 +37,7 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 
 	// when Debugging it would be needed
 	//std::vector<float>		errors(frameCount, 0.0f);
-	for (size_t nIteration = 0; nIteration < boneCount; nIteration++)
+	for (size_t nIteration = 0; nIteration < frameCount; nIteration++)
 	{
 
 		size_t	cursor			= 0;
@@ -61,7 +61,10 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 				p0 = p1;
 				p1 = p2;
 				p2 = p3;
-				p3 = (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
+				if (cursor < controlPoints.size() - 1)
+					p3 = controlPoints[++cursor];
+				else
+					p3 = controlPoints.back();
 			}
 
 			const float t = static_cast<float>(i - p1) / (p2 - p1);
@@ -99,13 +102,17 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 
 	// TODO: populate this and return
 	std::vector<CompressedFrame> frames;
+	frames.reserve(controlPoints.size());
+
 	for (size_t p : controlPoints)
 	{
 		CompressedFrame frame = {};
 		frame.setChannelType(ChannelType::Rotation);
-		frame.setJointIndex(boneIndex);
-		frame.setKeyTime(p);
+		frame.setJointIndex(static_cast<uint16_t>(boneIndex));
+		frame.setKeyTime(static_cast<uint16_t>(p));
 		frame.setQuantized(Quantization::quantize(pAnimation->getRotation(p, boneIndex)));
+
+		frames.push_back(frame);
 	}
 
 	

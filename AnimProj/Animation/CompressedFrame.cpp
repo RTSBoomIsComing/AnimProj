@@ -33,14 +33,14 @@ uint16_t pa::CompressedFrame::getKeyTime() const
 	return _keyTime;
 }
 
-inline void pa::CompressedFrame::setKeyTime(uint16_t keyTime)
+void pa::CompressedFrame::setKeyTime(uint16_t keyTime)
 {
 	_keyTime = keyTime;
 }
 
 void pa::CompressedFrame::setQuantized(uint64_t quantized)
 {
-	reinterpret_cast<uint64_t&>(_v[0]) = quantized & 0xFFFF'FFFF'FFFF;
+	std::memcpy(_v, &reinterpret_cast<uint16_t*>(&quantized)[1], 6);
 }
 
 uint64_t pa::CompressedFrame::getQuantized() const

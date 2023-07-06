@@ -99,10 +99,10 @@ void pa::MyApplication::OnUpdate()
 	frameNumber++;
 
 	std::vector<XMMATRIX> worldTransforms(_pSkeleton->getBoneCount());
-	for (const uint8_t boneIndex : _pSkeleton->_DFSPath)
+	for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
 	{
 		// Get parent bone data
-		const uint8_t parentBoneIndex = _pSkeleton->_parentList[boneIndex];
+		const uint8_t parentBoneIndex = static_cast<uint8_t>(_pSkeleton->getParentBoneIndex(boneIndex));
 		const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
 
 		// Get current bone data

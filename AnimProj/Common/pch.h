@@ -26,3 +26,17 @@ using Microsoft::WRL::ComPtr;
 
 #include <DirectXMath.h>
 #include "DirectX11Helper.h"
+
+
+namespace pa
+{
+	struct Bit48
+	{
+		Bit48()
+		{
+			static_assert(6 == sizeof(Bit48), "sizeof Bit48 is 6byte");
+		};
+
+		uint16_t _m[3] = {};
+	};
+}
