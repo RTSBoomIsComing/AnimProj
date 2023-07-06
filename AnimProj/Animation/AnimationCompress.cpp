@@ -35,8 +35,6 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 	const size_t			boneCount	= pAnimation->getBoneCount();
 	std::vector<size_t>		controlPoints = { 0, frameCount - 1 };
 
-	// when Debugging it would be needed
-	//std::vector<float>		errors(frameCount, 0.0f);
 	for (size_t nIteration = 0; nIteration < frameCount; nIteration++)
 	{
 
@@ -49,7 +47,7 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 
 		float		maxError = 0.0f;
 		bool		needFitting = false;
-		const float threshold = 0.0001f;
+		const float threshold = 0.01f;
 
 		for (size_t i = 0; i < frameCount; i++)
 		{
@@ -82,9 +80,6 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 				maxError = error;
 				maxErrorIndex = i;
 			}
-
-			// when Debugging it would be needed
-			//errors[i] = error;
 		}
 
 		if (maxError < threshold)
@@ -103,6 +98,7 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 	// TODO: populate this and return
 	std::vector<CompressedFrame> frames;
 	frames.reserve(controlPoints.size());
+	std::cout << controlPoints.size() << std::endl;
 
 	for (size_t p : controlPoints)
 	{
@@ -114,8 +110,4 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 
 		frames.push_back(frame);
 	}
-
-	
-
-
 }
