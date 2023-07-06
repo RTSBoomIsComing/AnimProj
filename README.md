@@ -1,8 +1,6 @@
 # AnimProj
 
 # 스켈레톤
-## 문제점
-1. ASF 로더와 스켈레톤이 완전히 분리되지 않았습니다.  
 
 ## _dfsRoute : DFS경로
 루트 본으로부터 리프 본까지의 깊이 우선 탐색 경로(Depth First Search) 를 추출합니다.  
