@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "Quantization.h"
 
-pa::Quantization::Quantization(DirectX::XMFLOAT4 quaternion)
+pa::Quantization::Quantization(DirectX::XMFLOAT4 vector4)
 {
 	using namespace DirectX;
 	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
 
-	const float* floats = &quaternion.x;
+	const float*		floats	= &vector4.x;
 	size_t				discard = 0;
 
 	_data = 0;
@@ -22,7 +22,7 @@ pa::Quantization::Quantization(DirectX::XMFLOAT4 quaternion)
 	}
 
 	if (floats[discard] < 0)
-		XMStoreFloat4(&quaternion, XMLoadFloat4(&quaternion) * -1);
+		XMStoreFloat4(&vector4, XMLoadFloat4(&vector4) * -1);
 
 
 	size_t index = 0;

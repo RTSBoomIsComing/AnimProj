@@ -87,7 +87,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Animation\AnimationCompress.h" />
-    <ClInclude Include="Common\Quantization.h" />
+    <ClInclude Include="Animation\Quantization.h" />
+    <ClInclude Include="Animation\CompressedFrame.h" />
     <ClInclude Include="Rendering\Renderer.h" />
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="ASFAMC\AMC.h" />
@@ -103,7 +104,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationCompress.cpp" />
-    <ClCompile Include="Common\Quantization.cpp" />
+    <ClCompile Include="Animation\Quantization.cpp" />
+    <ClCompile Include="Animation\CompressedFrame.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="ASFAMC\AMC.cpp" />

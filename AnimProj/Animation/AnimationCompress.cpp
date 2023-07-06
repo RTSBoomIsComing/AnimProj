@@ -1,13 +1,14 @@
 #include "pch.h"
 #include "AnimationCompress.h"
 #include "Animation.h"
+#include "CompressedFrame.h"
 
 pa::AnimationCompress::AnimationCompress(pa::Animation* pAnimation)
 {
 	using namespace DirectX;
-	_pAnimation = pAnimation;
-
-	const size_t	boneCount = pAnimation->getBoneCount();
+	
+	_pAnimation					= pAnimation;
+	const size_t	boneCount	= pAnimation->getBoneCount();
 
 	for (size_t i = 0; i < boneCount; i++)
 	{
@@ -84,7 +85,7 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 		}
 
 		if (maxError < threshold)
-			return;
+			break;
 
 		for (auto it = controlPoints.rbegin(); it < controlPoints.rend(); it++)
 		{
@@ -95,4 +96,8 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 			}
 		}
 	}
+
+	// TODO
+	std::vector<CompressedFrame> frames;
+
 }
