@@ -13,7 +13,7 @@ namespace pa
 		CompressedFrame();
 		~CompressedFrame() = default;
 
-		void			SetChannelType(ChannelType type);
+		void			setChannelType(ChannelType type);
 		ChannelType		getChannelType()					const;
 
 		void			setJointIndex(uint16_t jointIndex);
@@ -22,6 +22,8 @@ namespace pa
 		void			setKeyTime(uint16_t keyTime);
 		uint16_t		getKeyTime()						const;
 
+		void			setQuantized(uint64_t quantized);
+		uint64_t		getQuantized()						const;
 
 	private:
 		uint16_t _keyTime		= 0;		// The time interval is 1/120 second. 
