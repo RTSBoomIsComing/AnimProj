@@ -14,7 +14,6 @@ pa::AnimationCompress::AnimationCompress(pa::Animation* pAnimation)
 	{
 		fitCurve(pAnimation, i);
 	}
-
 }
 
 float pa::AnimationCompress::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
@@ -97,7 +96,7 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 		}
 	}
 
-	// TODO
+	// TODO: populate this and return
 	std::vector<CompressedFrame> frames;
 
 }

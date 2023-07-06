@@ -1,64 +1,64 @@
 #include "pch.h"
 #include "Quantization.h"
 
-pa::Quantization::Quantization(DirectX::XMFLOAT4 vector4)
+pa::Quantization::Quantization(const DirectX::XMFLOAT4& vector4)
 {
 	using namespace DirectX;
 	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
 
 	const float*		floats	= &vector4.x;
-	size_t				discard = 0;
+	size_t				discard = std::numeric_limits<size_t>::max();
 
 	_data = 0;
-
-	for (size_t i = 0; i < 4; i++)
-	{
-		if (std::fabs(floats[i]) > sqrt1_2)
-		{
-			discard = i;
-			break;
-		}
-		assert(i == 3 && "check whether it is unit quaternion");
-	}
-
-	if (floats[discard] < 0)
-		XMStoreFloat4(&vector4, XMLoadFloat4(&vector4) * -1);
-
 
 	size_t index = 0;
 	for (size_t i = 0; i < 4; i++)
 	{
-		if (i != discard)
-			_data |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (44 * (-15 * index++));
+		if (std::fabs(floats[i]) >= sqrt1_2)
+		{
+			discard = i;
+			continue;
+		}
+		_data |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
 	}
 
-	_data |= discard << 46;
+	assert(discard < 4 && "there was no discard");
+
+	_data |= discard << 45;
+
+	if (floats[discard] < 0)
+		_data |= 1ui64 << 47;
 }
 
 DirectX::XMVECTOR pa::Quantization::deQuantize()
+{
+	return deQuantize(_data);
+}
+
+DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
 {
 	using namespace DirectX;
 	size_t				index		= 0;
 	float				floats[4]	= {};
 
-
-	const size_t		discard		= (_data >> 45) & 0b11;
+	const bool			discardSign	= (quantized >> 47) & 0x1;
+	const size_t		discard		= (quantized >> 45) & 0x3;
 	const float			squareSum	= XMVectorGetX(XMVectorSum(XMVector4LengthSq(XMLoadFloat(floats))));
 
 	for (size_t i = 0; i < 4; i++)
 	{
 		if (discard == i)
 			continue;
-			
-		floats[i] = deQuantizeFloat(index++);
+
+		floats[i] = deQuantizeFloat(quantized, index++);
 	}
 
-	floats[discard] = std::sqrtf(1.0f - squareSum);
+	floats[discard] = std::sqrtf(1.0f - squareSum) * (discardSign ? -1 : 1);
 
 	return XMLoadFloat(floats);
 }
 
-uint16_t pa::Quantization::quantizeFloat(float value) const
+uint16_t pa::Quantization::quantizeFloat(float value)
 {
 	// NOTE
 	// if the value is sqrt(2) then result is 16383
@@ -72,17 +72,17 @@ uint16_t pa::Quantization::quantizeFloat(float value) const
 	int16_t	result = maxQuantizeValue * static_cast<int16_t>(sqrt2 * value);
 	result += maxQuantizeValue;
 
-	assert(result >= 0);
+	assert(result >= 0 && "result must be positive");
 
 	return static_cast<uint16_t>(result);
 }
 
-float pa::Quantization::deQuantizeFloat(size_t index) const
+float pa::Quantization::deQuantizeFloat(uint64_t quantized, size_t index)
 {
 	constexpr uint16_t	maxQuantizeValue = 16383;			// 2^14 - 1;
 	constexpr float		sqrt2 = 1.41421356237309504880f;	// sqrt(2)
 
-	int16_t extracted = static_cast<int16_t>(_data >> (30 * (-15 * index))) & 0b1'1111'1111'1111'1111;
+	int16_t extracted = static_cast<int16_t>(quantized >> (30 * (-15 * index))) & 0x7FFF;
 
 	extracted -= maxQuantizeValue;
 

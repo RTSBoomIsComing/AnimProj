@@ -11,16 +11,17 @@ namespace pa
 	class Quantization
 	{
 	public:
-		Quantization(DirectX::XMFLOAT4 quaternion);
+		Quantization(const DirectX::XMFLOAT4& quaternion);
 		~Quantization() = default;
 
 		DirectX::XMVECTOR deQuantize();
+		static DirectX::XMVECTOR deQuantize(uint64_t quantized);
 	private:
-		uint16_t	quantizeFloat(float value) const;
-		float		deQuantizeFloat(size_t index) const;
+		static uint16_t		quantizeFloat(float value);
+		static float		deQuantizeFloat(uint64_t quantized, size_t index);
 
 	private:
-		uint64_t _data : 48;
+		uint64_t _data;
 	};
 
 }
