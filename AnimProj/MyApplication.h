@@ -19,7 +19,11 @@ namespace pa
 		virtual void OnKeyDown(UINT8 key) override;
 		virtual void OnKeyUp(UINT8 key) override;
 
-	protected:
+	private:
+		void initialize(HWND hWnd);
+		void initializeGraphicsPipeline();
+
+	private:
 		ComPtr<ID3D11Device>				_device;
 		ComPtr<ID3D11DeviceContext>			_deviceContext;
 		ComPtr<IDXGISwapChain>				_swapChain;
@@ -29,13 +33,9 @@ namespace pa
 		D3D11_VIEWPORT						_viewport;
 
 	private:
-		void initialize(HWND hWnd);
-		void initializeGraphicsPipeline();
-
-	private:
-		float	_clearColor[4] = { 0.2f, 0.4f, 0.6f, 1.0f };
-		float	_cameraRotationFactor = 0.0f;
-		float	_cameraHeight = 0.0f;
+		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
+		float	_cameraRotationFactor	= 0.0f;
+		float	_cameraHeight			= 0.0f;
 
 		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
 		ComPtr<ID3D11Buffer>			_meshConstantBuffer;
@@ -49,7 +49,8 @@ namespace pa
 		Skeleton*						_pSkeleton;
 		Animation*						_pAnimation;
 
-		bool keyState[4] = {};
+	private:
+		bool	keyState[4]				= {};
 	};
 }
 

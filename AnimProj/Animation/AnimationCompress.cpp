@@ -2,6 +2,7 @@
 #include "AnimationCompress.h"
 #include "Animation.h"
 #include "CompressedFrame.h"
+#include "Quantization.h"
 
 pa::AnimationCompress::AnimationCompress(pa::Animation* pAnimation)
 {
@@ -98,5 +99,16 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 
 	// TODO: populate this and return
 	std::vector<CompressedFrame> frames;
+	for (size_t p : controlPoints)
+	{
+		CompressedFrame frame = {};
+		frame.setChannelType(ChannelType::Rotation);
+		frame.setJointIndex(boneIndex);
+		frame.setKeyTime(p);
+		frame.setQuantized(Quantization::quantize(pAnimation->getRotation(p, boneIndex)));
+	}
+
+	
+
 
 }
