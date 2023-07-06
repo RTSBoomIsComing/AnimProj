@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Quantization.h"
 
-DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
+DirectX::XMFLOAT4 pa::Quantization::deQuantize(uint64_t quantized)
 {
 	using namespace DirectX;
 	size_t				index		= 0;
@@ -9,7 +9,6 @@ DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
 
 	const bool			discardSign	= (quantized >> 47) & 0x1;
 	const size_t		discard		= (quantized >> 45) & 0x3;
-	const float			squareSum	= XMVectorGetX(XMVectorSum(XMVector4LengthSq(XMLoadFloat(floats))));
 
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -19,9 +18,10 @@ DirectX::XMVECTOR pa::Quantization::deQuantize(uint64_t quantized)
 		floats[i] = deQuantizeFloat(quantized, index++);
 	}
 
+	const float			squareSum	= XMVectorGetX(XMVectorSum(XMVector4LengthSq(XMLoadFloat(floats))));
 	floats[discard] = std::sqrtf(1.0f - squareSum) * (discardSign ? -1 : 1);
 
-	return XMLoadFloat(floats);
+	return XMFLOAT4(floats);
 }
 
 uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& vector4)
@@ -54,7 +54,7 @@ uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& vector4)
 		if (discard == i)
 			continue;
 	
-		quantized |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 * (-15 * index++));	// 30, 15, 0
+		quantized |= static_cast<uint64_t>(quantizeFloat(floats[i])) << (30 + (-15 * index++));	// 30, 15, 0
 	}
 
 
@@ -90,7 +90,7 @@ float pa::Quantization::deQuantizeFloat(uint64_t quantized, size_t index)
 	constexpr uint16_t	maxQuantizeValue = 16383;			// 2^14 - 1;
 	constexpr float		sqrt2 = 1.41421356237309504880f;	// sqrt(2)
 
-	int16_t extracted = static_cast<int16_t>(quantized >> (30 * (-15 * index))) & 0x7FFF;
+	int16_t extracted = static_cast<int16_t>(quantized >> (30 + (-15 * index))) & 0x7FFF;
 
 	extracted -= maxQuantizeValue;
 

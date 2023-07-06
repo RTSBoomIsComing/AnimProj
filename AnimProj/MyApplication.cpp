@@ -8,6 +8,7 @@
 #include "Animation/AnimationCompress.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
+#include "Animation/Quantization.h"
 
 pa::MyApplication::MyApplication()
 {

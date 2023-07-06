@@ -11,7 +11,7 @@ namespace pa
 	class Quantization
 	{
 	public:
-		static DirectX::XMVECTOR deQuantize(uint64_t quantized);
+		static DirectX::XMFLOAT4 deQuantize(uint64_t quantized);
 		static uint64_t		quantize(const DirectX::XMFLOAT4& vector4);
 	private:
 		static uint16_t		quantizeFloat(float value);
