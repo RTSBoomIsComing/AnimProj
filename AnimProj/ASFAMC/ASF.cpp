@@ -133,7 +133,7 @@ void pa::ASF::parseRoot(std::istream& stream)
 
 	Skeleton::Bone bone = {};
 	const XMMATRIX rotation = eulerRotation(orientation, axisOrder);
-	XMStoreFloat4(&bone.rotation, XMQuaternionRotationMatrix(rotation));
+	XMStoreFloat4(&bone.rotation, XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation)));
 
 	_pSkeleton->_boneList.push_back(bone);
 }
@@ -208,7 +208,7 @@ void pa::ASF::parseBoneData(std::istream& stream)
 		XMStoreFloat4(&bone.direction, adjustedDirection);
 
 		const XMMATRIX rotation = eulerRotation(axis, axisOrder);
-		const XMVECTOR quaternion = XMQuaternionRotationMatrix(rotation);
+		const XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
 		XMStoreFloat4(&bone.rotation, quaternion);
 
 		_pSkeleton->_boneList.push_back(bone);

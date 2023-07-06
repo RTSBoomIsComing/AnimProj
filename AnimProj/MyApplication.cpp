@@ -4,7 +4,8 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Skeleton.h"
-#include "Rendering/Animation.h"
+#include "Animation/Animation.h"
+#include "Animation/AnimationCompress.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 
@@ -19,15 +20,15 @@ pa::MyApplication::MyApplication()
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
 	_pSkeleton = new Skeleton();
@@ -36,6 +37,8 @@ pa::MyApplication::MyApplication()
 
 	_pAnimation = new Animation();
 	amc.generateAnimation(&asf, _pAnimation);
+
+	AnimationCompress animationCompressTest(_pAnimation);
 
 	initializeGraphicsPipeline();
 }

@@ -1,0 +1,98 @@
+#include "pch.h"
+#include "AnimationCompress.h"
+#include "Animation.h"
+
+pa::AnimationCompress::AnimationCompress(pa::Animation* pAnimation)
+{
+	using namespace DirectX;
+	_pAnimation = pAnimation;
+
+	const size_t	boneCount = pAnimation->getBoneCount();
+
+	for (size_t i = 0; i < boneCount; i++)
+	{
+		fitCurve(pAnimation, i);
+	}
+
+}
+
+float pa::AnimationCompress::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
+{
+	using namespace DirectX;
+
+	const XMVECTOR	difference = other - origin;
+	const float		error = XMVectorGetX(XMVector4LengthSq(difference));
+
+	return error;
+}
+
+void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneIndex)
+{
+	using namespace DirectX;
+
+	const size_t			frameCount	= pAnimation->getFrameCount();
+	const size_t			boneCount	= pAnimation->getBoneCount();
+	std::vector<size_t>		controlPoints = { 0, frameCount - 1 };
+
+	// when Debugging it would be needed
+	//std::vector<float>		errors(frameCount, 0.0f);
+	for (size_t nIteration = 0; nIteration < boneCount; nIteration++)
+	{
+
+		size_t	cursor			= 0;
+		size_t	p0				= controlPoints[0];
+		size_t	p1				= controlPoints[cursor++];
+		size_t	p2				= controlPoints[cursor++];
+		size_t	p3				= (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
+		size_t	maxErrorIndex	= std::numeric_limits<size_t>::max();
+
+		float		maxError = 0.0f;
+		bool		needFitting = false;
+		const float threshold = 0.0001f;
+
+		for (size_t i = 0; i < frameCount; i++)
+		{
+			if (std::find(controlPoints.begin(), controlPoints.end(), i) != controlPoints.end())
+				continue;	// skip already collected index
+
+			if (p2 < i)
+			{
+				p0 = p1;
+				p1 = p2;
+				p2 = p3;
+				p3 = (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
+			}
+
+			const float t = static_cast<float>(i - p1) / (p2 - p1);
+
+			XMVECTOR catmullRom = XMVectorCatmullRom(
+				XMLoadFloat4(&pAnimation->getRotation(p0, boneIndex)),
+				XMLoadFloat4(&pAnimation->getRotation(p1, boneIndex)),
+				XMLoadFloat4(&pAnimation->getRotation(p2, boneIndex)),
+				XMLoadFloat4(&pAnimation->getRotation(p3, boneIndex)), t);
+
+			const float error = getError(XMLoadFloat4(&pAnimation->getRotation(i, boneIndex)), catmullRom);
+
+			if (maxError < error)
+			{
+				maxError = error;
+				maxErrorIndex = i;
+			}
+
+			// when Debugging it would be needed
+			//errors[i] = error;
+		}
+
+		if (maxError < threshold)
+			return;
+
+		for (auto it = controlPoints.rbegin(); it < controlPoints.rend(); it++)
+		{
+			if (*it < maxErrorIndex)
+			{
+				controlPoints.insert(it.base(), maxErrorIndex);
+				break;
+			}
+		}
+	}
+}

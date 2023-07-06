@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "AMC.h"
 #include "ASF.h"
-#include "../Rendering/Animation.h"
+#include "../Animation/Animation.h"
 
 pa::AMC::AMC(const wchar_t* filePath)
 {
@@ -73,7 +73,6 @@ void pa::AMC::generateAnimation(const ASF* pASF, Animation* pAnimation)
 	size_t dataIndex = 0;
 	for (int frameID = 0; frameID < _frameCount; frameID++)
 	{
-		//_animationSheets[frameID].rotations.resize(pASF->getBoneCount(), XMMatrixIdentity());
 		for (const int boneIndex : orderMatch)
 		{
 			// rx, ry, rz, tx, ty, tz, l
@@ -87,7 +86,7 @@ void pa::AMC::generateAnimation(const ASF* pASF, Animation* pAnimation)
 				if (ASF::Channel::None == channel)
 					break;
 
-				dataBuffer[static_cast<size_t>(channel)] = _data[dataIndex++]; //* pASF->_unitAngle;
+				dataBuffer[static_cast<size_t>(channel)] = _data[dataIndex++];
 			}
 
 			dataBuffer[0] *= pASF->_unitAngle	* -1;	// rx
@@ -101,7 +100,7 @@ void pa::AMC::generateAnimation(const ASF* pASF, Animation* pAnimation)
 			dataBuffer[6] *= pASF->_unitLength;			// l (length)
 
 			XMMATRIX rotation = ASF::eulerRotation(dataBuffer, pASF->_axisOrders[boneIndex]);
-			XMVECTOR quaternion = XMQuaternionRotationMatrix(rotation);
+			XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
 			XMStoreFloat4(&pAnimation->getRotation(frameID, boneIndex), quaternion);
 			pAnimation->getPosition(frameID, boneIndex) = XMFLOAT4(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
 		}

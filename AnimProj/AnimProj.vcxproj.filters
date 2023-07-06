@@ -45,13 +45,16 @@
     <ClInclude Include="Rendering\Skeleton.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\Animation.h">
+    <ClInclude Include="Animation\Animation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\Renderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Quantization.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\AnimationCompress.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,13 +92,16 @@
     <ClCompile Include="Rendering\Skeleton.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\Animation.cpp">
+    <ClCompile Include="Animation\Animation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Renderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Common\Quantization.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\AnimationCompress.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

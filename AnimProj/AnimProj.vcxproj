@@ -86,9 +86,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\AnimationCompress.h" />
     <ClInclude Include="Common\Quantization.h" />
     <ClInclude Include="Rendering\Renderer.h" />
-    <ClInclude Include="Rendering\Animation.h" />
+    <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="ASFAMC\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
@@ -101,9 +102,10 @@
     <ClInclude Include="Rendering\Skeleton.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animation\AnimationCompress.cpp" />
     <ClCompile Include="Common\Quantization.cpp" />
     <ClCompile Include="Rendering\Renderer.cpp" />
-    <ClCompile Include="Rendering\Animation.cpp" />
+    <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="ASFAMC\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />

@@ -6,6 +6,7 @@ namespace pa
 	class Animation
 	{
 		friend class AMC;
+		friend class AnimationCompress;
 	public:
 		Animation() = default;
 		~Animation() = default;
