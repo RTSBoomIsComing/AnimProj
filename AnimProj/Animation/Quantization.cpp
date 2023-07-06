@@ -24,12 +24,12 @@ DirectX::XMFLOAT4 pa::Quantization::deQuantize(uint64_t quantized)
 	return XMFLOAT4(floats);
 }
 
-uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& vector4)
+uint64_t pa::Quantization::quantize(const DirectX::XMFLOAT4& normalized)
 {
 	using namespace DirectX;
 	constexpr float		sqrt1_2 = 0.707106781186547524401f; // 1 / sqrt(2)
 
-	const float*		floats = &vector4.x;
+	const float*		floats = &normalized.x;
 	size_t				discard = std::numeric_limits<size_t>::max();
 	float				max = 0.0f;
 

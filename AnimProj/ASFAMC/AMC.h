@@ -3,12 +3,6 @@
 
 namespace pa
 {
-	struct AnimationSheet
-	{
-		DirectX::XMFLOAT4 rootPosition;
-		std::vector<DirectX::XMMATRIX> rotations;
-	};
-
 	class ASF;
 	class Animation;
 	class AMC

@@ -39,6 +39,7 @@ pa::MyApplication::MyApplication()
 	_pAnimation = new Animation();
 	amc.generateAnimation(&asf, _pAnimation);
 
+	// For Test
 	AnimationCompress animationCompressTest(_pAnimation);
 
 	initializeGraphicsPipeline();
