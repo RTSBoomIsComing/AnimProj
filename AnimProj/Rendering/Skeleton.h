@@ -25,8 +25,6 @@ namespace pa
 
 
 	private:
-		DirectX::XMFLOAT4			_rootPosition;
-
 		// contain bone data
 		std::vector<Skeleton::Bone>	_boneList;
 

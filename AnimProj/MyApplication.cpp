@@ -108,14 +108,14 @@ void pa::MyApplication::OnUpdate()
 
 		// TODO : EVOKE LOGICAL ERROR
 		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
+		const XMMATRIX inverseOriginalRotation = XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&bone.rotation)));
 
 		// Apply animation
 		const XMMATRIX& relativeRotation = XMMatrixRotationQuaternion(
 			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
 		
 
-		const XMMATRIX localRotation =
-			XMMatrixInverse(nullptr, originalRotation) * relativeRotation * originalRotation;
+		const XMMATRIX localRotation = inverseOriginalRotation * relativeRotation * originalRotation;
 
 		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, localRotation);
 		const XMMATRIX localTranslation = XMMatrixTranslationFromVector(relativePosition);
