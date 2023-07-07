@@ -1,4 +1,6 @@
 #pragma once
+#include "CompressedFrame.h"
+
 namespace pa
 {
 	class Animation;
@@ -11,8 +13,9 @@ namespace pa
 	private:
 		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 		void fitCurve(const Animation* pAnimation, size_t boneIndex);
-
-		Animation* _pAnimation;
+		
+	private:
+		std::vector<pa::CompressedFrame> _compressedFrames;
 	};
 }
 

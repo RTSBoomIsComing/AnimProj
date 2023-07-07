@@ -1,20 +1,33 @@
 #include "pch.h"
 #include "AnimationCompress.h"
 #include "Animation.h"
-#include "CompressedFrame.h"
 #include "Quantization.h"
 
 pa::AnimationCompress::AnimationCompress(pa::Animation* pAnimation)
 {
 	using namespace DirectX;
 	
-	_pAnimation					= pAnimation;
 	const size_t	boneCount	= pAnimation->getBoneCount();
 
 	for (size_t i = 0; i < boneCount; i++)
 	{
 		fitCurve(pAnimation, i);
 	}
+	auto compareFrame = [](const CompressedFrame& a, const CompressedFrame& b) {
+		return a.getKeyTime() < b.getKeyTime();
+	};
+
+	// need more fast sorting algorithm
+	// or population algorithm
+	std::sort(_compressedFrames.begin(), _compressedFrames.end(), compareFrame);
+	
+	for (auto& frame : _compressedFrames)
+	{
+
+		auto v = Quantization::deQuantize(frame.getQuantized());
+		std::cout << v.x << " " << v.y << " " << v.z << " " << v.w << std::endl;
+	}
+
 }
 
 float pa::AnimationCompress::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
@@ -95,11 +108,9 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 		}
 	}
 
-	// TODO: populate this and return
-	std::vector<CompressedFrame> frames;
-	frames.reserve(controlPoints.size());
+	// For Test, need to remove
 	std::cout << controlPoints.size() << std::endl;
-
+	
 	for (size_t p : controlPoints)
 	{
 		CompressedFrame frame = {};
@@ -108,6 +119,6 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 		frame.setKeyTime(static_cast<uint16_t>(p));
 		frame.setQuantized(Quantization::quantize(pAnimation->getRotation(p, boneIndex)));
 
-		frames.push_back(frame);
+		_compressedFrames.push_back(frame);
 	}
 }
