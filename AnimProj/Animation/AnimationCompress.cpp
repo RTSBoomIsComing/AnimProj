@@ -45,9 +45,9 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 		size_t	p3				= (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
 		size_t	maxErrorIndex	= std::numeric_limits<size_t>::max();
 
-		float		maxError = 0.0f;
-		bool		needFitting = false;
-		const float threshold = 0.01f;
+		float			maxError = 0.0f;
+		bool			needFitting = false;
+		constexpr float	threshold = 0.01f;
 
 		for (size_t i = 0; i < frameCount; i++)
 		{
