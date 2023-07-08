@@ -10,6 +10,11 @@
 #include "ASFAMC/AMC.h"
 #include "Animation/Quantization.h"
 
+namespace pa
+{
+	extern void SandboxModifySkeleton(Skeleton* pSkeleton);
+}
+
 pa::MyApplication::MyApplication()
 {
 	using namespace DirectX;
@@ -34,13 +39,18 @@ pa::MyApplication::MyApplication()
 
 	_pSkeleton = new Skeleton();
 	ASF asf(_pSkeleton, asfFilePath.c_str());
+
+	Skeleton ModifiedSkeleton;
+	SandboxModifySkeleton(_pSkeleton);
+
+
 	AMC amc(amcFilePath.c_str());
 
 	_pAnimation = new Animation();
 	amc.generateAnimation(&asf, _pAnimation);
 
 	// For Test
-	AnimationCompress animationCompressTest(_pAnimation);
+	//AnimationCompress animationCompressTest(_pAnimation);
 
 	initializeGraphicsPipeline();
 }
@@ -116,15 +126,20 @@ void pa::MyApplication::OnUpdate()
 		const XMMATRIX inverseOriginalRotation = XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&bone.rotation)));
 
 		// Apply animation
-		const XMMATRIX& relativeRotation = XMMatrixRotationQuaternion(
+		XMMATRIX animationRotation = XMMatrixRotationQuaternion(
 			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
-		
 
-		const XMMATRIX localRotation = inverseOriginalRotation * relativeRotation * originalRotation;
+		// For Test
+		//animationRotation = XMMatrixIdentity();
 
-		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, localRotation);
+		const XMMATRIX localRotation = inverseOriginalRotation * animationRotation * originalRotation;
+
+		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, animationRotation);
 		const XMMATRIX localTranslation = XMMatrixTranslationFromVector(relativePosition);
-		const XMMATRIX localTransform = localRotation * localTranslation;
+		//const XMMATRIX localTransform = localRotation * localTranslation;
+		
+		//For Test
+		const XMMATRIX localTransform = XMMatrixTranslationFromVector(originalDirection) * animationRotation * originalRotation;
 
 		// Store world transform for rendering
 		worldTransforms[boneIndex] = localTransform * parentWorldTransform;

@@ -5,6 +5,7 @@ namespace pa
 	class Skeleton
 	{
 		friend class ASF;
+		friend void SandboxModifySkeleton(Skeleton* pSkeleton);
 	public:
 		struct Bone
 		{
