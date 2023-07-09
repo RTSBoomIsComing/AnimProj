@@ -20,7 +20,7 @@ namespace pa
 		virtual void OnKeyUp(UINT8 key) override;
 
 	private:
-		void initialize(HWND hWnd);
+		void initializeD3dDevices(HWND hWnd);
 		void initializeGraphicsPipeline();
 
 	private:
@@ -44,10 +44,10 @@ namespace pa
 		ComPtr<ID3D11PixelShader>		_pixelShader;
 		ComPtr<ID3D11RasterizerState>	_rasterizerState;
 
-		Camera*							_pCamera;
-		Mesh*							_pCubeMesh;
-		Skeleton*						_pSkeleton;
-		Animation*						_pAnimation;
+		Camera*							_pCamera = nullptr;
+		Mesh*							_pCubeMesh = nullptr;
+		Skeleton*						_pSkeleton = nullptr;
+		Animation*						_pAnimation = nullptr;
 
 	private:
 		bool	keyState[4]				= {};

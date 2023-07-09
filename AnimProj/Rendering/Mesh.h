@@ -1,23 +1,25 @@
 // author: Changwan Yu
 #pragma once
-
+#include "Rendering.h"
 namespace pa
 {
-	class MeshFactory;
 	class Mesh
 	{
-		friend MeshFactory;
 	public:
 		Mesh() = default;
 		~Mesh() = default;
 
+		void draw(ID3D11DeviceContext* pDeviceContext);
+		void drawInstanced(ID3D11DeviceContext* pDeviceContext, UINT instanceCount);
 		void setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext);
 
 	public:
 		UINT getVertexCount() const;
 		UINT getIndexCount() const;
-
-	private:
+	protected:
+		void processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors);
+		void processIndices(ID3D11Device* pDevice, std::vector<UINT> const& indices);
+	protected:
 		D3D11_PRIMITIVE_TOPOLOGY	_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		ComPtr<ID3D11Buffer>		_indexBuffer;
 		ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
@@ -28,13 +30,6 @@ namespace pa
 
 		UINT _indexCount	= 0;
 		UINT _vertexCount	= 0;
-	};
-
-	class MeshFactory
-	{
-	public:
-		static Mesh* CreateCubeMesh(ID3D11Device* pDevice, float scale = 1.0f);
-		static Mesh* CreateSphereMesh(ID3D11Device* pDevice);
 	};
 }
 
