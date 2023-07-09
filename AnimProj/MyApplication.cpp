@@ -125,12 +125,12 @@ void pa::MyApplication::OnUpdate()
 		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
 
 		// Apply animation
-		//XMMATRIX animationRotation = XMMatrixRotationQuaternion(
-		//	XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+		XMMATRIX animationRotation = XMMatrixRotationQuaternion(
+			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
 
 		//For Test
 		//const XMMATRIX localTransform = animationRotation * originalRotation * XMMatrixTranslationFromVector(originalDirection);
-		const XMMATRIX localTransform = originalRotation * XMMatrixTranslationFromVector(originalDirection);
+		const XMMATRIX localTransform = animationRotation * originalRotation * XMMatrixTranslationFromVector(originalDirection);
 
 		// Store world transform for rendering
 		worldTransforms[boneIndex] = localTransform * parentWorldTransform;

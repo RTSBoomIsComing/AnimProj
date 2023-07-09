@@ -32,6 +32,8 @@ namespace pa
 		std::vector<uint8_t> hierarchy;
 		for (size_t currentBonIndex : pSkeleton->getDFSPath())
 		{
+			pSkeleton->_boneList[currentBonIndex].rotation = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
+
 			hierarchy.push_back(currentBonIndex);
 
 			// find all children of this bone
@@ -53,8 +55,7 @@ namespace pa
 			{
 				Skeleton::Bone dummyBone;
 				dummyBone.rotation = pSkeleton->getBone(childBoneIndex).rotation;
-				pSkeleton->_boneList[childBoneIndex].rotation = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
-				
+		
 				const size_t dummyBoneIndex = pSkeleton->getBoneCount();
 				
 				pSkeleton->_boneList.push_back(dummyBone);
