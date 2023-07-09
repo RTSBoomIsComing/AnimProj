@@ -25,16 +25,16 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
 	_pSkeleton = new Skeleton();
@@ -123,23 +123,14 @@ void pa::MyApplication::OnUpdate()
 
 		// TODO : EVOKE LOGICAL ERROR
 		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
-		const XMMATRIX inverseOriginalRotation = XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&bone.rotation)));
 
 		// Apply animation
-		XMMATRIX animationRotation = XMMatrixRotationQuaternion(
-			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+		//XMMATRIX animationRotation = XMMatrixRotationQuaternion(
+		//	XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
 
-		// For Test
-		//animationRotation = XMMatrixIdentity();
-
-		const XMMATRIX localRotation = inverseOriginalRotation * animationRotation * originalRotation;
-
-		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, animationRotation);
-		const XMMATRIX localTranslation = XMMatrixTranslationFromVector(relativePosition);
-		//const XMMATRIX localTransform = localRotation * localTranslation;
-		
 		//For Test
-		const XMMATRIX localTransform = XMMatrixTranslationFromVector(originalDirection) * animationRotation * originalRotation;
+		//const XMMATRIX localTransform = animationRotation * originalRotation * XMMatrixTranslationFromVector(originalDirection);
+		const XMMATRIX localTransform = originalRotation * XMMatrixTranslationFromVector(originalDirection);
 
 		// Store world transform for rendering
 		worldTransforms[boneIndex] = localTransform * parentWorldTransform;
