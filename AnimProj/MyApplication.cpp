@@ -136,8 +136,10 @@ void pa::MyApplication::OnUpdate()
 
 		// Store world transform for rendering
 		worldTransforms[boneIndex] = localTransform * parentWorldTransform;
+
+		const float boneStickScale = XMVectorGetX(XMVector3Length(originalDirection));
 		boneStickTransforms[boneIndex] = 
-			XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixTranslation(0.f, 0.0f, 0.f) * localRotation * parentWorldTransform;
+			XMMatrixScaling(0.25f, boneStickScale, 0.25f) * XMMatrixTranslation(0.f, 0.0f, 0.f) * parentWorldTransform;
 	}
 
 	{
