@@ -5,29 +5,29 @@ pa::StickMesh::StickMesh(ID3D11Device* pDevice)
 {
 	using namespace DirectX;
 
-	float scale = 0.5f;
+	float scale = 1.0f;
 	std::vector<XMFLOAT4> positions =
 	{
-		{ -scale, -scale, -scale, 1.0 }, //0
-		{ -scale,  scale, -scale, 1.0 }, //1
-		{  scale,  scale, -scale, 1.0 }, //2
-		{  scale, -scale, -scale, 1.0 }, //3
-		{ -scale, -scale,  scale, 1.0 }, //4
-		{ -scale,  scale,  scale, 1.0 }, //5
-		{  scale,  scale,  scale, 1.0 }, //6
-		{  scale, -scale,  scale, 1.0 }, //7
+		{ -scale / 2,    0.f, -scale / 2, 1.0 }, //0
+		{ -scale / 2,  scale, -scale / 2, 1.0 }, //1
+		{  scale / 2,  scale, -scale / 2, 1.0 }, //2
+		{  scale / 2,    0.f, -scale / 2, 1.0 }, //3
+		{ -scale / 2,    0.f,  scale / 2, 1.0 }, //4
+		{ -scale / 2,  scale,  scale / 2, 1.0 }, //5
+		{  scale / 2,  scale,  scale / 2, 1.0 }, //6
+		{  scale / 2,    0.f,  scale / 2, 1.0 }, //7
 	};
 
 	std::vector<XMFLOAT4> colors =
 	{
-		{ 0,  0,  1, 1 }, //0
-		{ 1,  0,  0, 1 }, //1
-		{ 1,  0,  0, 1 }, //2
-		{ 0,  0,  1, 1 }, //3
-		{ 0,  0,  1, 1 }, //4
-		{ 1,  0,  0, 1 }, //5
-		{ 1,  0,  0, 1 }, //6
-		{ 0,  0,  1, 1 }, //7
+		{ 0.5,  0.5,  0.5, 1 }, //0
+		{ 0.5,  0.5,  0.5, 1 }, //1
+		{ 0.5,  0.5,  0.5, 1 }, //2
+		{ 0.5,  0.5,  0.5, 1 }, //3
+		{ 0.5,  0.5,  0.5, 1 }, //4
+		{ 0.5,  0.5,  0.5, 1 }, //5
+		{ 0.5,  0.5,  0.5, 1 }, //6
+		{ 0.5,  0.5,  0.5, 1 }, //7
 	};
 
 	processVertices(pDevice, positions, colors);
