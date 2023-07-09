@@ -48,7 +48,7 @@
     <ClInclude Include="Animation\Animation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\Renderer.h">
+    <ClInclude Include="Rendering\Rendering.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\Quantization.h">
@@ -58,6 +58,15 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\CompressedFrame.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ASFAMC\Acclaim.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\StickMesh.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\CubeMesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,7 +107,7 @@
     <ClCompile Include="Animation\Animation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Rendering\Renderer.cpp">
+    <ClCompile Include="Rendering\Rendering.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\Quantization.cpp">
@@ -111,6 +120,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Sandbox.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ASFAMC\Acclaim.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\StickMesh.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\CubeMesh.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

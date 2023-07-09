@@ -4,14 +4,6 @@ namespace pa
 {
 	class Skeleton;
 
-	struct Bone
-	{
-
-		DirectX::XMFLOAT4	direction	= {};	// in global coordinate
-		float				length		= 0.0f;
-	};
-	
-	
 	class ASF
 	{
 		friend class AMC;

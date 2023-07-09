@@ -13,7 +13,7 @@ namespace pa
 		~AMC() = default;
 
 		bool							loadFromFile(const wchar_t* filePath);
-		void							generateAnimation(const ASF* pASF, Animation* pAnimation);
+		void							generateAnimation(ASF* pASF, Animation* pAnimation);
 	private:
 		int								_frameCount;
 		std::vector<float>				_data;

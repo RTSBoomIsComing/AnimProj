@@ -51,6 +51,9 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)Common\;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -86,10 +89,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ASFAMC\Acclaim.h" />
     <ClInclude Include="Animation\AnimationCompress.h" />
     <ClInclude Include="Animation\Quantization.h" />
     <ClInclude Include="Animation\CompressedFrame.h" />
-    <ClInclude Include="Rendering\Renderer.h" />
+    <ClInclude Include="Rendering\CubeMesh.h" />
+    <ClInclude Include="Rendering\Rendering.h" />
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="ASFAMC\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
@@ -101,12 +106,15 @@
     <ClInclude Include="MyApplication.h" />
     <ClInclude Include="Common\pch.h" />
     <ClInclude Include="Rendering\Skeleton.h" />
+    <ClInclude Include="Rendering\StickMesh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ASFAMC\Acclaim.cpp" />
     <ClCompile Include="Animation\AnimationCompress.cpp" />
     <ClCompile Include="Animation\Quantization.cpp" />
     <ClCompile Include="Animation\CompressedFrame.cpp" />
-    <ClCompile Include="Rendering\Renderer.cpp" />
+    <ClCompile Include="Rendering\CubeMesh.cpp" />
+    <ClCompile Include="Rendering\Rendering.cpp" />
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="ASFAMC\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
@@ -123,6 +131,7 @@
     </ClCompile>
     <ClCompile Include="Rendering\Skeleton.cpp" />
     <ClCompile Include="Sandbox.cpp" />
+    <ClCompile Include="Rendering\StickMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

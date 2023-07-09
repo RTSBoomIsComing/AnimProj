@@ -3,6 +3,8 @@
 #include "MyApplication.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
+#include "Rendering/StickMesh.h"
+#include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Animation/Animation.h"
 #include "Animation/AnimationCompress.h"
@@ -19,28 +21,28 @@ pa::MyApplication::MyApplication()
 {
 	using namespace DirectX;
 
-	initialize(getHwnd());
+	initializeD3dDevices(getHwnd());
 
 	_pCamera = new Camera();
-	_pCubeMesh = MeshFactory::CreateCubeMesh(_device.Get(), 0.25f);
+	_pStickMesh = new StickMesh(_device.Get());
+	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
 	_pSkeleton = new Skeleton();
 	ASF asf(_pSkeleton, asfFilePath.c_str());
 
-	Skeleton ModifiedSkeleton;
 	SandboxModifySkeleton(_pSkeleton);
 
 
@@ -53,6 +55,10 @@ pa::MyApplication::MyApplication()
 	//AnimationCompress animationCompressTest(_pAnimation);
 
 	initializeGraphicsPipeline();
+
+	_worldTransforms.resize(_pSkeleton->getBoneCount());
+	_boneStickTransforms.resize(_pSkeleton->getBoneCount());
+
 }
 
 pa::MyApplication::~MyApplication()
@@ -62,6 +68,9 @@ pa::MyApplication::~MyApplication()
 
 	if (nullptr != _pCubeMesh)
 		delete _pCubeMesh;
+
+	if (nullptr != _pStickMesh)
+		delete _pStickMesh;
 
 	if (nullptr != _pSkeleton)
 		delete _pSkeleton;
@@ -105,45 +114,71 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
 	static std::size_t frameNumber = -1;
-	if (frameNumber >= _pAnimation->getFrameCount() - 1)
+	if (nullptr != _pAnimation && frameNumber >= _pAnimation->getFrameCount() - 1)
 		frameNumber = -1;
 
 	frameNumber++;
 
-	std::vector<XMMATRIX> worldTransforms(_pSkeleton->getBoneCount());
 	for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
 	{
 		// Get parent bone data
 		const uint8_t parentBoneIndex = static_cast<uint8_t>(_pSkeleton->getParentBoneIndex(boneIndex));
-		const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : worldTransforms[parentBoneIndex];
+		const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : _worldTransforms[parentBoneIndex];
 
 		// Get current bone data
 		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
 		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
-
-		// TODO : EVOKE LOGICAL ERROR
 		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
-		const XMMATRIX inverseOriginalRotation = XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&bone.rotation)));
 
 		// Apply animation
-		XMMATRIX animationRotation = XMMatrixRotationQuaternion(
-			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+		XMMATRIX animationRotation = XMMatrixIdentity();
+		if (nullptr != _pAnimation)
+		{
+			animationRotation = XMMatrixRotationQuaternion(
+				XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+		}
 
-		// For Test
-		//animationRotation = XMMatrixIdentity();
-
-		const XMMATRIX localRotation = inverseOriginalRotation * animationRotation * originalRotation;
-
-		const XMVECTOR relativePosition = XMVector4Transform(originalDirection, animationRotation);
-		const XMMATRIX localTranslation = XMMatrixTranslationFromVector(relativePosition);
-		//const XMMATRIX localTransform = localRotation * localTranslation;
-		
-		//For Test
-		const XMMATRIX localTransform = XMMatrixTranslationFromVector(originalDirection) * animationRotation * originalRotation;
+		const XMMATRIX localRotation = animationRotation * originalRotation;
+		const XMMATRIX localTransform = localRotation * XMMatrixTranslationFromVector(originalDirection);
 
 		// Store world transform for rendering
-		worldTransforms[boneIndex] = localTransform * parentWorldTransform;
+		_worldTransforms[boneIndex] = localTransform * parentWorldTransform;
+
+		const float boneStickScale = XMVectorGetX(XMVector3Length(originalDirection));
+		if (boneStickScale <= 0)
+		{
+			_boneStickTransforms[boneIndex] = XMMATRIX{};
+			continue;
+		}
+
+		XMVECTOR normVec1 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
+		XMVECTOR normVec2 = XMVector3Normalize(originalDirection);
+		float dotProduct = XMVectorGetX(XMVector3Dot(normVec1, normVec2));
+		XMVECTOR rotationAxis = XMVector3Cross(normVec1, normVec2);
+		float angle = std::acosf(dotProduct);
+
+		
+		_boneStickTransforms[boneIndex] = 
+			XMMatrixScaling(0.25, boneStickScale, 0.25) * XMMatrixRotationAxis(rotationAxis, angle)
+			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
 	}
+}
+
+void pa::MyApplication::OnRender()
+{
+	// rendering screen 
+	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
+	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
+	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	_deviceContext->RSSetViewports(1, &_viewport);
+	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
+
+	// renderer
+	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	_deviceContext->IASetInputLayout(_inputLayout.Get());
+	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+	_deviceContext->RSSetState(_rasterizerState.Get());
 
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
@@ -151,36 +186,29 @@ void pa::MyApplication::OnUpdate()
 		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		//  Update the vertex buffer here.
-		std::memcpy(mappedResource.pData, worldTransforms.data(), sizeof(DirectX::XMMATRIX) * worldTransforms.size());
+		std::memcpy(mappedResource.pData, _boneStickTransforms.data(), sizeof(DirectX::XMMATRIX) * _boneStickTransforms.size());
 
 		//  Reenable GPU access to the vertex buffer data.
 		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
 		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
 	}
-}
+	_pStickMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_pSkeleton->getBoneCount()));
 
-void pa::MyApplication::OnRender()
-{
-	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
-	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
-	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 
-	_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	_deviceContext->IASetInputLayout(_inputLayout.Get());
+		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
-	_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
-	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+		//  Update the vertex buffer here.
+		std::memcpy(mappedResource.pData, _worldTransforms.data(), sizeof(DirectX::XMMATRIX) * _worldTransforms.size());
 
-	_deviceContext->RSSetState(_rasterizerState.Get());
-	_deviceContext->RSSetViewports(1, &_viewport);
+		//  Reenable GPU access to the vertex buffer data.
+		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
+		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
+	}
+	_pCubeMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_pSkeleton->getBoneCount()));
 
-	_deviceContext->OMSetDepthStencilState(_depthStencilState.Get(), 0);
-
-	_pCubeMesh->setGraphicsPipeline(_deviceContext.Get());
-
-	UINT instanceCount = static_cast<UINT>(_pSkeleton->getBoneCount());
-	_deviceContext->DrawIndexedInstanced(_pCubeMesh->getIndexCount(), instanceCount, 0, 0, 0);
-
+	// renderer
 	_swapChain->Present(1, 0);
 }
 
@@ -265,7 +293,7 @@ void pa::MyApplication::initializeGraphicsPipeline()
 	}
 }
 
-void pa::MyApplication::initialize(HWND hWnd)
+void pa::MyApplication::initializeD3dDevices(HWND hWnd)
 {
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;
