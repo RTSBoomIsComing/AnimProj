@@ -7,6 +7,7 @@ namespace pa
 	class ASF
 	{
 		friend class AMC;
+		friend class RAnimation;
 
 	public:
 		enum class Channel : uint8_t
@@ -29,7 +30,8 @@ namespace pa
 		bool			loadFromFile(const wchar_t* filePath, class pa::Skeleton* pSkeleton);
 
 	public:
-		inline size_t	getBoneCount() const { return _boneNameList.size(); }
+		inline size_t				getBoneCount() const { return _boneNameList.size(); }
+		static DirectX::XMMATRIX	eulerRotation(const float axis[3], const std::string& order);
 
 	private:
 		void			parseUnits(std::istream& stream);
@@ -41,8 +43,6 @@ namespace pa
 		std::size_t getBoneIndexFromName(const std::string& boneName) const;
 
 	private:
-		// TODO: Need to extract it to common math header
-		static DirectX::XMMATRIX				eulerRotation(const float axis[3], const std::string& order);
 
 	private:
 		pa::Skeleton*							_pSkeleton;
