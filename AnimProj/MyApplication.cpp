@@ -7,6 +7,7 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Animation/Animation.h"
+#include "Animation/RAnimation.h"
 #include "Animation/AnimationCompress.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
@@ -50,6 +51,8 @@ pa::MyApplication::MyApplication()
 
 	_pAnimation = new Animation();
 	amc.generateAnimation(&asf, _pAnimation);
+
+	_ranimation = new RAnimation(&asf, &amc);
 
 	// For Test
 	//AnimationCompress animationCompressTest(_pAnimation);

@@ -8,6 +8,7 @@ namespace pa
 	class Mesh;
 	class Skeleton;
 	class Animation;
+	class RAnimation;
 
 	class MyApplication : public Win32Application
 	{
@@ -44,11 +45,12 @@ namespace pa
 		ComPtr<ID3D11PixelShader>		_pixelShader;
 		ComPtr<ID3D11RasterizerState>	_rasterizerState;
 
-		Camera*							_pCamera = nullptr;
-		Mesh*							_pCubeMesh = nullptr;
-		Mesh*							_pStickMesh = nullptr;
-		Skeleton*						_pSkeleton = nullptr;
-		Animation*						_pAnimation = nullptr;
+		Camera*							_pCamera	= nullptr;
+		Mesh*							_pCubeMesh	= nullptr;
+		Mesh*							_pStickMesh	= nullptr;
+		Skeleton*						_pSkeleton	= nullptr;
+		Animation*						_pAnimation	= nullptr;
+		RAnimation*						_ranimation	= nullptr;
 
 		std::vector<DirectX::XMMATRIX> _worldTransforms;
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
