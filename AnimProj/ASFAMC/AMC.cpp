@@ -3,7 +3,6 @@
 #include "AMC.h"
 #include "ASF.h"
 #include "../Rendering/Skeleton.h"
-#include "../Animation/Animation.h"
 
 pa::AMC::AMC(const wchar_t* filePath)
 {
@@ -53,61 +52,4 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 	}
 
 	return true;
-}
-
-void pa::AMC::generateAnimation(ASF* pASF, Animation* pAnimation)
-{
-	using namespace DirectX;
-
-	std::vector<int> orderMatch;
-	orderMatch.reserve(_dataOrder.size());
-
-	for (const auto& name : _dataOrder)
-	{
-		auto it = std::find(pASF->_boneNameList.begin(), pASF->_boneNameList.end(), name);
-		size_t index = it - pASF->_boneNameList.begin();
-		orderMatch.push_back(static_cast<int>(index));
-	}
-
-	pAnimation->initialize(_frameCount, pASF->_pSkeleton->getBoneCount());
-
-	size_t dataIndex = 0;
-	for (int frameID = 0; frameID < _frameCount; frameID++)
-	{
-		for (const int boneIndex : orderMatch)
-		{
-			// rx, ry, rz, tx, ty, tz, l
-			float dataBuffer[7] = {};
-			for (int j = 0; j < 7; j++)
-			{
-				const ASF::Channel& channel = pASF->_DOFs[boneIndex].channels[j];
-				if (ASF::Channel::LN == channel)
-					DebugBreak();
-
-				if (ASF::Channel::None == channel)
-					break;
-
-				dataBuffer[static_cast<size_t>(channel)] = _data[dataIndex++];
-			}
-
-			dataBuffer[0] *= pASF->_unitAngle	* -1;	// rx
-			dataBuffer[1] *= pASF->_unitAngle	* -1;	// ry
-			dataBuffer[2] *= pASF->_unitAngle;			// rz
-
-			dataBuffer[3] *= pASF->_unitLength;			// tx
-			dataBuffer[4] *= pASF->_unitLength;			// ty
-			dataBuffer[5] *= pASF->_unitLength	* -1;	// tz
-
-			dataBuffer[6] *= pASF->_unitLength;			// l (length)
-
-			XMMATRIX rotation = ASF::eulerRotation(dataBuffer, pASF->_axisOrders[boneIndex]);
-			XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
-
-			size_t parentBoneIndex = pASF->_pSkeleton->getParentBoneIndex(boneIndex);
-			if (boneIndex == 0)
-				parentBoneIndex = 0;
-			XMStoreFloat4(&pAnimation->getRotation(frameID, parentBoneIndex), quaternion);
-			pAnimation->getPosition(frameID, parentBoneIndex) = XMFLOAT4(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
-		}
-	}
 }

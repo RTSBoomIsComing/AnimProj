@@ -3,34 +3,40 @@
 
 namespace pa
 {
+	class ASF;
+	class AMC;
 	class Animation
 	{
-		friend class AMC;
-		friend class AnimationCompress;
+		friend class MyApplication;
+	public:
+		struct Frame
+		{
+			uint32_t			key		= std::numeric_limits<uint32_t>::max();
+
+			// scale, position or rotation(quaternion)
+			DirectX::XMFLOAT4	v		= {};
+		};
+
+		struct BoneAnimation
+		{
+			std::vector<Animation::Frame>	scale;
+			std::vector<Animation::Frame>	rotation;
+			std::vector<Animation::Frame>	position;
+		};
 	public:
 		Animation() = default;
+		Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		~Animation() = default;
 
-	public:
-		void						initialize(size_t frameCount, size_t boneCount);
-		inline std::size_t			getFrameCount() const { return _frameCount; };
-		inline std::size_t			getBoneCount() const { return _boneCount; };
-		
-		DirectX::XMFLOAT4 const&	getRotation(std::size_t frameIndex, std::size_t boneIndex) const;
-		DirectX::XMFLOAT4 const&	getPosition(std::size_t frameIndex, std::size_t boneIndex) const;
-		DirectX::XMFLOAT4&			getRotation(std::size_t frameIndex, std::size_t boneIndex);
-		DirectX::XMFLOAT4&			getPosition(std::size_t frameIndex, std::size_t boneIndex);
+		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
+		void compressAnimation();
+	private:
+		void fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold = 0.01f);
+		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 
 	private:
-		size_t _boneCount	= 0;
-		size_t _frameCount	= 0;
-
-		// represent two dimensional array from
-		// 1. frame index
-		// 2. bone index
-		std::vector<DirectX::XMFLOAT4> _rotations;
-		std::vector<DirectX::XMFLOAT4> _positions;
+		size_t							_duration			= 0;
+		std::vector<BoneAnimation>		_boneAnimation;
 	};
 }
-
 
