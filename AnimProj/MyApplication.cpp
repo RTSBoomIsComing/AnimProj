@@ -6,7 +6,7 @@
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
-#include "Animation/RAnimation.h"
+#include "Animation/Animation.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 #include "Animation/Quantization.h"
@@ -47,8 +47,8 @@ pa::MyApplication::MyApplication()
 
 	AMC amc(amcFilePath.c_str());
 
-	_ranimation = new RAnimation(&asf, &amc);
-	//_ranimation->compressAnimation();
+	_animation = new Animation(&asf, &amc);
+	//_animation->compressAnimation();
 
 	initializeGraphicsPipeline();
 
@@ -71,8 +71,8 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pSkeleton)
 		delete _pSkeleton;
 
-	if (nullptr != _ranimation)
-		delete _ranimation;
+	if (nullptr != _animation)
+		delete _animation;
 }
 
 void pa::MyApplication::OnUpdate()
@@ -124,7 +124,7 @@ void pa::MyApplication::OnUpdate()
 	static float	playTime = 0.0f; 
 
 	playTime += deltaTime.count();
-	if (playTime >= interval * (_ranimation->_duration - 2))
+	if (playTime >= interval * (_animation->_duration - 2))
 	{
 		playTime = 0.0f;
 		for (auto& keyFrameRotation : keyFrameRotations)
@@ -149,10 +149,10 @@ void pa::MyApplication::OnUpdate()
 
 
 		XMMATRIX animationRotation = XMMatrixIdentity();
-		if (nullptr != _ranimation 
-			&& false == _ranimation->_boneAnimation[boneIndex].rotation.empty())
+		if (nullptr != _animation 
+			&& false == _animation->_boneAnimation[boneIndex].rotation.empty())
 		{
-			const auto& animationRotations = _ranimation->_boneAnimation[boneIndex].rotation;
+			const auto& animationRotations = _animation->_boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor1;
 			while (animationRotations[cursor].key < 1 + playTime / interval)

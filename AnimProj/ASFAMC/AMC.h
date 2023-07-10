@@ -6,7 +6,7 @@ namespace pa
 	class ASF;
 	class AMC
 	{
-		friend class RAnimation;
+		friend class Animation;
 	public:
 		AMC() = default;
 		AMC(const wchar_t* filePath);

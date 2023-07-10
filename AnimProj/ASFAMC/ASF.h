@@ -7,7 +7,7 @@ namespace pa
 	class ASF
 	{
 		friend class AMC;
-		friend class RAnimation;
+		friend class Animation;
 
 	public:
 		enum class Channel : uint8_t

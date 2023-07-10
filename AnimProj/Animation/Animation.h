@@ -5,7 +5,7 @@ namespace pa
 {
 	class ASF;
 	class AMC;
-	class RAnimation
+	class Animation
 	{
 		friend class MyApplication;
 	public:
@@ -19,19 +19,19 @@ namespace pa
 
 		struct BoneAnimation
 		{
-			std::vector<RAnimation::Frame>	scale;
-			std::vector<RAnimation::Frame>	rotation;
-			std::vector<RAnimation::Frame>	position;
+			std::vector<Animation::Frame>	scale;
+			std::vector<Animation::Frame>	rotation;
+			std::vector<Animation::Frame>	position;
 		};
 	public:
-		RAnimation() = default;
-		RAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
-		~RAnimation() = default;
+		Animation() = default;
+		Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
+		~Animation() = default;
 
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void compressAnimation();
 	private:
-		void fitBoneAnimationRotation(std::vector<RAnimation::Frame>& rotations, float threshold = 0.01f);
+		void fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold = 0.01f);
 		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 
 	private:

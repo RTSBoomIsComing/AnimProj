@@ -1,17 +1,17 @@
 #include "pch.h"
-#include "RAnimation.h"
+#include "Animation.h"
 #include "../ASFAMC/ASF.h"
 #include "../ASFAMC/AMC.h"
 #include "../Rendering/Skeleton.h"
 
-pa::RAnimation::RAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
+pa::Animation::Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
 {
 	bool result = initializeAnimation(acclaimSkeleton, acclaimMotion);
 	if (true != result)
 		DebugBreak();
 }
 
-bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
+bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
 {
 	using namespace DirectX;
 
@@ -80,7 +80,7 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 			if (hasTranslation)
 			{
 				XMVECTOR position = XMVECTOR{ dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f };
-				RAnimation::Frame frame = {};
+				Animation::Frame frame = {};
 				frame.key = frameIndex;
 				XMStoreFloat4(&frame.v, position);
 				_boneAnimation[boneIndex].position.push_back(frame);
@@ -98,7 +98,7 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 				if (boneIndex == 0)
 					preRotationPropagateBoneIndex = 0;
 				
-				RAnimation::Frame frame = {};
+				Animation::Frame frame = {};
 				frame.key = frameIndex;
 				XMStoreFloat4(&frame.v, quaternion);
 				_boneAnimation[preRotationPropagateBoneIndex].rotation.push_back(frame);
@@ -109,7 +109,7 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 	return true;
 }
 
-void pa::RAnimation::compressAnimation()
+void pa::Animation::compressAnimation()
 {
 	for (auto& boneAnimation : _boneAnimation)
 	{
@@ -117,7 +117,7 @@ void pa::RAnimation::compressAnimation()
 	}
 }
 
-void pa::RAnimation::fitBoneAnimationRotation(std::vector<RAnimation::Frame>& rotations, float	threshold)
+void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float	threshold)
 {
 	using namespace DirectX;
 
@@ -182,7 +182,7 @@ void pa::RAnimation::fitBoneAnimationRotation(std::vector<RAnimation::Frame>& ro
 			}
 		}
 	}
-	std::vector<RAnimation::Frame> newRotations;
+	std::vector<Animation::Frame> newRotations;
 	for (int point : controlPoints)
 	{
 		newRotations.push_back(rotations[point]);
@@ -190,7 +190,7 @@ void pa::RAnimation::fitBoneAnimationRotation(std::vector<RAnimation::Frame>& ro
 	rotations = newRotations;
 }
 
-float pa::RAnimation::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
+float pa::Animation::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
 {
 	using namespace DirectX;
 
