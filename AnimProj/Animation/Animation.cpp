@@ -124,6 +124,13 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 	if (rotations.empty())
 		return;
 
+	std::vector<bool>		points(false, rotations.size());
+	points.front()	= true;
+	points.back()	= true;
+
+
+
+
 	std::vector<int>		controlPoints = { 0, static_cast<int>(_duration) - 1 };
 	for (size_t nIteration = 0; nIteration < _duration; nIteration++)
 	{
