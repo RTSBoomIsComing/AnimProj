@@ -124,75 +124,69 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 	if (rotations.empty())
 		return;
 
-	std::vector<bool>		points(false, rotations.size());
-	points.front()	= true;
-	points.back()	= true;
+	std::vector<bool>		picked(rotations.size(), false);
+	picked.front()			= true;
+	picked.back()			= true;
 
-
-
-
-	std::vector<int>		controlPoints = { 0, static_cast<int>(_duration) - 1 };
-	for (size_t nIteration = 0; nIteration < _duration; nIteration++)
+	while(true)
 	{
+		std::vector<int>	sectionMiddles;
+		std::vector<float>	errorSums;
 
-		size_t	cursor = 0;
-		size_t	p0 = controlPoints[0];
-		size_t	p1 = controlPoints[cursor++];
-		size_t	p2 = controlPoints[cursor++];
-		size_t	p3 = (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
-		size_t	maxErrorIndex = std::numeric_limits<size_t>::max();
+		int p0 = 0;
 
-		float			maxError = 0.0f;
+		auto iterator = std::find(picked.begin(), picked.end(), true);
+		int p1 = std::distance(picked.begin(), iterator);
 
-		for (size_t i = 0; i < _duration; i++)
+		iterator = std::find(++iterator, picked.end(), true);
+		int p2 = std::distance(picked.begin(), iterator);
+
+		if (iterator < picked.end())
+			iterator = std::find(++iterator, picked.end(), true);
+
+		int p3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : p2;
+
+		while (p1 != p2)
 		{
-			if (std::find(controlPoints.begin(), controlPoints.end(), i) != controlPoints.end())
-				continue;	// skip already collected index
+			sectionMiddles.push_back((p1 + p2) * 0.5);
+			errorSums.push_back(0.0f);
 
-			if (p2 < i)
+			for (int between = p1 + 1; between < p2; between++)
 			{
-				p0 = p1;
-				p1 = p2;
-				p2 = p3;
-				if (cursor < controlPoints.size() - 1)
-					p3 = controlPoints[++cursor];
-				else
-					p3 = controlPoints.back();
+				const float t = static_cast<float>(between - p1) / (p2 - p1);
+				XMVECTOR catmullRom = XMVectorCatmullRom(
+					XMLoadFloat4(&rotations[p0].v),
+					XMLoadFloat4(&rotations[p1].v),
+					XMLoadFloat4(&rotations[p2].v),
+					XMLoadFloat4(&rotations[p3].v), t);
+
+				const XMVECTOR	difference = XMLoadFloat4(&rotations[between].v) - catmullRom;
+				errorSums.back() += XMVectorGetX(XMVector4LengthSq(difference));
 			}
 
-			const float t = static_cast<float>(i - p1) / (p2 - p1);
+			p0 = p1;
+			p1 = p2;
+			p2 = p3;
 
-			XMVECTOR catmullRom = XMVectorCatmullRom(
-				XMLoadFloat4(&rotations[p0].v),
-				XMLoadFloat4(&rotations[p1].v),
-				XMLoadFloat4(&rotations[p2].v),
-				XMLoadFloat4(&rotations[p3].v), t);
-
-			const float error = getError(XMLoadFloat4(&rotations[i].v), catmullRom);
-
-			if (maxError < error)
-			{
-				maxError = error;
-				maxErrorIndex = i;
-			}
+			if (iterator < picked.end())
+				iterator = std::find(++iterator, picked.end(), true);
+			
+			p3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : p2;
 		}
 
-		if (maxError < threshold)
-			break;
+		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());
+		if (*errorIterator < threshold)
+			break; // TODO
 
-		for (auto it = controlPoints.rbegin(); it < controlPoints.rend(); it++)
-		{
-			if (*it < maxErrorIndex)
-			{
-				controlPoints.insert(it.base(), static_cast<int>(maxErrorIndex));
-				break;
-			}
-		}
+		picked[sectionMiddles[std::distance(errorSums.begin(), errorIterator)]] = true;
 	}
+
+	
 	std::vector<Animation::Frame> newRotations;
-	for (int point : controlPoints)
+	for (int point = 0; point < rotations.size(); point++)
 	{
-		newRotations.push_back(rotations[point]);
+		if (picked[point])
+			newRotations.push_back(rotations[point]);
 	}
 	rotations = newRotations;
 }

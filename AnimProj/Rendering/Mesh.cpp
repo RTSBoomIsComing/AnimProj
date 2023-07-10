@@ -36,7 +36,7 @@ UINT pa::Mesh::getIndexCount() const
 
 void pa::Mesh::processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors)
 {
-	assert(positions.size());
+	assert(!positions.empty());
 	assert(positions.size() == colors.size() && "sizes of vertex attributes are not equal");
 	_vertexCount = static_cast<UINT>(positions.size());
 

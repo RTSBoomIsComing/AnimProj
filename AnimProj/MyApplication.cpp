@@ -6,6 +6,7 @@
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
+#include "Rendering/Character.h"
 #include "Animation/Animation.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
@@ -48,7 +49,7 @@ pa::MyApplication::MyApplication()
 	AMC amc(amcFilePath.c_str());
 
 	_animation = new Animation(&asf, &amc);
-	//_animation->compressAnimation();
+	_animation->compressAnimation();
 
 	initializeGraphicsPipeline();
 
@@ -123,11 +124,12 @@ void pa::MyApplication::OnUpdate()
 	//static std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
 	static std::vector<KeyFrameData> keyFrameRotations(_pSkeleton->getBoneCount());
 
-	constexpr float interval = 1.0f / 120;
+	constexpr int	animationFPS = 120;
+	constexpr float interval = 1.0f / animationFPS;
 	static float	playTime = 0.0f; 
 
 	playTime += deltaTime.count();
-	if (playTime >= interval * (_animation->_duration - 2))
+	if (playTime * animationFPS >= _animation->_duration -1)
 	{
 		playTime = 0.0f;
 		for (auto& keyFrameRotation : keyFrameRotations)
@@ -156,11 +158,10 @@ void pa::MyApplication::OnUpdate()
 			const auto& animationRotations = _animation->_boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor1;
-			while (animationRotations[cursor].key < 1 + playTime / interval)
+			while (animationRotations[cursor].key < playTime * animationFPS)
 			{
 				cursor = std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
-
-
+				
 				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
 				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
 
@@ -171,6 +172,8 @@ void pa::MyApplication::OnUpdate()
 
 			const float	t0	= keyFrameRotations[boneIndex].t0;
 			const float	t1	= keyFrameRotations[boneIndex].t1;
+			assert(t0 <= playTime && playTime <= t1);
+
 			float		t	= (playTime - t0) / (t1 - t0);
 
 			const int cursor0 = keyFrameRotations[boneIndex].cursor0;
