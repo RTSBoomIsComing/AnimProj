@@ -29,15 +29,15 @@ pa::MyApplication::MyApplication()
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
 	_pSkeleton = new Skeleton();
@@ -117,6 +117,10 @@ void pa::MyApplication::OnUpdate()
 	{
 		int		cursor0 = 0;
 		int		cursor1 = 0;
+		int		cursor2 = 0;
+
+		// in loop, cursor3 would be adjusted
+		int		cursor3 = 1;
 		float	t0		= 0.0f;
 		float	t1		= 0.0f;
 	};
@@ -157,16 +161,18 @@ void pa::MyApplication::OnUpdate()
 		{
 			const auto& animationRotations = _animation->_boneAnimation[boneIndex].rotation;
 			
-			int cursor = keyFrameRotations[boneIndex].cursor1;
+			int cursor = keyFrameRotations[boneIndex].cursor2;
 			while (animationRotations[cursor].key < playTime * animationFPS)
 			{
 				cursor = std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
 				
 				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
-				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
-
 				keyFrameRotations[boneIndex].t1			= animationRotations[cursor].key * interval;
-				keyFrameRotations[boneIndex].cursor1	= cursor;
+
+				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
+				keyFrameRotations[boneIndex].cursor1	= keyFrameRotations[boneIndex].cursor2;
+				keyFrameRotations[boneIndex].cursor2	= cursor;
+				keyFrameRotations[boneIndex].cursor3	= std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
 			}
 
 
@@ -176,19 +182,23 @@ void pa::MyApplication::OnUpdate()
 
 			float		t	= (playTime - t0) / (t1 - t0);
 
-			const int cursor0 = keyFrameRotations[boneIndex].cursor0;
-			const int cursor1 = keyFrameRotations[boneIndex].cursor1;
+			const int p0 = keyFrameRotations[boneIndex].cursor0;
+			const int p1 = keyFrameRotations[boneIndex].cursor1;
+			const int p2 = keyFrameRotations[boneIndex].cursor2;
+			const int p3 = keyFrameRotations[boneIndex].cursor3;
 
 			XMVECTOR finalQuaternion;
-			if (cursor0 == cursor1)
+			if (p1 == p2)
 			{
-				finalQuaternion = XMLoadFloat4(&animationRotations[cursor0].v);
+				finalQuaternion = XMLoadFloat4(&animationRotations[p1].v);
 			}
 			else
 			{
-				XMVECTOR quaternion0 = XMLoadFloat4(&animationRotations[cursor0].v);
-				XMVECTOR quaternion1 = XMLoadFloat4(&animationRotations[cursor0].v);
-				finalQuaternion = XMQuaternionSlerp(quaternion0, quaternion1, t);
+				finalQuaternion = XMVectorCatmullRom(
+					XMLoadFloat4(&animationRotations[p0].v),
+					XMLoadFloat4(&animationRotations[p1].v),
+					XMLoadFloat4(&animationRotations[p2].v),
+					XMLoadFloat4(&animationRotations[p3].v), t);
 			}
 			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 		}
