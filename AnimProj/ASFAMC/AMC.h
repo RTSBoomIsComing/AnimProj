@@ -4,7 +4,6 @@
 namespace pa
 {
 	class ASF;
-	class Animation;
 	class AMC
 	{
 		friend class RAnimation;
@@ -15,7 +14,6 @@ namespace pa
 	
 	public:
 		bool							loadFromFile(const wchar_t* filePath);
-		void							generateAnimation(ASF* pASF, Animation* pAnimation);
 
 	public:
 		inline float					getData(size_t index)	const	{ return _data[index]; }

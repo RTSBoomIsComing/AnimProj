@@ -108,3 +108,94 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 
 	return true;
 }
+
+void pa::RAnimation::compressAnimation()
+{
+	for (auto& boneAnimation : _boneAnimation)
+	{
+		fitBoneAnimationRotation(boneAnimation.rotation);
+	}
+}
+
+void pa::RAnimation::fitBoneAnimationRotation(std::vector<RAnimation::Frame>& rotations, float	threshold)
+{
+	using namespace DirectX;
+
+	if (rotations.empty())
+		return;
+
+	std::vector<int>		controlPoints = { 0, static_cast<int>(_duration) - 1 };
+	for (size_t nIteration = 0; nIteration < _duration; nIteration++)
+	{
+
+		size_t	cursor = 0;
+		size_t	p0 = controlPoints[0];
+		size_t	p1 = controlPoints[cursor++];
+		size_t	p2 = controlPoints[cursor++];
+		size_t	p3 = (cursor < controlPoints.size()) ? controlPoints[cursor++] : controlPoints.back();
+		size_t	maxErrorIndex = std::numeric_limits<size_t>::max();
+
+		float			maxError = 0.0f;
+
+		for (size_t i = 0; i < _duration; i++)
+		{
+			if (std::find(controlPoints.begin(), controlPoints.end(), i) != controlPoints.end())
+				continue;	// skip already collected index
+
+			if (p2 < i)
+			{
+				p0 = p1;
+				p1 = p2;
+				p2 = p3;
+				if (cursor < controlPoints.size() - 1)
+					p3 = controlPoints[++cursor];
+				else
+					p3 = controlPoints.back();
+			}
+
+			const float t = static_cast<float>(i - p1) / (p2 - p1);
+
+			XMVECTOR catmullRom = XMVectorCatmullRom(
+				XMLoadFloat4(&rotations[p0].v),
+				XMLoadFloat4(&rotations[p1].v),
+				XMLoadFloat4(&rotations[p2].v),
+				XMLoadFloat4(&rotations[p3].v), t);
+
+			const float error = getError(XMLoadFloat4(&rotations[i].v), catmullRom);
+
+			if (maxError < error)
+			{
+				maxError = error;
+				maxErrorIndex = i;
+			}
+		}
+
+		if (maxError < threshold)
+			break;
+
+		for (auto it = controlPoints.rbegin(); it < controlPoints.rend(); it++)
+		{
+			if (*it < maxErrorIndex)
+			{
+				controlPoints.insert(it.base(), static_cast<int>(maxErrorIndex));
+				break;
+			}
+		}
+	}
+	std::vector<RAnimation::Frame> newRotations;
+	for (int point : controlPoints)
+	{
+		newRotations.push_back(rotations[point]);
+	}
+	rotations = newRotations;
+}
+
+float pa::RAnimation::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
+{
+	using namespace DirectX;
+
+	const XMVECTOR	difference = other - origin;
+	const float		error = XMVectorGetX(XMVector4LengthSq(difference));
+
+	return error;
+}

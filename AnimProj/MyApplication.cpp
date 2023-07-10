@@ -7,7 +7,6 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Animation/RAnimation.h"
-#include "Animation/AnimationCompress.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 #include "Animation/Quantization.h"
@@ -28,15 +27,15 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
-	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
@@ -49,9 +48,7 @@ pa::MyApplication::MyApplication()
 	AMC amc(amcFilePath.c_str());
 
 	_ranimation = new RAnimation(&asf, &amc);
-
-	// For Test
-	//AnimationCompress animationCompressTest(_pAnimation);
+	_ranimation->compressAnimation();
 
 	initializeGraphicsPipeline();
 

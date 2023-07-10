@@ -29,6 +29,10 @@ namespace pa
 		~RAnimation() = default;
 
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
+		void compressAnimation();
+	private:
+		void fitBoneAnimationRotation(std::vector<RAnimation::Frame>& rotations, float threshold = 0.01f);
+		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 
 	private:
 		size_t							_duration			= 0;
