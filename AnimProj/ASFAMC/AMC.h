@@ -18,7 +18,8 @@ namespace pa
 		void							generateAnimation(ASF* pASF, Animation* pAnimation);
 
 	public:
-		inline float					getData(size_t index) const { return _data[index]; }
+		inline float					getData(size_t index)	const	{ return _data[index]; }
+		inline size_t					getFrameCount()			const	{ return _frameCount; }
 
 	private:
 		int								_frameCount;

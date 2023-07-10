@@ -122,6 +122,10 @@ void pa::MyApplication::OnUpdate()
 
 	frameNumber++;
 
+	static float elipsedTime = 0.0f;
+	elipsedTime += deltaTime.count();
+	size_t currentFrameIndex = static_cast<size_t>(elipsedTime * 120);
+	_ranimation->_duration;
 	for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
 	{
 		// Get parent bone data

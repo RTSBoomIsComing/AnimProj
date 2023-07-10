@@ -7,6 +7,7 @@ namespace pa
 	class AMC;
 	class RAnimation
 	{
+		friend class MyApplication;
 	public:
 		struct Frame
 		{
@@ -26,9 +27,10 @@ namespace pa
 
 
 	private:
-		std::vector<RAnimation::Frame> _scales;
-		std::vector<RAnimation::Frame> _rotations;
-		std::vector<RAnimation::Frame> _positions;
+		size_t							_duration	= 0;
+		std::vector<RAnimation::Frame>	_scales;
+		std::vector<RAnimation::Frame>	_rotations;
+		std::vector<RAnimation::Frame>	_positions;
 	};
 }
 
