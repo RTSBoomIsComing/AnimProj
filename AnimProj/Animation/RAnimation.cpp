@@ -22,6 +22,8 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 		return false;
 
 	_duration = acclaimMotion->getFrameCount();
+	_boneAnimation.resize(acclaimSkeleton->_pSkeleton->getBoneCount());
+
 
 	std::vector<size_t> fitBones;
 	fitBones.reserve(acclaimMotion->_dataOrder.size());
@@ -79,10 +81,9 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 			{
 				XMVECTOR position = XMVECTOR{ dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f };
 				RAnimation::Frame frame = {};
-				frame.joint = boneIndex;
 				frame.key = frameIndex;
 				XMStoreFloat4(&frame.v, position);
-				_positions.push_back(frame);
+				_boneAnimation[boneIndex].position.push_back(frame);
 			}
 
 			if (hasRotation)
@@ -92,17 +93,15 @@ bool pa::RAnimation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* 
 
 				// move pre-rotation data of current bone to parent bone
 				size_t preRotationPropagateBoneIndex = acclaimSkeleton->_pSkeleton->getParentBoneIndex(boneIndex);
+				
+				// exception about root that has no parent
 				if (boneIndex == 0)
-				{
-					// exception about root has no parent
 					preRotationPropagateBoneIndex = 0;
-				}
-
+				
 				RAnimation::Frame frame = {};
-				frame.joint = preRotationPropagateBoneIndex;
 				frame.key = frameIndex;
 				XMStoreFloat4(&frame.v, quaternion);
-				_rotations.push_back(frame);
+				_boneAnimation[preRotationPropagateBoneIndex].rotation.push_back(frame);
 			}
 		}
 	}

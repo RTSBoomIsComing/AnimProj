@@ -116,59 +116,123 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
-	static std::size_t frameNumber = -1;
-	if (nullptr != _pAnimation && frameNumber >= _pAnimation->getFrameCount() - 1)
-		frameNumber = -1;
-
-	frameNumber++;
+	struct KeyFrameData 
+	{
+		XMFLOAT4 p0 = {};
+		XMFLOAT4 p1 = {};
+		float t0;
+		float t1;
+	};
 
 	static float elipsedTime = 0.0f;
+	const float	 playTime = std::fmodf(elipsedTime, (1.0f / 120.f) * _ranimation->_duration);
 	elipsedTime += deltaTime.count();
-	size_t currentFrameIndex = static_cast<size_t>(elipsedTime * 120);
-	_ranimation->_duration;
-	for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
+	
+
+	//std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
+	std::vector<KeyFrameData> animationRotations(_pSkeleton->getBoneCount());
+	std::vector<uint16_t> rotationCursors(_pSkeleton->getBoneCount());
+
+	for (const size_t boneIndex : _pSkeleton->getDFSPath())
 	{
-		// Get parent bone data
-		const uint8_t parentBoneIndex = static_cast<uint8_t>(_pSkeleton->getParentBoneIndex(boneIndex));
-		const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : _worldTransforms[parentBoneIndex];
+		const size_t parentBoneIndex = _pSkeleton->getParentBoneIndex(boneIndex);
+		const XMMATRIX& parentWorldTransform = 
+			(parentBoneIndex < _pSkeleton->getBoneCount()) ? _worldTransforms[parentBoneIndex] : XMMatrixIdentity();
 
-		// Get current bone data
 		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
-		const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
-		const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
+		const XMVECTOR bonePosition = XMLoadFloat4(&bone.direction);
+		const XMMATRIX boneRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
+		XMMATRIX boneMatrix			= boneRotation * XMMatrixTranslationFromVector(bonePosition);
 
-		// Apply animation
+
+
 		XMMATRIX animationRotation = XMMatrixIdentity();
-		if (nullptr != _pAnimation)
+		if (nullptr != _ranimation 
+			&& _ranimation->_boneAnimation[boneIndex].rotation.size() > 0)
 		{
-			animationRotation = XMMatrixRotationQuaternion(
-				XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+			XMVECTOR quaternion0 = XMLoadFloat4(&animationRotations[boneIndex].p0);
+			XMVECTOR quaternion1 = XMLoadFloat4(&animationRotations[boneIndex].p1);
+			const float	t0	= animationRotations[boneIndex].t0;
+			const float	t1	= animationRotations[boneIndex].t1;
+			float		t	= (playTime - t0) / (t1 - t0);
+			XMVECTOR quaternionSlerp = XMQuaternionSlerp(quaternion0, quaternion1, t);
+			animationRotation *= XMMatrixRotationQuaternion(quaternionSlerp);
 		}
 
-		const XMMATRIX localRotation = animationRotation * originalRotation;
-		const XMMATRIX localTransform = localRotation * XMMatrixTranslationFromVector(originalDirection);
+		boneMatrix = animationRotation * boneMatrix;
+		_worldTransforms[boneIndex] = boneMatrix * parentWorldTransform;
 
-		// Store world transform for rendering
-		_worldTransforms[boneIndex] = localTransform * parentWorldTransform;
-
-		const float boneStickScale = XMVectorGetX(XMVector3Length(originalDirection));
+		const float boneStickScale = XMVectorGetX(XMVector3Length(bonePosition));
 		if (boneStickScale <= 0)
 		{
 			_boneStickTransforms[boneIndex] = XMMATRIX{};
 			continue;
 		}
 
-		XMVECTOR normVec1 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
-		XMVECTOR normVec2 = XMVector3Normalize(originalDirection);
-		float dotProduct = XMVectorGetX(XMVector3Dot(normVec1, normVec2));
-		XMVECTOR rotationAxis = XMVector3Cross(normVec1, normVec2);
-		float angle = std::acosf(dotProduct);
-
+		const XMVECTOR vec0 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
+		const XMVECTOR vec1 = XMVector3Normalize(bonePosition);
 		
-		_boneStickTransforms[boneIndex] = 
+		const float		dotProduct		= XMVectorGetX(XMVector3Dot(vec0, vec1));
+		const float		angle			= std::acosf(dotProduct);
+		const XMVECTOR	rotationAxis	= XMVector3Cross(vec0, vec1);
+
+
+		_boneStickTransforms[boneIndex] =
 			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
 			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
 	}
+
+
+
+	//static std::size_t frameNumber = -1;
+	//if (nullptr != _pAnimation && frameNumber >= _pAnimation->getFrameCount() - 1)
+	//	frameNumber = -1;
+
+	//frameNumber++;
+
+	//for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
+	//{
+	//	// Get parent bone data
+	//	const uint8_t parentBoneIndex = static_cast<uint8_t>(_pSkeleton->getParentBoneIndex(boneIndex));
+	//	const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : _worldTransforms[parentBoneIndex];
+
+	//	// Get current bone data
+	//	const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
+	//	const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
+	//	const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
+
+	//	// Apply animation
+	//	XMMATRIX animationRotation = XMMatrixIdentity();
+	//	if (nullptr != _pAnimation)
+	//	{
+	//		animationRotation = XMMatrixRotationQuaternion(
+	//			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
+	//	}
+
+	//	const XMMATRIX localRotation = animationRotation * originalRotation;
+	//	const XMMATRIX localTransform = localRotation * XMMatrixTranslationFromVector(originalDirection);
+
+	//	// Store world transform for rendering
+	//	_worldTransforms[boneIndex] = localTransform * parentWorldTransform;
+
+	//	const float boneStickScale = XMVectorGetX(XMVector3Length(originalDirection));
+	//	if (boneStickScale <= 0)
+	//	{
+	//		_boneStickTransforms[boneIndex] = XMMATRIX{};
+	//		continue;
+	//	}
+
+	//	XMVECTOR normVec1 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
+	//	XMVECTOR normVec2 = XMVector3Normalize(originalDirection);
+	//	float dotProduct = XMVectorGetX(XMVector3Dot(normVec1, normVec2));
+	//	XMVECTOR rotationAxis = XMVector3Cross(normVec1, normVec2);
+	//	float angle = std::acosf(dotProduct);
+
+	//	
+	//	_boneStickTransforms[boneIndex] = 
+	//		XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
+	//		* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
+	//}
 }
 
 void pa::MyApplication::OnRender()

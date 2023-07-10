@@ -11,11 +11,17 @@ namespace pa
 	public:
 		struct Frame
 		{
-			uint64_t			joint	= std::numeric_limits<uint64_t>::max();
-			uint64_t			key		= std::numeric_limits<uint64_t>::max();
+			uint32_t			key		= std::numeric_limits<uint32_t>::max();
 
 			// scale, position or rotation(quaternion)
 			DirectX::XMFLOAT4	v		= {};
+		};
+
+		struct BoneAnimation
+		{
+			std::vector<RAnimation::Frame>	scale;
+			std::vector<RAnimation::Frame>	rotation;
+			std::vector<RAnimation::Frame>	position;
 		};
 	public:
 		RAnimation() = default;
@@ -24,13 +30,9 @@ namespace pa
 
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 
-
-
 	private:
-		size_t							_duration	= 0;
-		std::vector<RAnimation::Frame>	_scales;
-		std::vector<RAnimation::Frame>	_rotations;
-		std::vector<RAnimation::Frame>	_positions;
+		size_t							_duration			= 0;
+		std::vector<BoneAnimation>		_boneAnimation;
 	};
 }
 
