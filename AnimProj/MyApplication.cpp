@@ -73,6 +73,9 @@ pa::MyApplication::~MyApplication()
 
 	if (nullptr != _animation)
 		delete _animation;
+
+	if (nullptr != _character)
+		delete _character;
 }
 
 void pa::MyApplication::OnUpdate()
@@ -132,8 +135,6 @@ void pa::MyApplication::OnUpdate()
 			keyFrameRotation = {};
 		}
 	}
-
-	
 
 	for (const size_t boneIndex : _pSkeleton->getDFSPath())
 	{

@@ -117,7 +117,7 @@ void pa::Animation::compressAnimation()
 	}
 }
 
-void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float	threshold)
+void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold)
 {
 	using namespace DirectX;
 

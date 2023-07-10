@@ -8,6 +8,7 @@ namespace pa
 	class Mesh;
 	class Skeleton;
 	class Animation;
+	class Character;
 
 	class MyApplication : public Win32Application
 	{
@@ -49,6 +50,7 @@ namespace pa
 		Mesh*							_pStickMesh	= nullptr;
 		Skeleton*						_pSkeleton	= nullptr;
 		Animation*						_animation	= nullptr;
+		Character*						_character = nullptr;
 
 		std::vector<DirectX::XMMATRIX> _worldTransforms;
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
