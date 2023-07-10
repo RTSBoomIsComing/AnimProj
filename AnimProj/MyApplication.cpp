@@ -28,16 +28,16 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
 	_pSkeleton = new Skeleton();
@@ -159,7 +159,7 @@ void pa::MyApplication::OnUpdate()
 
 		
 		_boneStickTransforms[boneIndex] = 
-			XMMatrixScaling(0.25, boneStickScale, 0.25) * XMMatrixRotationAxis(rotationAxis, angle)
+			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
 			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
 	}
 }

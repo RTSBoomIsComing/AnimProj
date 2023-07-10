@@ -111,14 +111,14 @@ void pa::AnimationCompress::fitCurve(const Animation* pAnimation, size_t boneInd
 	// For Test, need to remove
 	std::cout << controlPoints.size() << std::endl;
 	
-	for (size_t p : controlPoints)
-	{
-		CompressedFrame frame = {};
-		frame.setChannelType(ChannelType::Rotation);
-		frame.setJointIndex(static_cast<uint16_t>(boneIndex));
-		frame.setKeyTime(static_cast<uint16_t>(p));
-		frame.setQuantized(Quantization::quantize(pAnimation->getRotation(p, boneIndex)));
+	//for (size_t p : controlPoints)
+	//{
+	//	CompressedFrame frame = {};
+	//	frame.setChannelType(ChannelType::Rotation);
+	//	frame.setJointIndex(static_cast<uint16_t>(boneIndex));
+	//	frame.setKeyTime(static_cast<uint16_t>(p));
+	//	frame.setQuantized(Quantization::quantize(pAnimation->getRotation(p, boneIndex)));
 
-		_compressedFrames.push_back(frame);
-	}
+	//	_compressedFrames.push_back(frame);
+	//}
 }
