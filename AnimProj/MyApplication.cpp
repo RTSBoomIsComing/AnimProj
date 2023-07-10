@@ -6,7 +6,6 @@
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
-#include "Animation/Animation.h"
 #include "Animation/RAnimation.h"
 #include "Animation/AnimationCompress.h"
 #include "ASFAMC/ASF.h"
@@ -49,9 +48,6 @@ pa::MyApplication::MyApplication()
 
 	AMC amc(amcFilePath.c_str());
 
-	_pAnimation = new Animation();
-	amc.generateAnimation(&asf, _pAnimation);
-
 	_ranimation = new RAnimation(&asf, &amc);
 
 	// For Test
@@ -78,8 +74,8 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pSkeleton)
 		delete _pSkeleton;
 
-	if (nullptr != _pAnimation)
-		delete _pAnimation;
+	if (nullptr != _ranimation)
+		delete _ranimation;
 }
 
 void pa::MyApplication::OnUpdate()
@@ -153,7 +149,7 @@ void pa::MyApplication::OnUpdate()
 			const auto& animationRotations = _ranimation->_boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor1;
-			while (animationRotations[cursor].key < 1 + playTime * 120)
+			while (animationRotations[cursor].key < 1 + playTime / interval)
 			{
 				cursor += 1;
 				if (cursor >= animationRotations.size())
@@ -165,7 +161,7 @@ void pa::MyApplication::OnUpdate()
 				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
 				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
 
-				keyFrameRotations[boneIndex].t1			= animationRotations[cursor].key;
+				keyFrameRotations[boneIndex].t1			= animationRotations[cursor].key * interval;
 				keyFrameRotations[boneIndex].cursor1	= cursor;
 			}
 
@@ -213,58 +209,6 @@ void pa::MyApplication::OnUpdate()
 			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
 			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
 	}
-
-
-
-	//static std::size_t frameNumber = -1;
-	//if (nullptr != _pAnimation && frameNumber >= _pAnimation->getFrameCount() - 1)
-	//	frameNumber = -1;
-
-	//frameNumber++;
-
-	//for (const uint8_t boneIndex : _pSkeleton->getDFSPath())
-	//{
-	//	// Get parent bone data
-	//	const uint8_t parentBoneIndex = static_cast<uint8_t>(_pSkeleton->getParentBoneIndex(boneIndex));
-	//	const XMMATRIX& parentWorldTransform = (_pSkeleton->getBoneCount() <= parentBoneIndex) ? XMMatrixIdentity() : _worldTransforms[parentBoneIndex];
-
-	//	// Get current bone data
-	//	const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
-	//	const XMVECTOR originalDirection = XMLoadFloat4(&bone.direction);
-	//	const XMMATRIX originalRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
-
-	//	// Apply animation
-	//	XMMATRIX animationRotation = XMMatrixIdentity();
-	//	if (nullptr != _pAnimation)
-	//	{
-	//		animationRotation = XMMatrixRotationQuaternion(
-	//			XMLoadFloat4(&_pAnimation->getRotation(frameNumber, boneIndex)));
-	//	}
-
-	//	const XMMATRIX localRotation = animationRotation * originalRotation;
-	//	const XMMATRIX localTransform = localRotation * XMMatrixTranslationFromVector(originalDirection);
-
-	//	// Store world transform for rendering
-	//	_worldTransforms[boneIndex] = localTransform * parentWorldTransform;
-
-	//	const float boneStickScale = XMVectorGetX(XMVector3Length(originalDirection));
-	//	if (boneStickScale <= 0)
-	//	{
-	//		_boneStickTransforms[boneIndex] = XMMATRIX{};
-	//		continue;
-	//	}
-
-	//	XMVECTOR normVec1 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
-	//	XMVECTOR normVec2 = XMVector3Normalize(originalDirection);
-	//	float dotProduct = XMVectorGetX(XMVector3Dot(normVec1, normVec2));
-	//	XMVECTOR rotationAxis = XMVector3Cross(normVec1, normVec2);
-	//	float angle = std::acosf(dotProduct);
-
-	//	
-	//	_boneStickTransforms[boneIndex] = 
-	//		XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
-	//		* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
-	//}
 }
 
 void pa::MyApplication::OnRender()
