@@ -27,15 +27,15 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
+	asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
-	amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
 
@@ -48,7 +48,7 @@ pa::MyApplication::MyApplication()
 	AMC amc(amcFilePath.c_str());
 
 	_ranimation = new RAnimation(&asf, &amc);
-	_ranimation->compressAnimation();
+	//_ranimation->compressAnimation();
 
 	initializeGraphicsPipeline();
 
@@ -117,14 +117,23 @@ void pa::MyApplication::OnUpdate()
 		float	t1		= 0.0f;
 	};
 
-	static float elipsedTime = 0.0f;
-	constexpr float interval = 1.0f / 120;
-	const float	 playTime = std::fmodf(elipsedTime, interval * _ranimation->_duration);
-	elipsedTime += deltaTime.count();
-	
-
 	//static std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
 	static std::vector<KeyFrameData> keyFrameRotations(_pSkeleton->getBoneCount());
+
+	constexpr float interval = 1.0f / 120;
+	static float	playTime = 0.0f; 
+
+	playTime += deltaTime.count();
+	if (playTime >= interval * (_ranimation->_duration - 2))
+	{
+		playTime = 0.0f;
+		for (auto& keyFrameRotation : keyFrameRotations)
+		{
+			keyFrameRotation = {};
+		}
+	}
+
+	
 
 	for (const size_t boneIndex : _pSkeleton->getDFSPath())
 	{
@@ -141,19 +150,15 @@ void pa::MyApplication::OnUpdate()
 
 		XMMATRIX animationRotation = XMMatrixIdentity();
 		if (nullptr != _ranimation 
-			&& _ranimation->_boneAnimation[boneIndex].rotation.size() > 0)
+			&& false == _ranimation->_boneAnimation[boneIndex].rotation.empty())
 		{
 			const auto& animationRotations = _ranimation->_boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor1;
 			while (animationRotations[cursor].key < 1 + playTime / interval)
 			{
-				cursor += 1;
-				if (cursor >= animationRotations.size())
-				{
-					keyFrameRotations[boneIndex] = {};
-					break;
-				}
+				cursor = std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
+
 
 				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
 				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
