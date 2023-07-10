@@ -118,20 +118,20 @@ void pa::MyApplication::OnUpdate()
 
 	struct KeyFrameData 
 	{
-		XMFLOAT4 p0 = {};
-		XMFLOAT4 p1 = {};
-		float t0;
-		float t1;
+		int		cursor0 = 0;
+		int		cursor1 = 0;
+		float	t0		= 0.0f;
+		float	t1		= 0.0f;
 	};
 
 	static float elipsedTime = 0.0f;
-	const float	 playTime = std::fmodf(elipsedTime, (1.0f / 120.f) * _ranimation->_duration);
+	constexpr float interval = 1.0f / 120;
+	const float	 playTime = std::fmodf(elipsedTime, interval * _ranimation->_duration);
 	elipsedTime += deltaTime.count();
 	
 
-	//std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
-	std::vector<KeyFrameData> animationRotations(_pSkeleton->getBoneCount());
-	std::vector<uint16_t> rotationCursors(_pSkeleton->getBoneCount());
+	//static std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
+	static std::vector<KeyFrameData> keyFrameRotations(_pSkeleton->getBoneCount());
 
 	for (const size_t boneIndex : _pSkeleton->getDFSPath())
 	{
@@ -150,13 +150,45 @@ void pa::MyApplication::OnUpdate()
 		if (nullptr != _ranimation 
 			&& _ranimation->_boneAnimation[boneIndex].rotation.size() > 0)
 		{
-			XMVECTOR quaternion0 = XMLoadFloat4(&animationRotations[boneIndex].p0);
-			XMVECTOR quaternion1 = XMLoadFloat4(&animationRotations[boneIndex].p1);
-			const float	t0	= animationRotations[boneIndex].t0;
-			const float	t1	= animationRotations[boneIndex].t1;
+			const auto& animationRotations = _ranimation->_boneAnimation[boneIndex].rotation;
+			
+			int cursor = keyFrameRotations[boneIndex].cursor1;
+			while (animationRotations[cursor].key < 1 + playTime * 120)
+			{
+				cursor += 1;
+				if (cursor >= animationRotations.size())
+				{
+					keyFrameRotations[boneIndex] = {};
+					break;
+				}
+
+				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
+				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
+
+				keyFrameRotations[boneIndex].t1			= animationRotations[cursor].key;
+				keyFrameRotations[boneIndex].cursor1	= cursor;
+			}
+
+
+			const float	t0	= keyFrameRotations[boneIndex].t0;
+			const float	t1	= keyFrameRotations[boneIndex].t1;
 			float		t	= (playTime - t0) / (t1 - t0);
-			XMVECTOR quaternionSlerp = XMQuaternionSlerp(quaternion0, quaternion1, t);
-			animationRotation *= XMMatrixRotationQuaternion(quaternionSlerp);
+
+			const int cursor0 = keyFrameRotations[boneIndex].cursor0;
+			const int cursor1 = keyFrameRotations[boneIndex].cursor1;
+
+			XMVECTOR finalQuaternion;
+			if (cursor0 == cursor1)
+			{
+				finalQuaternion = XMLoadFloat4(&animationRotations[cursor0].v);
+			}
+			else
+			{
+				XMVECTOR quaternion0 = XMLoadFloat4(&animationRotations[cursor0].v);
+				XMVECTOR quaternion1 = XMLoadFloat4(&animationRotations[cursor0].v);
+				finalQuaternion = XMQuaternionSlerp(quaternion0, quaternion1, t);
+			}
+			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 		}
 
 		boneMatrix = animationRotation * boneMatrix;
