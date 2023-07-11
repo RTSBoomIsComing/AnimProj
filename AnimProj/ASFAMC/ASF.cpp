@@ -343,8 +343,6 @@ void pa::ASF::correctSkeleton()
 	}
 
 	_pSkeleton->_DFSPath = hierarchy;
-
-
 }
 
 DirectX::XMMATRIX pa::ASF::eulerRotation(const float axis[3], const std::string& order)

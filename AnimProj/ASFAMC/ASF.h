@@ -39,11 +39,11 @@ namespace pa
 		void			parseBoneData(std::istream& stream);
 		void			parseHierarchy(std::istream& stream);
 
-		Channel	getChannel(std::string channelName) const;
-		std::size_t getBoneIndexFromName(const std::string& boneName) const;
+		Channel			getChannel(std::string channelName) const;
+		std::size_t		getBoneIndexFromName(const std::string& boneName) const;
 
-	private:
-		void correctSkeleton();
+		void			correctSkeleton();
+
 
 	private:
 		pa::Skeleton*							_pSkeleton;
