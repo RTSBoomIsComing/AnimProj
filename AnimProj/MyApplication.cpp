@@ -38,19 +38,19 @@ pa::MyApplication::MyApplication()
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
 	std::wstring amcFilePath;
-	
+
 	amcFilePath = amcDirectory + LR"(idle.amc)";
 	AMC amcIdle(amcFilePath.c_str());
 
 	amcFilePath = amcDirectory + LR"(walk.amc)";
 	AMC amcWalk(amcFilePath.c_str());
-	
+
 	amcFilePath = amcDirectory + LR"(runjog.amc)";
 	AMC amcRun(amcFilePath.c_str());
-	
+
 	amcFilePath = amcDirectory + LR"(jumpbalance.amc)";
 	AMC amcJump(amcFilePath.c_str());
-	
+
 	amcFilePath = amcDirectory + LR"(punchstrike.amc)";
 	AMC amcPunch(amcFilePath.c_str());
 
@@ -58,16 +58,13 @@ pa::MyApplication::MyApplication()
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcRun));
-//	_animations.push_back(Animation(&asf, &amcJump));
-//	_animations.push_back(Animation(&asf, &amcWalk));
-//	_animations.push_back(Animation(&asf, &amcPunch));
+	//	_animations.push_back(Animation(&asf, &amcJump));
+	//	_animations.push_back(Animation(&asf, &amcWalk));
+	//	_animations.push_back(Animation(&asf, &amcPunch));
 
 
-	//_animations[0].compressAnimation();
-//	for (const auto& boneAnimation : _animations[1]._boneAnimation)
-//	{
-//		std::cout << boneAnimation.rotation.size() << std::endl;
-//	}
+		_animations[1].compressAnimation();
+
 
 	initializeGraphicsPipeline();
 
@@ -130,99 +127,43 @@ void pa::MyApplication::OnUpdate()
 	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
 	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
-	struct KeyFrameData 
-	{
-		int		cursor0 = 0;
-		int		cursor1 = 0;
-		int		cursor2 = 0;
-
-		// in loop, cursor3 would be adjusted
-		int		cursor3 = 1;
-		float	t0		= 0.0f;
-		float	t1		= 0.0f;
-	};
-
-	//static std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
-	static std::vector<KeyFrameData> keyFrameRotations(_pSkeleton->getBoneCount());
-
 	constexpr int	animationFrameRate = 120;
 	constexpr float interval = 1.0f / animationFrameRate;
-	static float	playTime = 0.0f; 
+	static float	playTime = 0.0f;
 
+	int keyFrameIndex = playTime * animationFrameRate;
 	playTime += deltaTime.count();
-	if (playTime * animationFrameRate >= _animations[animationIndex]._duration -1)
+
+	if (keyFrameIndex > _animations[animationIndex]._duration)
 	{
+		keyFrameIndex = 0;
 		playTime = 0.0f;
-		for (auto& keyFrameRotation : keyFrameRotations)
-		{
-			keyFrameRotation = {};
-		}
+
 	}
 
 	for (const size_t boneIndex : _pSkeleton->getDFSPath())
 	{
+		XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
+		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
+		{
+			finalQuaternion =
+				_animations[animationIndex].playBoneAnimation(_animations[animationIndex]._boneAnimation[boneIndex].rotation, keyFrameIndex);
+
+			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
+			finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
+		}
+
+		XMMATRIX animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
+
+
 		const size_t parentBoneIndex = _pSkeleton->getParentBoneIndex(boneIndex);
-		const XMMATRIX& parentWorldTransform = 
+		const XMMATRIX& parentWorldTransform =
 			(parentBoneIndex < _pSkeleton->getBoneCount()) ? _worldTransforms[parentBoneIndex] : XMMatrixIdentity();
 
 		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
 		const XMVECTOR bonePosition = XMLoadFloat4(&bone.direction);
 		const XMMATRIX boneRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
-		XMMATRIX boneMatrix			= boneRotation * XMMatrixTranslationFromVector(bonePosition);
-
-
-
-		XMMATRIX animationRotation = XMMatrixIdentity();
-		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
-		{
-			const auto& animationRotations = _animations[animationIndex]._boneAnimation[boneIndex].rotation;
-			
-			int cursor = keyFrameRotations[boneIndex].cursor2;
-			while (animationRotations[cursor].key < playTime * animationFrameRate)
-			{
-				cursor = std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
-				
-				keyFrameRotations[boneIndex].t0			= keyFrameRotations[boneIndex].t1;
-				keyFrameRotations[boneIndex].t1			= animationRotations[cursor].key * interval;
-
-				keyFrameRotations[boneIndex].cursor0	= keyFrameRotations[boneIndex].cursor1;
-				keyFrameRotations[boneIndex].cursor1	= keyFrameRotations[boneIndex].cursor2;
-				keyFrameRotations[boneIndex].cursor2	= cursor;
-				keyFrameRotations[boneIndex].cursor3	= std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
-			}
-
-
-			const float	t0	= keyFrameRotations[boneIndex].t0;
-			const float	t1	= keyFrameRotations[boneIndex].t1;
-			assert(t0 <= playTime && playTime <= t1);
-
-			float		t	= (playTime - t0) / (t1 - t0);
-
-			const int p0 = keyFrameRotations[boneIndex].cursor0;
-			const int p1 = keyFrameRotations[boneIndex].cursor1;
-			const int p2 = keyFrameRotations[boneIndex].cursor2;
-			const int p3 = keyFrameRotations[boneIndex].cursor3;
-
-			XMVECTOR finalQuaternion;
-			if (p1 == p2)
-			{
-				finalQuaternion = XMLoadFloat4(&animationRotations[p1].v);
-			}
-			else
-			{
-				finalQuaternion = XMVectorCatmullRom(
-					XMLoadFloat4(&animationRotations[p0].v),
-					XMLoadFloat4(&animationRotations[p1].v),
-					XMLoadFloat4(&animationRotations[p2].v),
-					XMLoadFloat4(&animationRotations[p3].v), t);
-			}
-			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
-
-			
-			finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
-			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
-		}
-
+		XMMATRIX boneMatrix = boneRotation * XMMatrixTranslationFromVector(bonePosition);
 
 		boneMatrix = animationRotation * boneMatrix;
 		_worldTransforms[boneIndex] = boneMatrix * parentWorldTransform;
@@ -236,10 +177,10 @@ void pa::MyApplication::OnUpdate()
 
 		const XMVECTOR vec0 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
 		const XMVECTOR vec1 = XMVector3Normalize(bonePosition);
-		
-		const float		dotProduct		= XMVectorGetX(XMVector3Dot(vec0, vec1));
-		const float		angle			= std::acosf(dotProduct);
-		const XMVECTOR	rotationAxis	= XMVector3Cross(vec0, vec1);
+
+		const float		dotProduct = XMVectorGetX(XMVector3Dot(vec0, vec1));
+		const float		angle = std::acosf(dotProduct);
+		const XMVECTOR	rotationAxis = XMVector3Cross(vec0, vec1);
 
 
 		_boneStickTransforms[boneIndex] =

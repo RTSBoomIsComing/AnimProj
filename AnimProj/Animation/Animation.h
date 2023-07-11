@@ -5,6 +5,7 @@ namespace pa
 {
 	class ASF;
 	class AMC;
+	class Skeleton;
 	class Animation
 	{
 		friend class MyApplication;
@@ -30,9 +31,10 @@ namespace pa
 
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void compressAnimation();
+		DirectX::XMVECTOR playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
 	private:
-		void fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold = 0.0001f);
-		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
+		void	fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.0001f);
+		float	getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 
 	private:
 		size_t							_duration			= 0;

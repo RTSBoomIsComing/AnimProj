@@ -21,7 +21,10 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 	if (nullptr == acclaimMotion)
 		return false;
 
-	_duration = acclaimMotion->getFrameCount();
+
+	// If frameCount is 121 then total duration is 120
+	// Because the frameIndex 0 is just base pose and not included in duration
+	_duration = acclaimMotion->getFrameCount() - 1;
 	_boneAnimation.resize(acclaimSkeleton->_pSkeleton->getBoneCount());
 
 
@@ -113,18 +116,63 @@ void pa::Animation::compressAnimation()
 {
 	for (auto& boneAnimation : _boneAnimation)
 	{
-		fitBoneAnimationRotation(boneAnimation.rotation);
+		fitBoneAnimationCatmullRom(boneAnimation.rotation);
+		fitBoneAnimationCatmullRom(boneAnimation.position);
+		fitBoneAnimationCatmullRom(boneAnimation.scale);
 	}
 }
 
-void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold)
+DirectX::XMVECTOR pa::Animation::playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset)
 {
 	using namespace DirectX;
 
-	if (rotations.empty())
+	int frameIndex = key;
+
+	if (frames.empty())
+		return { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	assert(offset < frames.size());
+	assert(frames.size() >= 2 && "frames need to have two control points, start point and end point");
+
+	constexpr int	frameRate = 120;
+	constexpr float interval = 1.0f / frameRate;
+
+
+	XMMATRIX animationRotation = XMMatrixIdentity();
+
+	auto findIt = std::find_if(frames.begin() + offset, frames.end(), [=](Animation::Frame const& f) { return key < f.key; });
+	size_t	index2	= (findIt != frames.end()) ? std::distance(frames.begin(), findIt) : frames.size() - 1;
+	size_t	index1	= index2 - 1;
+	size_t	index0	= (0 < index1) ? index1 - 1 : index1;
+	size_t	index3	= (index2 < frames.size() - 1) ? index2 + 1 : index2;
+
+	int		P0 = frames[index0].key;
+	int		P1 = frames[index1].key;
+	int		P2 = frames[index2].key;
+	int		P3 = frames[index3].key;
+
+	assert(P1 < P2);
+	assert(P1 <= key && key <= P2);
+	float	t	= static_cast<float>(key - P1) / (P2 - P1);
+
+
+	XMVECTOR quaternion = XMVectorCatmullRom(XMLoadFloat4(&frames[index0].v), XMLoadFloat4(&frames[index1].v),
+			XMLoadFloat4(&frames[index2].v), XMLoadFloat4(&frames[index3].v), t);
+	
+	// Is need normalize here ? 
+	// quaternion = XMQuaternionNormalize(quaternion);
+	
+	return quaternion;
+}
+
+void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold)
+{
+	using namespace DirectX;
+
+	if (frames.empty())
 		return;
 
-	std::vector<bool>		picked(rotations.size(), false);
+	std::vector<bool>		picked(frames.size(), false);
 	picked.front()			= true;
 	picked.back()			= true;
 
@@ -155,14 +203,14 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 			{
 				const float t = static_cast<float>(between - p1) / (p2 - p1);
 				XMVECTOR catmullRom = XMVectorCatmullRom(
-					XMLoadFloat4(&rotations[p0].v),
-					XMLoadFloat4(&rotations[p1].v),
-					XMLoadFloat4(&rotations[p2].v),
-					XMLoadFloat4(&rotations[p3].v), t);
+					XMLoadFloat4(&frames[p0].v),
+					XMLoadFloat4(&frames[p1].v),
+					XMLoadFloat4(&frames[p2].v),
+					XMLoadFloat4(&frames[p3].v), t);
 
 				catmullRom = XMQuaternionNormalize(catmullRom);
 
-				const XMVECTOR	difference = XMLoadFloat4(&rotations[between].v) - catmullRom;
+				const XMVECTOR	difference = XMLoadFloat4(&frames[between].v) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
 				//errorSums.back() += error;
 
@@ -192,12 +240,12 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 
 	
 	std::vector<Animation::Frame> newRotations;
-	for (int point = 0; point < rotations.size(); point++)
+	for (int point = 0; point < frames.size(); point++)
 	{
 		if (picked[point])
-			newRotations.push_back(rotations[point]);
+			newRotations.push_back(frames[point]);
 	}
-	rotations = newRotations;
+	frames = newRotations;
 }
 
 float pa::Animation::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
@@ -209,3 +257,4 @@ float pa::Animation::getError(const DirectX::XMVECTOR& origin, const DirectX::XM
 
 	return error;
 }
+
