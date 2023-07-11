@@ -9,8 +9,8 @@ namespace pa
 	class Character
 	{
 	public:
-		Character() = default;
-		~Character() = default;
+		Character();
+		~Character();
 
 	public:
 		void update(float deltaTime);
@@ -20,7 +20,7 @@ namespace pa
 
 	private:
 		Skeleton*				_skeleton;
-		std::vector<Animation*>	_animations;
+		std::vector<Animation>	_animations;
 	};
 }
 

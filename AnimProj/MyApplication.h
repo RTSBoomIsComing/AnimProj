@@ -49,11 +49,11 @@ namespace pa
 		ComPtr<ID3D11PixelShader>		_pixelShader;
 		ComPtr<ID3D11RasterizerState>	_rasterizerState;
 
-		Camera*							_camera	= nullptr;
+		Camera*							_camera		= nullptr;
 		Mesh*							_pCubeMesh	= nullptr;
 		Mesh*							_pStickMesh	= nullptr;
 		Skeleton*						_pSkeleton	= nullptr;
-		Character*						_character = nullptr;
+		Character*						_character	= nullptr;
 
 		std::vector<Animation>			_animations;
 

@@ -19,18 +19,19 @@ pa::MyApplication::MyApplication()
 	initializeD3dDevices(getHwnd());
 	initializeGraphicsPipeline();
 
-	_camera	= new Camera(_device.Get());
+	_camera		= new Camera(_device.Get());
 	_pStickMesh	= new StickMesh(_device.Get());
 	_pCubeMesh	= new CubeMesh(_device.Get(), 0.25f);
 
-	std::wstring asfFilePath = _SOLUTIONDIR;
 
 	_pSkeleton = new Skeleton();
+	std::wstring asfFilePath = _SOLUTIONDIR;
 	ASF asf(_pSkeleton, asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+
+	_character = new Character{};
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
-
 
 	AMC amcIdle(amcDirectory + LR"(idle.amc)");
 	AMC amcWalk(amcDirectory + LR"(walk.amc)");
@@ -40,12 +41,12 @@ pa::MyApplication::MyApplication()
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcRun));
-	//	_animations.push_back(Animation(&asf, &amcJump));
-	//	_animations.push_back(Animation(&asf, &amcWalk));
-	//	_animations.push_back(Animation(&asf, &amcPunch));
+	_animations.push_back(Animation(&asf, &amcJump));
+	_animations.push_back(Animation(&asf, &amcWalk));
+	_animations.push_back(Animation(&asf, &amcPunch));
 
 
-	_animations[1].compressAnimation();
+	//_animations[1].compressAnimation();
 
 	_worldTransforms.resize(_pSkeleton->getBoneCount());
 	_boneStickTransforms.resize(_pSkeleton->getBoneCount());
