@@ -10,6 +10,12 @@ pa::AMC::AMC(const wchar_t* filePath)
 		DebugBreak();
 }
 
+pa::AMC::AMC(const std::wstring& filePath)
+{
+	if (loadFromFile(filePath.c_str()) != true)
+		DebugBreak();
+}
+
 bool pa::AMC::loadFromFile(const wchar_t* filePath)
 {
 	std::ifstream stream{ filePath };

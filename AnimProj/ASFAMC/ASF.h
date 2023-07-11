@@ -26,6 +26,7 @@ namespace pa
 		ASF(pa::Skeleton* pSkeleton);
 		~ASF() = default;
 		ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath);
+		ASF(pa::Skeleton* pSkeleton, const std::wstring& filePath);
 
 		bool			loadFromFile(const wchar_t* filePath, class pa::Skeleton* pSkeleton);
 

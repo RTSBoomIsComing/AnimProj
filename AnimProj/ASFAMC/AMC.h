@@ -10,6 +10,7 @@ namespace pa
 	public:
 		AMC() = default;
 		AMC(const wchar_t* filePath);
+		AMC(const std::wstring& filePath);
 		~AMC() = default;
 	
 	public:

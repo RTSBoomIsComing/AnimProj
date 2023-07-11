@@ -28,6 +28,13 @@ pa::ASF::ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath)
 		DebugBreak();
 }
 
+pa::ASF::ASF(pa::Skeleton* pSkeleton, const std::wstring& filePath)
+	: _pSkeleton(pSkeleton)
+{
+	if (loadFromFile(filePath.c_str(), pSkeleton) != true)
+		DebugBreak();
+}
+
 bool pa::ASF::loadFromFile(const wchar_t* filePath, pa::Skeleton* pSkeleton)
 {
 	std::ifstream stream{ filePath };

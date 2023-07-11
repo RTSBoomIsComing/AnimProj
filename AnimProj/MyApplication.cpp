@@ -23,34 +23,19 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	asfFilePath += LR"(Assets\ASFAMC\subject02\02.asf)";
 
 	_pSkeleton = new Skeleton();
-	ASF asf(_pSkeleton, asfFilePath.c_str());
-
-	//SandboxModifySkeleton(_pSkeleton);
+	ASF asf(_pSkeleton, asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
-	std::wstring amcFilePath;
 
-	amcFilePath = amcDirectory + LR"(idle.amc)";
-	AMC amcIdle(amcFilePath.c_str());
-
-	amcFilePath = amcDirectory + LR"(walk.amc)";
-	AMC amcWalk(amcFilePath.c_str());
-
-	amcFilePath = amcDirectory + LR"(runjog.amc)";
-	AMC amcRun(amcFilePath.c_str());
-
-	amcFilePath = amcDirectory + LR"(jumpbalance.amc)";
-	AMC amcJump(amcFilePath.c_str());
-
-	amcFilePath = amcDirectory + LR"(punchstrike.amc)";
-	AMC amcPunch(amcFilePath.c_str());
-
-
+	AMC amcIdle(amcDirectory + LR"(idle.amc)");
+	AMC amcWalk(amcDirectory + LR"(walk.amc)");
+	AMC amcRun(amcDirectory + LR"(runjog.amc)");
+	AMC amcJump(amcDirectory + LR"(jumpbalance.amc)");
+	AMC amcPunch(amcDirectory + LR"(punchstrike.amc)");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcRun));
@@ -127,7 +112,7 @@ void pa::MyApplication::OnUpdate()
 	constexpr float interval = 1.0f / animationFrameRate;
 	static float	playTime = 0.0f;
 
-	int keyFrameIndex = playTime * animationFrameRate;
+	int keyFrameIndex = static_cast<int>(playTime * animationFrameRate);
 	playTime += deltaTime.count();
 
 	if (keyFrameIndex > _animations[animationIndex]._duration)
