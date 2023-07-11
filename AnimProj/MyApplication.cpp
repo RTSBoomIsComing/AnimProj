@@ -100,7 +100,7 @@ void pa::MyApplication::OnUpdate()
 		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
 		{
 			finalQuaternion =
-				_animations[animationIndex].playBoneAnimation(_animations[animationIndex]._boneAnimation[boneIndex].rotation, keyFrameIndex);
+				_animations[animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
 
 			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
 			finalQuaternion = XMQuaternionNormalize(
@@ -118,8 +118,8 @@ void pa::MyApplication::OnUpdate()
 		const XMVECTOR bonePosition = XMLoadFloat4(&bone.direction);
 		const XMMATRIX boneRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
 		XMMATRIX boneMatrix = boneRotation * XMMatrixTranslationFromVector(bonePosition);
-
 		boneMatrix = animationRotation * boneMatrix;
+
 		_worldTransforms[boneIndex] = boneMatrix * parentWorldTransform;
 
 		const float boneStickScale = XMVectorGetX(XMVector3Length(bonePosition));

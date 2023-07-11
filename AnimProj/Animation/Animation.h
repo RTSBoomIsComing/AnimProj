@@ -31,10 +31,11 @@ namespace pa
 
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void compressAnimation();
-		DirectX::XMVECTOR playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
+
+		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset = 0);
 	private:
-		void	fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.0001f);
-		float	getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
+		DirectX::XMVECTOR	playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
+		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.0001f);
 
 	private:
 		size_t							_duration			= 0;

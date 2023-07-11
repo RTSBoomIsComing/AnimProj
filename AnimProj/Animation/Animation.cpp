@@ -122,6 +122,12 @@ void pa::Animation::compressAnimation()
 	}
 }
 
+DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset)
+{
+	using namespace DirectX;
+	return XMQuaternionNormalize(playBoneAnimation(_boneAnimation[boneIndex].rotation, key));
+}
+
 DirectX::XMVECTOR pa::Animation::playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset)
 {
 	using namespace DirectX;
@@ -246,15 +252,5 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 			newRotations.push_back(frames[point]);
 	}
 	frames = newRotations;
-}
-
-float pa::Animation::getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const
-{
-	using namespace DirectX;
-
-	const XMVECTOR	difference = other - origin;
-	const float		error = XMVectorGetX(XMVector4LengthSq(difference));
-
-	return error;
 }
 
