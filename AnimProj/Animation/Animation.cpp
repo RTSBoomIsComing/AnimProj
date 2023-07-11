@@ -160,8 +160,13 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 					XMLoadFloat4(&rotations[p2].v),
 					XMLoadFloat4(&rotations[p3].v), t);
 
+				catmullRom = XMQuaternionNormalize(catmullRom);
+
 				const XMVECTOR	difference = XMLoadFloat4(&rotations[between].v) - catmullRom;
-				errorSums.back() += XMVectorGetX(XMVector4LengthSq(difference));
+				const float error = XMVectorGetX(XMVector4LengthSq(difference));
+				//errorSums.back() += error;
+
+				errorSums.back() = std::max(errorSums.back(), error);
 			}
 
 			p0 = p1;
@@ -176,7 +181,7 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 
 		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());
 		if (*errorIterator < threshold)
-			break; // TODO
+			break;
 
 		picked[sectionMiddles[std::distance(errorSums.begin(), errorIterator)]] = true;
 	}

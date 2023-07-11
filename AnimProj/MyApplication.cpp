@@ -50,6 +50,10 @@ pa::MyApplication::MyApplication()
 
 	_animation = new Animation(&asf, &amc);
 	_animation->compressAnimation();
+	for (const auto& boneAnimation : _animation->_boneAnimation)
+	{
+		std::cout << boneAnimation.rotation.size() << std::endl;
+	}
 
 	initializeGraphicsPipeline();
 
@@ -200,8 +204,10 @@ void pa::MyApplication::OnUpdate()
 					XMLoadFloat4(&animationRotations[p2].v),
 					XMLoadFloat4(&animationRotations[p3].v), t);
 			}
+			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
 			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 		}
+
 
 		boneMatrix = animationRotation * boneMatrix;
 		_worldTransforms[boneIndex] = boneMatrix * parentWorldTransform;

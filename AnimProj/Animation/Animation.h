@@ -31,7 +31,7 @@ namespace pa
 		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void compressAnimation();
 	private:
-		void fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold = 0.01f);
+		void fitBoneAnimationRotation(std::vector<Animation::Frame>& rotations, float threshold = 0.0005f);
 		float getError(const DirectX::XMVECTOR& origin, const DirectX::XMVECTOR& other) const;
 
 	private:
