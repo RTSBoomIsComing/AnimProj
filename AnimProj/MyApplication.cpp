@@ -7,10 +7,9 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Rendering/Character.h"
-#include "Animation/Animation.h"
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
-#include "Animation/Quantization.h"
+#include "Animation/Animation.h"
 
 namespace pa
 {
@@ -29,31 +28,37 @@ pa::MyApplication::MyApplication()
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	asfFilePath += LR"(Assets\ASFAMC\subject02\02.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
-	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
-
-	std::wstring amcFilePath = _SOLUTIONDIR;
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\runjog.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\jumpbalance.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\subject02\punchstrike.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
-
 
 	_pSkeleton = new Skeleton();
 	ASF asf(_pSkeleton, asfFilePath.c_str());
 
 	SandboxModifySkeleton(_pSkeleton);
 
+	std::wstring amcDirectory = _SOLUTIONDIR;
+	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\runjog.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\jumpbalance.amc)";
 
-	AMC amc(amcFilePath.c_str());
+	std::wstring amcFilePath;
+	
+	amcFilePath = amcDirectory + LR"(walk.amc)";
+	AMC amcWalk(amcFilePath.c_str());
+	
+	amcFilePath = amcDirectory + LR"(runjog.amc)";
+	AMC amcRun(amcFilePath.c_str());
+	
+	amcFilePath = amcDirectory + LR"(jumpbalance.amc)";
+	AMC amcJump(amcFilePath.c_str());
+	
+	amcFilePath = amcDirectory + LR"(punchstrike.amc)";
+	AMC amcPunch(amcFilePath.c_str());
 
-	_animation = new Animation(&asf, &amc);
+
+
+
+
+	_animation = new Animation(&asf, &amcWalk);
 	//_animation->compressAnimation();
 	for (const auto& boneAnimation : _animation->_boneAnimation)
 	{

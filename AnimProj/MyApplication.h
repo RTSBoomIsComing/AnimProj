@@ -52,6 +52,8 @@ namespace pa
 		Animation*						_animation	= nullptr;
 		Character*						_character = nullptr;
 
+
+
 		std::vector<DirectX::XMMATRIX> _worldTransforms;
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
 
