@@ -166,7 +166,11 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
 				//errorSums.back() += error;
 
-				errorSums.back() = std::max(errorSums.back(), error);
+				if (errorSums.back() < error)
+				{
+					errorSums.back() = error;
+					sectionMiddles.back() = between;
+				}
 			}
 
 			p0 = p1;

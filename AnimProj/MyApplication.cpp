@@ -28,14 +28,19 @@ pa::MyApplication::MyApplication()
 	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
+	asfFilePath += LR"(Assets\ASFAMC\subject02\02.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\07-walk\07-walk.asf)";
-	asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
+	//asfFilePath += LR"(Assets\ASFAMC\09-run\09-run.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\131-dance\131-dance.asf)";
 	//asfFilePath += LR"(Assets\ASFAMC\135-martialArts\135-martialArts.asf)";
 
 	std::wstring amcFilePath = _SOLUTIONDIR;
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\walk.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\runjog.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\subject02\jumpbalance.amc)";
+	amcFilePath += LR"(Assets\ASFAMC\subject02\punchstrike.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\07-walk\07_05-walk.amc)";
-	amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
+	//amcFilePath += LR"(Assets\ASFAMC\09-run\09_06-run.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\131-dance\131_04-dance.amc)";
 	//amcFilePath += LR"(Assets\ASFAMC\135-martialArts\135_06-martialArts.amc)";
 
@@ -49,7 +54,7 @@ pa::MyApplication::MyApplication()
 	AMC amc(amcFilePath.c_str());
 
 	_animation = new Animation(&asf, &amc);
-	_animation->compressAnimation();
+	//_animation->compressAnimation();
 	for (const auto& boneAnimation : _animation->_boneAnimation)
 	{
 		std::cout << boneAnimation.rotation.size() << std::endl;
@@ -132,12 +137,12 @@ void pa::MyApplication::OnUpdate()
 	//static std::vector<KeyFramePair> positions(_pSkeleton->getBoneCount());
 	static std::vector<KeyFrameData> keyFrameRotations(_pSkeleton->getBoneCount());
 
-	constexpr int	animationFPS = 120;
-	constexpr float interval = 1.0f / animationFPS;
+	constexpr int	animationFrameRate = 120;
+	constexpr float interval = 1.0f / animationFrameRate;
 	static float	playTime = 0.0f; 
 
 	playTime += deltaTime.count();
-	if (playTime * animationFPS >= _animation->_duration -1)
+	if (playTime * animationFrameRate >= _animation->_duration -1)
 	{
 		playTime = 0.0f;
 		for (auto& keyFrameRotation : keyFrameRotations)
@@ -166,7 +171,7 @@ void pa::MyApplication::OnUpdate()
 			const auto& animationRotations = _animation->_boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor2;
-			while (animationRotations[cursor].key < playTime * animationFPS)
+			while (animationRotations[cursor].key < playTime * animationFrameRate)
 			{
 				cursor = std::min(cursor + 1, static_cast<int>(animationRotations.size()) - 1);
 				
@@ -205,6 +210,9 @@ void pa::MyApplication::OnUpdate()
 					XMLoadFloat4(&animationRotations[p3].v), t);
 			}
 			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
+
+
+			//finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp({ 0.0f, 0.0f, 0.0f, 1.0f }, finalQuaternion, 0.5f));
 			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 		}
 
