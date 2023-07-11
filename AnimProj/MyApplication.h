@@ -1,6 +1,7 @@
 // author: Changwan Yu
 #pragma once
 #include "App/Win32Application.h"
+#include "Animation/Animation.h"
 
 namespace pa
 {
@@ -49,10 +50,9 @@ namespace pa
 		Mesh*							_pCubeMesh	= nullptr;
 		Mesh*							_pStickMesh	= nullptr;
 		Skeleton*						_pSkeleton	= nullptr;
-		Animation*						_animation	= nullptr;
 		Character*						_character = nullptr;
 
-
+		std::vector<Animation>			_animations;
 
 		std::vector<DirectX::XMMATRIX> _worldTransforms;
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;

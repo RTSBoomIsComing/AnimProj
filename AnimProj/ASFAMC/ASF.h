@@ -43,6 +43,7 @@ namespace pa
 		std::size_t getBoneIndexFromName(const std::string& boneName) const;
 
 	private:
+		void correctSkeleton();
 
 	private:
 		pa::Skeleton*							_pSkeleton;
@@ -54,7 +55,7 @@ namespace pa
 		float									_unitLength		= 1.0f;
 		float									_unitAngle		= 1.0f;
 		std::vector<DOF>						_DOFs;
-		std::vector<const char*>				_axisOrders;
+		std::vector<std::string>				_axisOrders;
 	};
 }
 

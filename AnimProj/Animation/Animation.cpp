@@ -136,19 +136,19 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 		int p0 = 0;
 
 		auto iterator = std::find(picked.begin(), picked.end(), true);
-		int p1 = std::distance(picked.begin(), iterator);
+		int p1 = static_cast<int>(std::distance(picked.begin(), iterator));
 
 		iterator = std::find(++iterator, picked.end(), true);
-		int p2 = std::distance(picked.begin(), iterator);
+		int p2 = static_cast<int>(std::distance(picked.begin(), iterator));
 
 		if (iterator < picked.end())
 			iterator = std::find(++iterator, picked.end(), true);
 
-		int p3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : p2;
+		int p3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : p2;
 
 		while (p1 != p2)
 		{
-			sectionMiddles.push_back((p1 + p2) * 0.5);
+			sectionMiddles.push_back((p1 + p2) / 2);
 			errorSums.push_back(0.0f);
 
 			for (int between = p1 + 1; between < p2; between++)
@@ -180,7 +180,7 @@ void pa::Animation::fitBoneAnimationRotation(std::vector<Animation::Frame>& rota
 			if (iterator < picked.end())
 				iterator = std::find(++iterator, picked.end(), true);
 			
-			p3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : p2;
+			p3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : p2;
 		}
 
 		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());

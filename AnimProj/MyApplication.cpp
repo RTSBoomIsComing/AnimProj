@@ -36,12 +36,12 @@ pa::MyApplication::MyApplication()
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\walk.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\runjog.amc)";
-	//amcFilePath += LR"(Assets\ASFAMC\subject02\jumpbalance.amc)";
 
 	std::wstring amcFilePath;
 	
+	amcFilePath = amcDirectory + LR"(idle.amc)";
+	AMC amcIdle(amcFilePath.c_str());
+
 	amcFilePath = amcDirectory + LR"(walk.amc)";
 	AMC amcWalk(amcFilePath.c_str());
 	
@@ -56,14 +56,18 @@ pa::MyApplication::MyApplication()
 
 
 
+	_animations.push_back(Animation(&asf, &amcIdle));
+	_animations.push_back(Animation(&asf, &amcRun));
+//	_animations.push_back(Animation(&asf, &amcJump));
+//	_animations.push_back(Animation(&asf, &amcWalk));
+//	_animations.push_back(Animation(&asf, &amcPunch));
 
 
-	_animation = new Animation(&asf, &amcWalk);
-	//_animation->compressAnimation();
-	for (const auto& boneAnimation : _animation->_boneAnimation)
-	{
-		std::cout << boneAnimation.rotation.size() << std::endl;
-	}
+	//_animations[0].compressAnimation();
+//	for (const auto& boneAnimation : _animations[1]._boneAnimation)
+//	{
+//		std::cout << boneAnimation.rotation.size() << std::endl;
+//	}
 
 	initializeGraphicsPipeline();
 
@@ -86,9 +90,6 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pSkeleton)
 		delete _pSkeleton;
 
-	if (nullptr != _animation)
-		delete _animation;
-
 	if (nullptr != _character)
 		delete _character;
 }
@@ -96,6 +97,8 @@ pa::MyApplication::~MyApplication()
 void pa::MyApplication::OnUpdate()
 {
 	using namespace DirectX;
+
+	constexpr int animationIndex = 1;
 
 	static auto lastTime = std::chrono::high_resolution_clock::now();
 	const auto currentTime = std::chrono::high_resolution_clock::now();
@@ -147,7 +150,7 @@ void pa::MyApplication::OnUpdate()
 	static float	playTime = 0.0f; 
 
 	playTime += deltaTime.count();
-	if (playTime * animationFrameRate >= _animation->_duration -1)
+	if (playTime * animationFrameRate >= _animations[animationIndex]._duration -1)
 	{
 		playTime = 0.0f;
 		for (auto& keyFrameRotation : keyFrameRotations)
@@ -170,10 +173,9 @@ void pa::MyApplication::OnUpdate()
 
 
 		XMMATRIX animationRotation = XMMatrixIdentity();
-		if (nullptr != _animation 
-			&& false == _animation->_boneAnimation[boneIndex].rotation.empty())
+		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
 		{
-			const auto& animationRotations = _animation->_boneAnimation[boneIndex].rotation;
+			const auto& animationRotations = _animations[animationIndex]._boneAnimation[boneIndex].rotation;
 			
 			int cursor = keyFrameRotations[boneIndex].cursor2;
 			while (animationRotations[cursor].key < playTime * animationFrameRate)
@@ -216,8 +218,8 @@ void pa::MyApplication::OnUpdate()
 			}
 			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
 
-
-			//finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp({ 0.0f, 0.0f, 0.0f, 1.0f }, finalQuaternion, 0.5f));
+			
+			finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
 			animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 		}
 
