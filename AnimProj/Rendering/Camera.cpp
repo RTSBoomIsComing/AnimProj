@@ -2,12 +2,23 @@
 #include "pch.h"
 #include "Camera.h"
 
-pa::Camera::Camera()
+pa::Camera::Camera(ID3D11Device* device)
 {
+	{
+		// Create camera constant buffer
+		D3D11_BUFFER_DESC bufferDesc;
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.ByteWidth = sizeof(pa::Camera::Matrices);
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = 0;
+		checkResult(device->CreateBuffer(&bufferDesc, nullptr, &_cameraConstantBuffer));
+	}
+
 	initialize();
 }
 
-void pa::Camera::initialize(void)
+void pa::Camera::initialize()
 {
 	constexpr float aspectRatio = 1280.0f / 720.0f;
 	_aspectRatio = aspectRatio;
@@ -20,22 +31,29 @@ void pa::Camera::initialize(void)
 }
 
 
-void pa::Camera::updateAspectRatio(float aspectRatio)
+void pa::Camera::setAspectRatio(float aspectRatio)
 {
 	_aspectRatio = aspectRatio;
 	_dirtyBit = true;
 }
 
-void pa::Camera::updateEyePosition(const DirectX::XMVECTOR& eyePosition)
+void pa::Camera::setEyePosition(const DirectX::XMVECTOR& eyePosition)
 {
 	DirectX::XMStoreFloat4(&_eyePosition, eyePosition);
 	_dirtyBit = true;
 }
 
-void pa::Camera::updateFocusPosition(const DirectX::XMVECTOR& focusPosition)
+void pa::Camera::setFocusPosition(const DirectX::XMVECTOR& focusPosition)
 {
 	DirectX::XMStoreFloat4(&_focusPosition, focusPosition);
 	_dirtyBit = true;
+}
+
+void pa::Camera::update(ID3D11DeviceContext* deviceContext)
+{
+	calculateMatrices();
+	deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_matrices, 0, 0);
+	deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 }
 
 void pa::Camera::calculateMatrices()

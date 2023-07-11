@@ -12,14 +12,15 @@ namespace pa
 		};
 
 	public:
-		Camera();
+		Camera(ID3D11Device* device);
 		~Camera() = default;
 
 
-		void initialize(void);
-		void updateAspectRatio(float aspectRatio);
-		void updateEyePosition(const DirectX::XMVECTOR& eyePosition);
-		void updateFocusPosition(const DirectX::XMVECTOR& focusPosition);
+		void initialize();
+		void setAspectRatio(float aspectRatio);
+		void setEyePosition(const DirectX::XMVECTOR& eyePosition);
+		void setFocusPosition(const DirectX::XMVECTOR& focusPosition);
+		void update(ID3D11DeviceContext* deviceContext);
 
 		const Matrices& getMatrices(void);
 
@@ -27,11 +28,14 @@ namespace pa
 		void calculateMatrices();
 
 	private:
-		Matrices			_matrices;
-		DirectX::XMFLOAT4	_eyePosition;
-		DirectX::XMFLOAT4	_focusPosition;
-		float				_aspectRatio;
-		bool				_dirtyBit;
+		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
+
+
+		Matrices						_matrices;
+		DirectX::XMFLOAT4				_eyePosition;
+		DirectX::XMFLOAT4				_focusPosition;
+		float							_aspectRatio;
+		bool							_dirtyBit;
 	};
 }
 

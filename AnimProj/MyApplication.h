@@ -2,7 +2,7 @@
 #pragma once
 #include "App/Win32Application.h"
 #include "Animation/Animation.h"
-
+#include "Timer.h"
 namespace pa
 {
 	class Camera;
@@ -24,6 +24,8 @@ namespace pa
 	private:
 		void initializeD3dDevices(HWND hWnd);
 		void initializeGraphicsPipeline();
+		void processInput(float deltaTime);
+		void processTime();
 
 	private:
 		ComPtr<ID3D11Device>				_device;
@@ -35,18 +37,19 @@ namespace pa
 		D3D11_VIEWPORT						_viewport;
 
 	private:
+		Timer	_timer;
+
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
 		float	_cameraRotationFactor	= 0.0f;
 		float	_cameraHeight			= 0.0f;
 
-		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
 		ComPtr<ID3D11Buffer>			_meshConstantBuffer;
 		ComPtr<ID3D11InputLayout>		_inputLayout;
 		ComPtr<ID3D11VertexShader>		_vertexShader;
 		ComPtr<ID3D11PixelShader>		_pixelShader;
 		ComPtr<ID3D11RasterizerState>	_rasterizerState;
 
-		Camera*							_pCamera	= nullptr;
+		Camera*							_camera	= nullptr;
 		Mesh*							_pCubeMesh	= nullptr;
 		Mesh*							_pStickMesh	= nullptr;
 		Skeleton*						_pSkeleton	= nullptr;

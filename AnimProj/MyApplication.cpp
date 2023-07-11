@@ -17,10 +17,11 @@ pa::MyApplication::MyApplication()
 	using namespace DirectX;
 
 	initializeD3dDevices(getHwnd());
+	initializeGraphicsPipeline();
 
-	_pCamera = new Camera();
-	_pStickMesh = new StickMesh(_device.Get());
-	_pCubeMesh = new CubeMesh(_device.Get(), 0.25f);
+	_camera	= new Camera(_device.Get());
+	_pStickMesh	= new StickMesh(_device.Get());
+	_pCubeMesh	= new CubeMesh(_device.Get(), 0.25f);
 
 	std::wstring asfFilePath = _SOLUTIONDIR;
 
@@ -46,18 +47,14 @@ pa::MyApplication::MyApplication()
 
 	_animations[1].compressAnimation();
 
-
-	initializeGraphicsPipeline();
-
 	_worldTransforms.resize(_pSkeleton->getBoneCount());
 	_boneStickTransforms.resize(_pSkeleton->getBoneCount());
-
 }
 
 pa::MyApplication::~MyApplication()
 {
-	if (nullptr != _pCamera)
-		delete _pCamera;
+	if (nullptr != _camera)
+		delete _camera;
 
 	if (nullptr != _pCubeMesh)
 		delete _pCubeMesh;
@@ -78,48 +75,23 @@ void pa::MyApplication::OnUpdate()
 
 	constexpr int animationIndex = 1;
 
-	static auto lastTime = std::chrono::high_resolution_clock::now();
-	const auto currentTime = std::chrono::high_resolution_clock::now();
-	const auto deltaTime = std::chrono::duration<float>(currentTime - lastTime);
-	lastTime = currentTime;
+	
+	_timer.update();
+	processInput(_timer.getDeltaTime());
 
-	{
-		float cameraDistance = 10.f;
-		if (keyState[0])
-			_cameraRotationFactor += deltaTime.count();
-		if (keyState[2])
-			_cameraRotationFactor -= deltaTime.count();
-		if (keyState[1])
-			_cameraHeight += deltaTime.count();
-		if (keyState[3])
-			_cameraHeight -= deltaTime.count();
+	_camera->update(_deviceContext.Get());
 
-
-
-		XMVECTOR newEyePosition = XMVECTOR{
-			cameraDistance * std::cosf(-XM_PIDIV2 + _cameraRotationFactor * 3),
-			_cameraHeight * 15,
-			cameraDistance * std::sinf(-XM_PIDIV2 + _cameraRotationFactor * 3),
-			1.0f };
-
-		_pCamera->updateEyePosition(newEyePosition);
-	}
-
-	_deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_pCamera->getMatrices(), 0, 0);
-	_deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 
 	constexpr int	animationFrameRate = 120;
-	constexpr float interval = 1.0f / animationFrameRate;
 	static float	playTime = 0.0f;
 
 	int keyFrameIndex = static_cast<int>(playTime * animationFrameRate);
-	playTime += deltaTime.count();
+	playTime += _timer.getDeltaTime();
 
 	if (keyFrameIndex > _animations[animationIndex]._duration)
 	{
 		keyFrameIndex = 0;
 		playTime = 0.0f;
-
 	}
 
 	for (const size_t boneIndex : _pSkeleton->getDFSPath())
@@ -279,16 +251,6 @@ void pa::MyApplication::initializeGraphicsPipeline()
 	}
 
 	{
-		// Create camera constant buffer
-		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		bufferDesc.ByteWidth = sizeof(pa::Camera::Matrices);
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.CPUAccessFlags = 0;
-		bufferDesc.MiscFlags = 0;
-		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_cameraConstantBuffer));
-	}
-	{
 		// Create mesh constant buffer
 		D3D11_BUFFER_DESC bufferDesc;
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -298,6 +260,30 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		bufferDesc.MiscFlags = 0;
 		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_meshConstantBuffer));
 	}
+}
+
+void pa::MyApplication::processInput(float deltaTime)
+{
+	using namespace DirectX;
+	float cameraDistance = 10.f;
+	if (keyState[0])
+		_cameraRotationFactor += deltaTime;
+	if (keyState[2])
+		_cameraRotationFactor -= deltaTime;
+	if (keyState[1])
+		_cameraHeight += deltaTime;
+	if (keyState[3])
+		_cameraHeight -= deltaTime;
+
+
+
+	XMVECTOR newEyePosition = XMVECTOR{
+		cameraDistance * std::cosf(-XM_PIDIV2 + _cameraRotationFactor * 3),
+		_cameraHeight * 15,
+		cameraDistance * std::sinf(-XM_PIDIV2 + _cameraRotationFactor * 3),
+		1.0f };
+
+	_camera->setEyePosition(newEyePosition);
 }
 
 void pa::MyApplication::initializeD3dDevices(HWND hWnd)
