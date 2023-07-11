@@ -146,10 +146,10 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimation(std::vector<Animation::Frame>
 	size_t	index0	= (0 < index1) ? index1 - 1 : index1;
 	size_t	index3	= (index2 < frames.size() - 1) ? index2 + 1 : index2;
 
-	int		P0 = frames[index0].key;
-	int		P1 = frames[index1].key;
-	int		P2 = frames[index2].key;
-	int		P3 = frames[index3].key;
+	uint32_t	P0	= frames[index0].key;
+	uint32_t	P1	= frames[index1].key;
+	uint32_t	P2	= frames[index2].key;
+	uint32_t	P3	= frames[index3].key;
 
 	assert(P1 < P2);
 	assert(P1 <= key && key <= P2);
@@ -178,35 +178,35 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 
 	while(true)
 	{
-		std::vector<int>	sectionMiddles;
+		std::vector<size_t>	sectionMiddles;
 		std::vector<float>	errorSums;
 
-		int p0 = 0;
+		size_t P0 = 0;
 
 		auto iterator = std::find(picked.begin(), picked.end(), true);
-		int p1 = static_cast<int>(std::distance(picked.begin(), iterator));
+		size_t P1 = std::distance(picked.begin(), iterator);
 
 		iterator = std::find(++iterator, picked.end(), true);
-		int p2 = static_cast<int>(std::distance(picked.begin(), iterator));
+		size_t P2 = std::distance(picked.begin(), iterator);
 
-		if (iterator < picked.end())
+		if (iterator != picked.end())
 			iterator = std::find(++iterator, picked.end(), true);
 
-		int p3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : p2;
+		size_t P3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : P2;
 
-		while (p1 != p2)
+		while (P1 != P2)
 		{
-			sectionMiddles.push_back((p1 + p2) / 2);
+			sectionMiddles.push_back((P1 + P2) / 2);
 			errorSums.push_back(0.0f);
 
-			for (int between = p1 + 1; between < p2; between++)
+			for (size_t between = P1 + 1; between < P2; between++)
 			{
-				const float t = static_cast<float>(between - p1) / (p2 - p1);
+				const float t = static_cast<float>(between - P1) / (P2 - P1);
 				XMVECTOR catmullRom = XMVectorCatmullRom(
-					XMLoadFloat4(&frames[p0].v),
-					XMLoadFloat4(&frames[p1].v),
-					XMLoadFloat4(&frames[p2].v),
-					XMLoadFloat4(&frames[p3].v), t);
+					XMLoadFloat4(&frames[P0].v),
+					XMLoadFloat4(&frames[P1].v),
+					XMLoadFloat4(&frames[P2].v),
+					XMLoadFloat4(&frames[P3].v), t);
 
 				catmullRom = XMQuaternionNormalize(catmullRom);
 
@@ -221,14 +221,14 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 				}
 			}
 
-			p0 = p1;
-			p1 = p2;
-			p2 = p3;
+			P0 = P1;
+			P1 = P2;
+			P2 = P3;
 
 			if (iterator < picked.end())
 				iterator = std::find(++iterator, picked.end(), true);
 			
-			p3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : p2;
+			P3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : P2;
 		}
 
 		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());

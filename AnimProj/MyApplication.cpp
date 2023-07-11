@@ -63,7 +63,7 @@ pa::MyApplication::MyApplication()
 	//	_animations.push_back(Animation(&asf, &amcPunch));
 
 
-		_animations[1].compressAnimation();
+	_animations[1].compressAnimation();
 
 
 	initializeGraphicsPipeline();
@@ -150,7 +150,8 @@ void pa::MyApplication::OnUpdate()
 				_animations[animationIndex].playBoneAnimation(_animations[animationIndex]._boneAnimation[boneIndex].rotation, keyFrameIndex);
 
 			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
-			finalQuaternion = XMQuaternionNormalize(XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
+			finalQuaternion = XMQuaternionNormalize(
+				XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
 		}
 
 		XMMATRIX animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
