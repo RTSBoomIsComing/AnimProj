@@ -11,10 +11,6 @@
 #include "ASFAMC/AMC.h"
 #include "Animation/Animation.h"
 
-namespace pa
-{
-	extern void SandboxModifySkeleton(Skeleton* pSkeleton);
-}
 
 pa::MyApplication::MyApplication()
 {
@@ -32,7 +28,7 @@ pa::MyApplication::MyApplication()
 	_pSkeleton = new Skeleton();
 	ASF asf(_pSkeleton, asfFilePath.c_str());
 
-	SandboxModifySkeleton(_pSkeleton);
+	//SandboxModifySkeleton(_pSkeleton);
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
