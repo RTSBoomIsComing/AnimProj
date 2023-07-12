@@ -89,7 +89,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Animation\AnimationBlender.h" />
     <ClInclude Include="ASFAMC\Acclaim.h" />
     <ClInclude Include="Animation\Quantization.h" />
     <ClInclude Include="Animation\CompressedFrame.h" />
@@ -112,7 +111,6 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="ASFAMC\Acclaim.cpp" />
     <ClCompile Include="Animation\Quantization.cpp" />
     <ClCompile Include="Animation\CompressedFrame.cpp" />

@@ -16,6 +16,7 @@ namespace pa
 
 		std::vector<DirectX::XMMATRIX> const& getMatrices() const;
 		std::vector<DirectX::XMFLOAT4> const& getRotations() const;
+
 	private:
 		Skeleton*						_skeleton;
 		std::vector<DirectX::XMFLOAT4>	_rotationsPerBone;

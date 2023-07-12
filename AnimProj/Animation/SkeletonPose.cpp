@@ -41,3 +41,4 @@ std::vector<DirectX::XMFLOAT4> const& pa::SkeletonPose::getRotations() const
 {
 	return _rotationsPerBone;
 }
+
