@@ -184,7 +184,7 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRomCyclic(std::vector<A
 
 	assert(offset < frames.size());
 	assert(frames.size() >= 2 && "frames need to have two control points, start point and end point");
-	uint32_t keyModular = _duration + 1;
+	uint32_t keyModular = static_cast<uint32_t>(_duration) + 1;
 	key = key % keyModular;
 
 	Animation::Frame findFrame{ key };
@@ -247,7 +247,7 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 
 		size_t P3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : P2;
 
-		while (P1 != P2)
+		while (P1 < P2)
 		{
 			sectionMiddles.push_back((P1 + P2) / 2);
 			errorSums.push_back(0.0f);
@@ -305,33 +305,30 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 {
 	using namespace DirectX;
 
-	if (frames.size() < 5)
+	if (frames.size() < 4)
 		return;
 
-	struct Section
-	{
-		uint32_t	key;
-		float		error = -1.0f;
-	};
-
-	std::list<Section>		pickedFrames;
-	pickedFrames.push_back({ 0 });
-	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) / 4 });
-	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) / 2 });
-	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) * 3 / 4 });
-	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) - 1 });
+	std::vector<bool>		picked(frames.size(), false);
+	picked.front() = true;
+	picked[frames.size() / 4] = true;
+	picked[frames.size() / 2] = true;
+	picked.back() = true;
 
 	while (true)
 	{
-		std::vector<std::list<uint32_t>::iterator>	sections;
+		std::vector<size_t>	sectionMiddles;
 		std::vector<float>	errorSums;
 
-		auto iter = pickedFrames.begin();
+		size_t P0 = frames.size() - 1;
 
-		size_t P0 = pickedFrames.back();
-		size_t P1 = *iter++;
-		size_t P2 = *iter++;
-		size_t P3 = *iter++;
+		auto iterator = std::find(picked.begin(), picked.end(), true);
+		size_t P1 = std::distance(picked.begin(), iterator);
+
+		iterator = std::find(++iterator, picked.end(), true);
+		size_t P2 = std::distance(picked.begin(), iterator);
+
+		iterator = std::find(++iterator, picked.end(), true);
+		size_t P3 = std::distance(picked.begin(), iterator);
 
 		while (P1 < P2)
 		{
@@ -351,39 +348,40 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 
 				const XMVECTOR	difference = XMLoadFloat4(&frames[between].v) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
-				//errorSums.back() += error;
+				errorSums.back() += error;
 
-				if (errorSums.back() < error)
-				{
-					errorSums.back() = error;
-					sectionMiddles.back() = between;
-				}
+				//if (errorSums.back() < error)
+				//{
+				//	errorSums.back() = error;
+				//	sectionMiddles.back() = between;
+				//}
 			}
 
 			P0 = P1;
 			P1 = P2;
 			P2 = P3;
 
-			if (pickedFrames.end() == iter)
-				iter = pickedFrames.begin();
+			if (iterator < picked.end())
+				iterator = std::find(++iterator, picked.end(), true);
 
-			P3 = *iter++;
+			P3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : 0;
 		}
 
 		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());
 		if (*errorIterator < threshold)
 			break;
 
-
+		picked[sectionMiddles[std::distance(errorSums.begin(), errorIterator)]] = true;
 	}
 
 
 	std::vector<Animation::Frame> newframes;
-	for (uint32_t picked : pickedFrames)
+	for (size_t point = 0; point < frames.size(); point++)
 	{
-		newframes.push_back(frames[picked]);
+		if (picked[point])
+			newframes.push_back(frames[point]);
 	}
-
 	frames = newframes;
+
 }
 
