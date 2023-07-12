@@ -93,7 +93,7 @@ void pa::MyApplication::OnUpdate()
 		playTime = 0.0f;
 	}
 
-	for (const size_t boneIndex : _skeleton->getDFSPath())
+	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
 		//XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
 		//if (false == _animations[_animationIndex]._boneAnimation[boneIndex].rotation.empty())
@@ -205,8 +205,8 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 	else if ('w' == key)
 	{
 		_animationBlendFactor += 0.01f;
-		if (_animationBlendFactor > 0.1f)
-			_animationBlendFactor = 0.0f;
+		if (_animationBlendFactor > 1.0f)
+			_animationBlendFactor = 1.0f;
 	}
 
 }
@@ -219,6 +219,13 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 	// down  : 40
 	if (37 <= key && key <= 40)
 		_keyState[key - 37] = false;
+
+	else if ('w' == key)
+	{
+		_animationBlendFactor -= 0.01f;
+		if (_animationBlendFactor < 0.0f)
+			_animationBlendFactor = 0.0f;
+	}
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

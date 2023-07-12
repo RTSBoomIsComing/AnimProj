@@ -14,7 +14,7 @@ namespace pa
 
 		inline size_t						getBoneCount()						const { return _boneMatrices.size(); }
 		inline size_t						getParentBoneIndex(size_t index)	const { return _parentList[index]; }
-		inline std::vector<uint8_t> const&	getDFSPath()						const { return _boneHierarchy; }
+		inline std::vector<uint8_t> const&	getHierarchy()						const { return _boneHierarchy; }
 
 	private:
 		Skeleton() = default;
