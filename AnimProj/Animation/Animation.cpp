@@ -117,18 +117,18 @@ void pa::Animation::compressAnimation()
 	for (auto& boneAnimation : _boneAnimation)
 	{
 		fitBoneAnimationCatmullRom(boneAnimation.rotation);
-		fitBoneAnimationCatmullRom(boneAnimation.position);
-		fitBoneAnimationCatmullRom(boneAnimation.scale);
+		//fitBoneAnimationCatmullRom(boneAnimation.position);
+		//fitBoneAnimationCatmullRom(boneAnimation.scale);
 	}
 }
 
 DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset)
 {
 	using namespace DirectX;
-	return XMQuaternionNormalize(playBoneAnimation(_boneAnimation[boneIndex].rotation, key));
+	return XMQuaternionNormalize(playBoneAnimationCatmullRom(_boneAnimation[boneIndex].rotation, key));
 }
 
-DirectX::XMVECTOR pa::Animation::playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset)
+DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRom(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset)
 {
 	using namespace DirectX;
 
@@ -143,10 +143,15 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimation(std::vector<Animation::Frame>
 	constexpr int	frameRate = 120;
 	constexpr float interval = 1.0f / frameRate;
 
-
+	
 	XMMATRIX animationRotation = XMMatrixIdentity();
 
-	auto findIt = std::find_if(frames.begin() + offset, frames.end(), [=](Animation::Frame const& f) { return key < f.key; });
+	Animation::Frame findFrame{ key };
+	auto findIt = std::upper_bound(frames.begin() + offset, frames.end(), findFrame, 
+		[](Animation::Frame const& f1, Animation::Frame const& f2) {
+			return f1.key < f2.key; 
+		});
+
 	size_t	index2	= (findIt != frames.end()) ? std::distance(frames.begin(), findIt) : frames.size() - 1;
 	size_t	index1	= index2 - 1;
 	size_t	index0	= (0 < index1) ? index1 - 1 : index1;
@@ -245,12 +250,12 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 	}
 
 	
-	std::vector<Animation::Frame> newRotations;
-	for (int point = 0; point < frames.size(); point++)
+	std::vector<Animation::Frame> newframes;
+	for (size_t point = 0; point < frames.size(); point++)
 	{
 		if (picked[point])
-			newRotations.push_back(frames[point]);
+			newframes.push_back(frames[point]);
 	}
-	frames = newRotations;
+	frames = newframes;
 }
 

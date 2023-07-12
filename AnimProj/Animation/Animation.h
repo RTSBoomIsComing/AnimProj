@@ -34,8 +34,8 @@ namespace pa
 
 		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset = 0);
 	private:
-		DirectX::XMVECTOR	playBoneAnimation(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
-		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.0001f);
+		DirectX::XMVECTOR	playBoneAnimationCatmullRom(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
+		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
 
 	private:
 		size_t							_duration			= 0;

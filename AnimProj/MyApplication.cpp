@@ -45,7 +45,11 @@ pa::MyApplication::MyApplication()
 	_animations.push_back(Animation(&asf, &amcPunch));
 
 
-	//_animations[1].compressAnimation();
+	_animations[0].compressAnimation();
+	_animations[1].compressAnimation();
+	_animations[2].compressAnimation();
+	_animations[3].compressAnimation();
+	_animations[4].compressAnimation();
 
 	_worldTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -72,9 +76,6 @@ pa::MyApplication::~MyApplication()
 void pa::MyApplication::OnUpdate()
 {
 	using namespace DirectX;
-
-	constexpr int animationIndex = 1;
-
 	
 	_timer.update();
 	processInput(_timer.getDeltaTime());
@@ -82,13 +83,13 @@ void pa::MyApplication::OnUpdate()
 	_camera->update(_deviceContext.Get());
 
 
-	constexpr int	animationFrameRate = 120;
-	static float	playTime = 0.0f;
+	constexpr int	animationFrameRate	= 120;
+	static float	playTime			= 0.0f;
 
 	int keyFrameIndex = static_cast<int>(playTime * animationFrameRate);
 	playTime += _timer.getDeltaTime();
 
-	if (keyFrameIndex > _animations[animationIndex]._duration)
+	if (keyFrameIndex > _animations[_animationIndex]._duration)
 	{
 		keyFrameIndex = 0;
 		playTime = 0.0f;
@@ -97,10 +98,10 @@ void pa::MyApplication::OnUpdate()
 	for (const size_t boneIndex : _skeleton->getDFSPath())
 	{
 		XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
-		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
+		if (false == _animations[_animationIndex]._boneAnimation[boneIndex].rotation.empty())
 		{
 			finalQuaternion =
-				_animations[animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
+				_animations[_animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
 
 			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
 			finalQuaternion = XMQuaternionNormalize(
@@ -189,7 +190,7 @@ void pa::MyApplication::OnRender()
 	_pCubeMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_skeleton->getBoneCount()));
 
 	// renderer
-	_swapChain->Present(1, 0);
+	_swapChain->Present(0, 0);
 }
 
 void pa::MyApplication::OnKeyDown(UINT8 key)
@@ -200,6 +201,13 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 	// down  : 40
 	if (37 <= key)
 		keyState[key - 37] = true;
+
+	if (49 == key)
+	{
+		if (++_animationIndex >= _animations.size())
+			_animationIndex = 0;
+	}
+
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)

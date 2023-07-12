@@ -61,6 +61,7 @@ namespace pa
 
 	private:
 		bool	keyState[4]				= {};
+		int		_animationIndex			= 0;
 	};
 }
 
