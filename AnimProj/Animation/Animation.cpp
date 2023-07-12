@@ -116,7 +116,7 @@ void pa::Animation::compressAnimation()
 {
 	for (auto& boneAnimation : _boneAnimation)
 	{
-		fitBoneAnimationCatmullRom(boneAnimation.rotation);
+		fitBoneAnimationCatmullRomCyclic(boneAnimation.rotation);
 		//fitBoneAnimationCatmullRom(boneAnimation.position);
 		//fitBoneAnimationCatmullRom(boneAnimation.scale);
 	}
@@ -135,8 +135,6 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRom(std::vector<Animati
 {
 	using namespace DirectX;
 
-	int frameIndex = key;
-
 	if (frames.empty())
 		return { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -147,8 +145,6 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRom(std::vector<Animati
 	constexpr float interval = 1.0f / frameRate;
 
 	
-	XMMATRIX animationRotation = XMMatrixIdentity();
-
 	Animation::Frame findFrame{ key };
 	auto findIt = std::upper_bound(frames.begin() + offset, frames.end(), findFrame, 
 		[](Animation::Frame const& f1, Animation::Frame const& f2) {
@@ -302,6 +298,92 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 		if (picked[point])
 			newframes.push_back(frames[point]);
 	}
+	frames = newframes;
+}
+
+void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold)
+{
+	using namespace DirectX;
+
+	if (frames.size() < 5)
+		return;
+
+	struct Section
+	{
+		uint32_t	key;
+		float		error = -1.0f;
+	};
+
+	std::list<Section>		pickedFrames;
+	pickedFrames.push_back({ 0 });
+	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) / 4 });
+	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) / 2 });
+	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) * 3 / 4 });
+	pickedFrames.push_back({ static_cast<uint32_t>(frames.size()) - 1 });
+
+	while (true)
+	{
+		std::vector<std::list<uint32_t>::iterator>	sections;
+		std::vector<float>	errorSums;
+
+		auto iter = pickedFrames.begin();
+
+		size_t P0 = pickedFrames.back();
+		size_t P1 = *iter++;
+		size_t P2 = *iter++;
+		size_t P3 = *iter++;
+
+		while (P1 < P2)
+		{
+			sectionMiddles.push_back((P1 + P2) / 2);
+			errorSums.push_back(0.0f);
+
+			for (size_t between = P1 + 1; between < P2; between++)
+			{
+				const float t = static_cast<float>(between - P1) / (P2 - P1);
+				XMVECTOR catmullRom = XMVectorCatmullRom(
+					XMLoadFloat4(&frames[P0].v),
+					XMLoadFloat4(&frames[P1].v),
+					XMLoadFloat4(&frames[P2].v),
+					XMLoadFloat4(&frames[P3].v), t);
+
+				catmullRom = XMQuaternionNormalize(catmullRom);
+
+				const XMVECTOR	difference = XMLoadFloat4(&frames[between].v) - catmullRom;
+				const float error = XMVectorGetX(XMVector4LengthSq(difference));
+				//errorSums.back() += error;
+
+				if (errorSums.back() < error)
+				{
+					errorSums.back() = error;
+					sectionMiddles.back() = between;
+				}
+			}
+
+			P0 = P1;
+			P1 = P2;
+			P2 = P3;
+
+			if (pickedFrames.end() == iter)
+				iter = pickedFrames.begin();
+
+			P3 = *iter++;
+		}
+
+		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());
+		if (*errorIterator < threshold)
+			break;
+
+
+	}
+
+
+	std::vector<Animation::Frame> newframes;
+	for (uint32_t picked : pickedFrames)
+	{
+		newframes.push_back(frames[picked]);
+	}
+
 	frames = newframes;
 }
 

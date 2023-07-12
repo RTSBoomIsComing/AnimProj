@@ -39,17 +39,15 @@ pa::MyApplication::MyApplication()
 	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
+	_animations.push_back(Animation(&asf, &amcWalk));
 	_animations.push_back(Animation(&asf, &amcRun));
 	_animations.push_back(Animation(&asf, &amcJump));
-	_animations.push_back(Animation(&asf, &amcWalk));
 	_animations.push_back(Animation(&asf, &amcPunch));
 
-
-	_animations[0].compressAnimation();
-	_animations[1].compressAnimation();
-	_animations[2].compressAnimation();
-	_animations[3].compressAnimation();
-	_animations[4].compressAnimation();
+	for (auto& animation : _animations)
+	{
+		animation.compressAnimation();
+	}
 
 	_worldTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
