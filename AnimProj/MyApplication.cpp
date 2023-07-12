@@ -34,7 +34,7 @@ pa::MyApplication::MyApplication()
 
 	AMC amcIdle(amcDirectory	+ L"idle.amc");
 	AMC amcWalk(amcDirectory	+ L"walk.amc");
-	AMC amcRun(amcDirectory		+ L"runjog.amc");
+	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
 	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
 	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
