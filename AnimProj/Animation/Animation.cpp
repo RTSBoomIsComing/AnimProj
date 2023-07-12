@@ -125,6 +125,9 @@ void pa::Animation::compressAnimation()
 DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset)
 {
 	using namespace DirectX;
+	//if (_boneAnimation[boneIndex].rotation.empty())
+	//	return XMVECTOR{ 0.0f, 0.0f, 0.0f, 1.0f };
+
 	return XMQuaternionNormalize(playBoneAnimationCatmullRom(_boneAnimation[boneIndex].rotation, key));
 }
 

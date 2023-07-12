@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\AnimationBlender.h" />
     <ClInclude Include="ASFAMC\Acclaim.h" />
     <ClInclude Include="Animation\Quantization.h" />
     <ClInclude Include="Animation\CompressedFrame.h" />
@@ -107,9 +108,11 @@
     <ClInclude Include="Common\pch.h" />
     <ClInclude Include="Rendering\Skeleton.h" />
     <ClInclude Include="Rendering\StickMesh.h" />
+    <ClInclude Include="Animation\SkeletonPose.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="ASFAMC\Acclaim.cpp" />
     <ClCompile Include="Animation\Quantization.cpp" />
     <ClCompile Include="Animation\CompressedFrame.cpp" />
@@ -133,6 +136,7 @@
     <ClCompile Include="Rendering\Skeleton.cpp" />
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Rendering\StickMesh.cpp" />
+    <ClCompile Include="Animation\SkeletonPose.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

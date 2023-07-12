@@ -60,8 +60,9 @@ namespace pa
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
 
 	private:
-		bool	keyState[4]				= {};
+		bool	_keyState[4]			= {};
 		int		_animationIndex			= 0;
+		float	_animationBlendFactor	= 0.0f;
 	};
 }
 

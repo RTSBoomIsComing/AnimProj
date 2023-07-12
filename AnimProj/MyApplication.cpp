@@ -89,7 +89,7 @@ void pa::MyApplication::OnUpdate()
 	int keyFrameIndex = static_cast<int>(playTime * animationFrameRate);
 	playTime += _timer.getDeltaTime();
 
-	if (keyFrameIndex > _animations[_animationIndex]._duration)
+	if (keyFrameIndex > _animations[_animationIndex].getDuration())
 	{
 		keyFrameIndex = 0;
 		playTime = 0.0f;
@@ -97,18 +97,14 @@ void pa::MyApplication::OnUpdate()
 
 	for (const size_t boneIndex : _skeleton->getDFSPath())
 	{
-		XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
-		if (false == _animations[_animationIndex]._boneAnimation[boneIndex].rotation.empty())
-		{
-			finalQuaternion =
-				_animations[_animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
-
-			finalQuaternion = XMQuaternionNormalize(finalQuaternion);
-			finalQuaternion = XMQuaternionNormalize(
-				XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
-		}
-
-		XMMATRIX animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
+		//XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
+		//if (false == _animations[_animationIndex]._boneAnimation[boneIndex].rotation.empty())
+		//{
+		//	//finalQuaternion = XMQuaternionNormalize(
+		//	//	XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
+		//}
+		XMVECTOR animationRotation = _animations[_animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
+		XMMATRIX animationMatrix = XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 
 		const size_t parentBoneIndex = _skeleton->getParentBoneIndex(boneIndex);
@@ -122,7 +118,7 @@ void pa::MyApplication::OnUpdate()
 		XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
 
 
-		_worldTransforms[boneIndex] = animationRotation * boneMatrix * parentWorldTransform;
+		_worldTransforms[boneIndex] = animationMatrix * boneMatrix * parentWorldTransform;
 
 		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0)
@@ -199,13 +195,20 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 	// up    : 38
 	// right : 39
 	// down  : 40
-	if (37 <= key)
-		keyState[key - 37] = true;
+	if (37 <= key && key <= 40)
+		_keyState[key - 37] = true;
 
-	if (49 == key)
+	// number 1
+	else if (49 == key)
 	{
 		if (++_animationIndex >= _animations.size())
 			_animationIndex = 0;
+	}
+	else if ('w' == key)
+	{
+		_animationBlendFactor += 0.01f;
+		if (_animationBlendFactor > 0.1f)
+			_animationBlendFactor = 0.0f;
 	}
 
 }
@@ -216,8 +219,8 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 	// up    : 38
 	// right : 39
 	// down  : 40
-	if (37 <= key)
-		keyState[key - 37] = false;
+	if (37 <= key && key <= 40)
+		_keyState[key - 37] = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
@@ -275,13 +278,13 @@ void pa::MyApplication::processInput(float deltaTime)
 {
 	using namespace DirectX;
 	float cameraDistance = 10.f;
-	if (keyState[0])
+	if (_keyState[0])
 		_cameraRotationFactor += deltaTime;
-	if (keyState[2])
+	if (_keyState[2])
 		_cameraRotationFactor -= deltaTime;
-	if (keyState[1])
+	if (_keyState[1])
 		_cameraHeight += deltaTime;
-	if (keyState[3])
+	if (_keyState[3])
 		_cameraHeight -= deltaTime;
 
 
