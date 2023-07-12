@@ -62,7 +62,7 @@ namespace pa
 	private:
 		bool	_keyState[4]			= {};
 		int		_animationIndex			= 0;
-		float	_animationBlendFactor	= 0.0f;
+		float	_animationBlendFactor	= 1.0f;
 	};
 }
 

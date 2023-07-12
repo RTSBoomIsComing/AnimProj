@@ -9,13 +9,6 @@ namespace pa
 	class Animation
 	{
 	public:
-		struct Pose
-		{
-			std::vector<DirectX::XMFLOAT4>	scale;
-			std::vector<DirectX::XMFLOAT4>	rotation;
-			std::vector<DirectX::XMFLOAT4>	position;
-		};
-
 		struct Frame
 		{
 			uint32_t			key		= std::numeric_limits<uint32_t>::max();
@@ -35,8 +28,8 @@ namespace pa
 		Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		~Animation() = default;
 
-		bool initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
-		void compressAnimation();
+		bool				initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
+		void				compressAnimation();
 		inline size_t		getDuration() const { return _duration; }
 		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset = 0);
 		DirectX::XMVECTOR	playBoneAnimationCatmullRom(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);

@@ -95,13 +95,11 @@ void pa::MyApplication::OnUpdate()
 
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		//XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
-		//if (false == _animations[_animationIndex]._boneAnimation[boneIndex].rotation.empty())
-		//{
-		//	//finalQuaternion = XMQuaternionNormalize(
-		//	//	XMQuaternionSlerp(XMLoadFloat4(&_animations[0]._boneAnimation[boneIndex].rotation[0].v), finalQuaternion, 1.0f));
-		//}
 		XMVECTOR animationRotation = _animations[_animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
+
+		animationRotation = XMQuaternionNormalize(
+			XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));
+
 		XMMATRIX animationMatrix = XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 
@@ -202,11 +200,17 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 		if (++_animationIndex >= _animations.size())
 			_animationIndex = 0;
 	}
-	else if ('w' == key)
+	else if ('W' == key)
 	{
-		_animationBlendFactor += 0.01f;
+		_animationBlendFactor += 0.1f;
 		if (_animationBlendFactor > 1.0f)
 			_animationBlendFactor = 1.0f;
+	}
+	else if ('S' == key)
+	{
+		_animationBlendFactor -= 0.1f;
+		if (_animationBlendFactor < 0.0f)
+			_animationBlendFactor = 0.0f;
 	}
 
 }
@@ -219,13 +223,6 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 	// down  : 40
 	if (37 <= key && key <= 40)
 		_keyState[key - 37] = false;
-
-	else if ('w' == key)
-	{
-		_animationBlendFactor -= 0.01f;
-		if (_animationBlendFactor < 0.0f)
-			_animationBlendFactor = 0.0f;
-	}
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

@@ -75,7 +75,7 @@
     <ClInclude Include="Animation\SkeletonPose.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationBlendGroup.h">
+    <ClInclude Include="Animation\AnimationBlender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -146,12 +146,24 @@
     <ClCompile Include="Animation\SkeletonPose.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationBlendGroup.cpp">
+    <ClCompile Include="Animation\AnimationBlender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="Animation\AnimationManager.h">
+      <Filter>헤더 파일</Filter>
+    </None>
+    <None Include="Animation\AnimationManager.cpp">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="Animation\IAnimation.h">
+      <Filter>헤더 파일</Filter>
+    </None>
+    <None Include="Animation\IAnimation.cpp">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicVertexShader.hlsl" />

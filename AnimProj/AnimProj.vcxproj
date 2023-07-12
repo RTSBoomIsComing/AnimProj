@@ -89,7 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationBlendGroup.h" />
+    <ClInclude Include="Animation\AnimationBlender.h" />
     <ClInclude Include="ASFAMC\Acclaim.h" />
     <ClInclude Include="Animation\Quantization.h" />
     <ClInclude Include="Animation\CompressedFrame.h" />
@@ -112,7 +112,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AnimationBlendGroup.cpp" />
+    <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="ASFAMC\Acclaim.cpp" />
     <ClCompile Include="Animation\Quantization.cpp" />
     <ClCompile Include="Animation\CompressedFrame.cpp" />
@@ -140,7 +140,11 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Animation\AnimationManager.cpp" />
+    <None Include="Animation\AnimationManager.h" />
     <None Include="cpp.hint" />
+    <None Include="Animation\IAnimation.cpp" />
+    <None Include="Animation\IAnimation.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicPixelShader.hlsl">
