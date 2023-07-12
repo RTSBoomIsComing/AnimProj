@@ -18,7 +18,8 @@ DirectX::XMFLOAT4 pa::Quantization::deQuantize(uint64_t quantized)
 		floats[i] = deQuantizeFloat(quantized, index++);
 	}
 
-	const float			squareSum	= XMVectorGetX(XMVectorSum(XMVector4LengthSq(XMLoadFloat(floats))));
+	XMFLOAT4 xmfloat4(floats);
+	const float			squareSum	= XMVectorGetX(XMVectorSum(XMVector4LengthSq(XMLoadFloat4(&xmfloat4))));
 	floats[discard] = std::sqrtf(1.0f - squareSum) * (discardSign ? -1 : 1);
 
 	return XMFLOAT4(floats);

@@ -17,25 +17,19 @@ static std::istream& ignoreEmptyChar(std::istream& stream)
 	return stream;
 }
 
-pa::ASF::ASF(pa::Skeleton* pSkeleton)
-	: _pSkeleton(pSkeleton)
-{}
-
-pa::ASF::ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath)
-	: _pSkeleton(pSkeleton)
+pa::ASF::ASF(const wchar_t* filePath)
 {
-	if (loadFromFile(filePath, pSkeleton) != true)
+	if (loadFromFile(filePath) != true)
 		DebugBreak();
 }
 
-pa::ASF::ASF(pa::Skeleton* pSkeleton, const std::wstring& filePath)
-	: _pSkeleton(pSkeleton)
+pa::ASF::ASF(const std::wstring& filePath)
 {
-	if (loadFromFile(filePath.c_str(), pSkeleton) != true)
+	if (loadFromFile(filePath.c_str()) != true)
 		DebugBreak();
 }
 
-bool pa::ASF::loadFromFile(const wchar_t* filePath, pa::Skeleton* pSkeleton)
+bool pa::ASF::loadFromFile(const wchar_t* filePath)
 {
 	std::ifstream stream{ filePath };
 	if (stream.fail())
@@ -65,6 +59,27 @@ bool pa::ASF::loadFromFile(const wchar_t* filePath, pa::Skeleton* pSkeleton)
 	correctSkeleton();
 
 	return true;
+}
+
+pa::Skeleton* pa::ASF::createSkeleton()
+{
+	using namespace DirectX;
+
+	Skeleton* skeleton = new Skeleton();
+	skeleton->_boneHierarchy	= _boneHierarchy;
+	skeleton->_parentList		= _parentList;
+	
+	for (size_t boneIndex = 0; boneIndex < getBoneCount(); boneIndex++)
+	{
+		
+		XMMATRIX boneMatrix = XMMatrixRotationQuaternion(XMLoadFloat4(&_boneRotations[boneIndex]))* 
+			XMMatrixTranslationFromVector(XMLoadFloat4(&_boneTranslations[boneIndex]));
+		
+
+		skeleton->_boneMatrices.emplace_back();
+		XMStoreFloat4x4(&skeleton->_boneMatrices.back(), boneMatrix);
+	}
+	return skeleton;
 }
 
 void pa::ASF::parseUnits(std::istream& stream)
@@ -103,8 +118,9 @@ void pa::ASF::parseRoot(std::istream& stream)
 {
 	using namespace DirectX;
 
-	char axisOrder[4] = {};
-	float orientation[3] = {};
+	char	axisOrder[4]	= {};
+	float	rootPosition[4]	= {};
+	float	orientation[3]	= {};
 
 	std::string buffer;
 	for (int i = 0; i < 4; i++)
@@ -128,29 +144,42 @@ void pa::ASF::parseRoot(std::istream& stream)
 		}
 		else if ("position" == buffer)
 		{
-			stream >> _rootPosition.x >> _rootPosition.y >> _rootPosition.z;
+			stream >> rootPosition[0] >> rootPosition[1] >> rootPosition[2];
+			rootPosition[2] *= -1;
 		}
 		else if ("orientation" == buffer)
 		{
 			stream >> orientation[0] >> orientation[1] >> orientation[2];
-			orientation[0] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
-			orientation[1] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
-			orientation[2] *= _unitAngle;
+
+			// right handed coordinate to left handed coordinate
+			orientation[0] *= -1; 
+			orientation[1] *= -1; 
 		}
 	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		orientation[i] *= _unitAngle;
+		rootPosition[i] *= _unitLength;
+	}
+
+
 	_boneNameList.push_back("root");
 
-	Skeleton::Bone bone = {};
+	//Skeleton::Bone bone = {};
 	const XMMATRIX rotation = eulerRotation(orientation, axisOrder);
-	XMStoreFloat4(&bone.rotation, XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation)));
 
-	_pSkeleton->_boneList.push_back(bone);
+	_boneRotations.emplace_back();
+	XMStoreFloat4(&_boneRotations.back(), XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation)));
+
+	_boneTranslations.push_back(XMFLOAT4(rootPosition));
+	//_skeleton->_boneList.push_back(bone);
 }
 
 void pa::ASF::parseBoneData(std::istream& stream)
 {
 	using namespace DirectX;
-
+	
 	std::string buffer;
 	while (ignoreEmptyChar(stream) && stream.peek() != ':')
 	{
@@ -171,7 +200,8 @@ void pa::ASF::parseBoneData(std::istream& stream)
 			line >> buffer;
 			if ("id" == buffer)
 			{
-				line.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+				continue;
+				//line.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			}
 			else if ("name" == buffer)
 			{
@@ -181,7 +211,9 @@ void pa::ASF::parseBoneData(std::istream& stream)
 			else if ("direction" == buffer)
 			{
 				line >> direction[0] >> direction[1] >> direction[2];
-				direction[2] *= -1; // right handed coordinate to left handed coordinate
+
+				// right handed coordinate to left handed coordinate
+				direction[2] *= -1; 
 			}
 			else if ("length" == buffer)
 			{
@@ -191,9 +223,10 @@ void pa::ASF::parseBoneData(std::istream& stream)
 			{
 				line >> axis[0] >> axis[1] >> axis[2] >> axisOrder;
 
-				axis[0] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
-				axis[1] *= _unitAngle * -1; // right handed coordinate to left handed coordinate
-				axis[2] *= _unitAngle;
+				// right handed coordinate to left handed coordinate
+				axis[0] *= -1; 
+				axis[1] *= -1;
+				
 			}
 			else if ("dof" == buffer)
 			{
@@ -207,32 +240,37 @@ void pa::ASF::parseBoneData(std::istream& stream)
 				break;
 		}
 
+		for (int i = 0; i < 3; i++)
+		{
+			axis[i] *= _unitAngle;
+		}
+
 		_axisOrders.push_back(axisOrder);
 		_DOFs.push_back(dof);
 
-		Skeleton::Bone bone = {};
 
-		bone.direction = XMFLOAT4(direction);
-		const XMVECTOR adjustedDirection = XMLoadFloat4(&bone.direction) * length * _unitLength;
-		XMStoreFloat4(&bone.direction, adjustedDirection);
+		XMFLOAT4 xmfloat4 = XMFLOAT4(direction);
+		const XMVECTOR boneTranslation = XMLoadFloat4(&xmfloat4) * length * _unitLength;
+		_boneTranslations.emplace_back();
+		XMStoreFloat4(&_boneTranslations.back(), boneTranslation);
 
 		const XMMATRIX rotation = eulerRotation(axis, axisOrder);
-		const XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
-		XMStoreFloat4(&bone.rotation, quaternion);
-
-		_pSkeleton->_boneList.push_back(bone);
+		_boneRotations.emplace_back();
+		XMStoreFloat4(&_boneRotations.back(), XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation)));
 	}
 }
 
 void pa::ASF::parseHierarchy(std::istream& stream)
 {
-	std::size_t boneCount = this->getBoneCount();
+	_boneHierarchy.reserve(getBoneCount());
+	_parentList.resize(getBoneCount(), std::numeric_limits<std::uint8_t>::max());
 
-	_pSkeleton->_DFSPath.reserve(boneCount);
-	_pSkeleton->_parentList.resize(boneCount, std::numeric_limits<std::uint8_t>::max());
+	//_skeleton->_DFSPath.reserve(boneCount);
+	//_skeleton->_parentList.resize(boneCount, std::numeric_limits<std::uint8_t>::max());
+	//_skeleton->_DFSPath.push_back(static_cast<int>(rootBoneIndex));
 
 	const size_t rootBoneIndex = getBoneIndexFromName("root");
-	_pSkeleton->_DFSPath.push_back(static_cast<int>(rootBoneIndex));
+	_boneHierarchy.push_back(static_cast<uint8_t>(rootBoneIndex));
 
 	std::string buffer;
 	stream >> buffer;
@@ -251,15 +289,17 @@ void pa::ASF::parseHierarchy(std::istream& stream)
 			break;
 
 		// get parent bone index
-		const size_t parentBoneIndex = getBoneIndexFromName(buffer);
+		const size_t parentIndex = getBoneIndexFromName(buffer);
 
 		while (lineStream >> buffer)
 		{
 			// get child bone index
-			const size_t childBoneIndex = getBoneIndexFromName(buffer);
+			const size_t childIndex = getBoneIndexFromName(buffer);
 
-			_pSkeleton->_DFSPath.push_back(static_cast<uint8_t>(childBoneIndex));
-			_pSkeleton->_parentList[childBoneIndex] = static_cast<uint8_t>(parentBoneIndex);
+			//_skeleton->_DFSPath.push_back(static_cast<uint8_t>(childBoneIndex));
+			//_skeleton->_parentList[childBoneIndex] = static_cast<uint8_t>(parentBoneIndex);
+			_boneHierarchy.push_back(static_cast<uint8_t>(childIndex));
+			_parentList[childIndex] = static_cast<uint8_t>(parentIndex);
 		}
 	}
 }
@@ -290,66 +330,81 @@ void pa::ASF::correctSkeleton()
 {
 	using namespace DirectX;
 
+	size_t boneCount = _boneRotations.size();
+
 	// Convert Global space to Local Space 
-	std::vector<XMFLOAT4> convertedQuats(_pSkeleton->getBoneCount(), XMFLOAT4{ 0.f, 0.f, 0.f, 1.f });
-	for (size_t i = 1; i < _pSkeleton->getBoneCount(); i++)
+	std::vector<XMFLOAT4> correctRotations(boneCount, XMFLOAT4{ 0.f, 0.f, 0.f, 1.f });
+	std::vector<XMFLOAT4> correctTranslations(boneCount, XMFLOAT4{ 0.f, 0.f, 0.f, 1.f });
+	for (size_t boneIndex = 1; boneIndex < boneCount; boneIndex++)
 	{
-		const Skeleton::Bone& bone = _pSkeleton->getBone(i);
-		const Skeleton::Bone& parentBone = _pSkeleton->getBone(_pSkeleton->getParentBoneIndex(i));
+		//const Skeleton::Bone& bone = _skeleton->getBone(i);
+		//const Skeleton::Bone& parentBone = _skeleton->getBone(_skeleton->getParentBoneIndex(i));
+		//size_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
+		size_t parentIndex = _parentList[boneIndex];
 
-		XMVECTOR dir = XMVector3Transform(XMLoadFloat4(&bone.direction), XMMatrixRotationQuaternion(
-			XMQuaternionInverse(XMLoadFloat4(&bone.rotation))));
-		XMStoreFloat4(&_pSkeleton->_boneList[i].direction, dir);
+		const XMVECTOR correctTranslation = XMVector3Transform(XMLoadFloat4(&_boneTranslations[boneIndex]), 
+			XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&_boneRotations[boneIndex]))));
+		XMStoreFloat4(&correctTranslations[boneIndex], correctTranslation);
 
-		XMVECTOR quat = XMQuaternionMultiply(XMLoadFloat4(&bone.rotation),
-			XMQuaternionInverse(XMLoadFloat4(&parentBone.rotation)));
-
-		XMStoreFloat4(&convertedQuats[i], quat);
+		const XMVECTOR correctRotation = XMQuaternionMultiply(XMLoadFloat4(&_boneRotations[boneIndex]),
+			XMQuaternionInverse(XMLoadFloat4(&_boneRotations[parentIndex])));
+		XMStoreFloat4(&correctRotations[boneIndex], correctRotation);
 	}
 
-	for (size_t i = 1; i < _pSkeleton->getBoneCount(); i++)
-	{
-		_pSkeleton->_boneList[i].rotation = convertedQuats[i];
-	}
+	_boneTranslations = correctTranslations;
+	//for (size_t i = 1; i < boneCount; i++)
+	//{
+	//	_skeleton->_boneList[i].rotation = convertedQuats[i];
+	//}
 
-	std::vector<uint8_t> hierarchy;
-	for (size_t currentBonIndex : _pSkeleton->getDFSPath())
-	{
-		_pSkeleton->_boneList[currentBonIndex].rotation = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
 
-		hierarchy.push_back(static_cast<uint8_t>(currentBonIndex));
+	std::vector<uint8_t> newHierarchy;
+	for (size_t boneIndex : _boneHierarchy)
+	{
+		//_skeleton->_boneList[currentBonIndex].rotation = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
+		_boneRotations[boneIndex] = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
+
+		newHierarchy.push_back(static_cast<uint8_t>(boneIndex));
 
 		// find all children of this bone
 		std::vector<size_t> childs;
-		auto it = _pSkeleton->_parentList.begin();
-		while ((it = std::find(it, _pSkeleton->_parentList.end(), static_cast<uint8_t>(currentBonIndex))) != _pSkeleton->_parentList.end())
+		auto it = _parentList.begin();
+		while ((it = std::find(it, _parentList.end(), static_cast<uint8_t>(boneIndex))) != _parentList.end())
 		{
-			childs.push_back(std::distance(_pSkeleton->_parentList.begin(), it));
+			childs.push_back(std::distance(_parentList.begin(), it));
 			it++;
 		}
 
 		if (childs.size() == 1)
 		{
-			_pSkeleton->_boneList[currentBonIndex].rotation = _pSkeleton->getBone(childs.front()).rotation;
+			//_skeleton->_boneList[currentBonIndex].rotation = _skeleton->getBone(childs.front()).rotation;
+			_boneRotations[boneIndex] = correctRotations[childs.front()];
 			continue;
 		}
 
-		for (size_t childBoneIndex : childs)
+		for (size_t childIndex : childs)
 		{
-			Skeleton::Bone dummyBone;
-			dummyBone.rotation = _pSkeleton->getBone(childBoneIndex).rotation;
+			//Skeleton::Bone dummyBone;
+			//dummyBone.rotation = _skeleton->getBone(childBoneIndex).rotation;
 
-			const size_t dummyBoneIndex = _pSkeleton->getBoneCount();
+			const size_t dummyBoneIndex = _boneRotations.size();
+			newHierarchy.push_back(static_cast<uint8_t>(dummyBoneIndex));
+			_parentList[childIndex] = static_cast<uint8_t>(dummyBoneIndex);
 
-			_pSkeleton->_boneList.push_back(dummyBone);
-			_pSkeleton->_parentList.push_back(static_cast<uint8_t>(currentBonIndex));
-			hierarchy.push_back(static_cast<uint8_t>(dummyBoneIndex));
+			//_skeleton->_boneList.push_back(dummyBone);
+			_boneRotations.push_back(correctRotations[childIndex]);
+			_boneTranslations.emplace_back();
 
-			_pSkeleton->_parentList[childBoneIndex] = static_cast<uint8_t>(dummyBoneIndex);
+			_parentList.push_back(static_cast<uint8_t>(boneIndex));
 		}
 	}
 
-	_pSkeleton->_DFSPath = hierarchy;
+	_boneHierarchy = newHierarchy;
+}
+
+size_t pa::ASF::getBoneCount() const {
+	assert(_boneRotations.size() == _boneTranslations.size());
+	return _boneRotations.size(); 
 }
 
 DirectX::XMMATRIX pa::ASF::eulerRotation(const float axis[3], const std::string& order)

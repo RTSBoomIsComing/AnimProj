@@ -23,21 +23,20 @@ pa::MyApplication::MyApplication()
 	_pStickMesh	= new StickMesh(_device.Get());
 	_pCubeMesh	= new CubeMesh(_device.Get(), 0.25f);
 
-
-	_pSkeleton = new Skeleton();
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	ASF asf(_pSkeleton, asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+	ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+	_skeleton = asf.createSkeleton();
 
-	_character = new Character{};
+	_character = new Character();
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
-	AMC amcIdle(amcDirectory + LR"(idle.amc)");
-	AMC amcWalk(amcDirectory + LR"(walk.amc)");
-	AMC amcRun(amcDirectory + LR"(runjog.amc)");
-	AMC amcJump(amcDirectory + LR"(jumpbalance.amc)");
-	AMC amcPunch(amcDirectory + LR"(punchstrike.amc)");
+	AMC amcIdle(amcDirectory	+ L"idle.amc");
+	AMC amcWalk(amcDirectory	+ L"walk.amc");
+	AMC amcRun(amcDirectory		+ L"runjog.amc");
+	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
+	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcRun));
@@ -48,8 +47,8 @@ pa::MyApplication::MyApplication()
 
 	//_animations[1].compressAnimation();
 
-	_worldTransforms.resize(_pSkeleton->getBoneCount());
-	_boneStickTransforms.resize(_pSkeleton->getBoneCount());
+	_worldTransforms.resize(_skeleton->getBoneCount());
+	_boneStickTransforms.resize(_skeleton->getBoneCount());
 }
 
 pa::MyApplication::~MyApplication()
@@ -63,8 +62,8 @@ pa::MyApplication::~MyApplication()
 	if (nullptr != _pStickMesh)
 		delete _pStickMesh;
 
-	if (nullptr != _pSkeleton)
-		delete _pSkeleton;
+	if (nullptr != _skeleton)
+		delete _skeleton;
 
 	if (nullptr != _character)
 		delete _character;
@@ -95,7 +94,7 @@ void pa::MyApplication::OnUpdate()
 		playTime = 0.0f;
 	}
 
-	for (const size_t boneIndex : _pSkeleton->getDFSPath())
+	for (const size_t boneIndex : _skeleton->getDFSPath())
 	{
 		XMVECTOR finalQuaternion = { 0.0f, 0.0f,0.0f, 1.0f };
 		if (false == _animations[animationIndex]._boneAnimation[boneIndex].rotation.empty())
@@ -111,27 +110,28 @@ void pa::MyApplication::OnUpdate()
 		XMMATRIX animationRotation = XMMatrixRotationQuaternion(finalQuaternion);
 
 
-		const size_t parentBoneIndex = _pSkeleton->getParentBoneIndex(boneIndex);
+		const size_t parentBoneIndex = _skeleton->getParentBoneIndex(boneIndex);
 		const XMMATRIX& parentWorldTransform =
-			(parentBoneIndex < _pSkeleton->getBoneCount()) ? _worldTransforms[parentBoneIndex] : XMMatrixIdentity();
+			(parentBoneIndex < _skeleton->getBoneCount()) ? _worldTransforms[parentBoneIndex] : XMMatrixIdentity();
 
-		const Skeleton::Bone& bone = _pSkeleton->getBone(boneIndex);
-		const XMVECTOR bonePosition = XMLoadFloat4(&bone.direction);
-		const XMMATRIX boneRotation = XMMatrixRotationQuaternion(XMLoadFloat4(&bone.rotation));
-		XMMATRIX boneMatrix = boneRotation * XMMatrixTranslationFromVector(bonePosition);
-		boneMatrix = animationRotation * boneMatrix;
+		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneIndex);
 
-		_worldTransforms[boneIndex] = boneMatrix * parentWorldTransform;
+		XMVECTOR boneTranslation = {};
+		XMVECTOR dummyVector = {};
+		XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
 
-		const float boneStickScale = XMVectorGetX(XMVector3Length(bonePosition));
+
+		_worldTransforms[boneIndex] = animationRotation * boneMatrix * parentWorldTransform;
+
+		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0)
 		{
 			_boneStickTransforms[boneIndex] = XMMATRIX{};
 			continue;
 		}
-
+		
 		const XMVECTOR vec0 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
-		const XMVECTOR vec1 = XMVector3Normalize(bonePosition);
+		const XMVECTOR vec1 = XMVector3Normalize(boneTranslation);
 
 		const float		dotProduct = XMVectorGetX(XMVector3Dot(vec0, vec1));
 		const float		angle = std::acosf(dotProduct);
@@ -163,30 +163,30 @@ void pa::MyApplication::OnRender()
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 
-		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		_deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		//  Update the vertex buffer here.
 		std::memcpy(mappedResource.pData, _boneStickTransforms.data(), sizeof(DirectX::XMMATRIX) * _boneStickTransforms.size());
 
 		//  Reenable GPU access to the vertex buffer data.
-		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
-		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
+		_deviceContext->Unmap(_worldCBuffer.Get(), 0);
+		_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 	}
-	_pStickMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_pSkeleton->getBoneCount()));
+	_pStickMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_skeleton->getBoneCount()));
 
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 
-		_deviceContext->Map(_meshConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		_deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 
 		//  Update the vertex buffer here.
 		std::memcpy(mappedResource.pData, _worldTransforms.data(), sizeof(DirectX::XMMATRIX) * _worldTransforms.size());
 
 		//  Reenable GPU access to the vertex buffer data.
-		_deviceContext->Unmap(_meshConstantBuffer.Get(), 0);
-		_deviceContext->VSSetConstantBuffers(1, 1, _meshConstantBuffer.GetAddressOf());
+		_deviceContext->Unmap(_worldCBuffer.Get(), 0);
+		_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 	}
-	_pCubeMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_pSkeleton->getBoneCount()));
+	_pCubeMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_skeleton->getBoneCount()));
 
 	// renderer
 	_swapChain->Present(1, 0);
@@ -259,7 +259,7 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		bufferDesc.MiscFlags = 0;
-		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_meshConstantBuffer));
+		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_worldCBuffer));
 	}
 }
 

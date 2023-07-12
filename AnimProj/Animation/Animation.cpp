@@ -25,7 +25,7 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 	// If frameCount is 121 then total duration is 120
 	// Because the frameIndex 0 is just base pose and not included in duration
 	_duration = acclaimMotion->getFrameCount() - 1;
-	_boneAnimation.resize(acclaimSkeleton->_pSkeleton->getBoneCount());
+	_boneAnimation.resize(acclaimSkeleton->getBoneCount());
 
 
 	std::vector<size_t> fitBones;
@@ -95,7 +95,7 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 				XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
 
 				// move pre-rotation data of current bone to parent bone
-				size_t preRotationPropagateBoneIndex = acclaimSkeleton->_pSkeleton->getParentBoneIndex(boneIndex);
+				size_t preRotationPropagateBoneIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
 				
 				// exception about root that has no parent
 				if (boneIndex == 0)

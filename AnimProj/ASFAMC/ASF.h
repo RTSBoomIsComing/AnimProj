@@ -20,35 +20,34 @@ namespace pa
 			Channel channels[6] = { Channel::None, Channel::None, Channel::None, Channel::None, Channel::None, Channel::None };
 		};
 
-
-
 	public:
-		ASF(pa::Skeleton* pSkeleton);
 		~ASF() = default;
-		ASF(pa::Skeleton* pSkeleton, const wchar_t* filePath);
-		ASF(pa::Skeleton* pSkeleton, const std::wstring& filePath);
+		ASF(const wchar_t* filePath);
+		ASF(const std::wstring& filePath);
 
-		bool			loadFromFile(const wchar_t* filePath, class pa::Skeleton* pSkeleton);
-
+		pa::Skeleton*				createSkeleton();
 	public:
-		inline size_t				getBoneCount() const { return _boneNameList.size(); }
 		static DirectX::XMMATRIX	eulerRotation(const float axis[3], const std::string& order);
+		inline size_t				getParentBoneIndex(size_t index) const { return _parentList[index]; }
 
 	private:
+		bool			loadFromFile(const wchar_t* filePath);
 		void			parseUnits(std::istream& stream);
 		void			parseRoot(std::istream& stream);
 		void			parseBoneData(std::istream& stream);
 		void			parseHierarchy(std::istream& stream);
 
+		size_t			getBoneCount() const;
 		Channel			getChannel(std::string channelName) const;
 		std::size_t		getBoneIndexFromName(const std::string& boneName) const;
 
 		void			correctSkeleton();
 
-
 	private:
-		pa::Skeleton*							_pSkeleton;
-		DirectX::XMFLOAT4						_rootPosition = { 0.0f, 0.0f, 0.0f, 1.0f };
+		std::vector<uint8_t>					_boneHierarchy;
+		std::vector<uint8_t>					_parentList;
+		std::vector<DirectX::XMFLOAT4>			_boneRotations;
+		std::vector<DirectX::XMFLOAT4>			_boneTranslations;
 		std::vector<std::string>				_boneNameList;
 
 	public:

@@ -25,7 +25,6 @@ namespace pa
 		void initializeD3dDevices(HWND hWnd);
 		void initializeGraphicsPipeline();
 		void processInput(float deltaTime);
-		void processTime();
 
 	private:
 		ComPtr<ID3D11Device>				_device;
@@ -43,7 +42,7 @@ namespace pa
 		float	_cameraRotationFactor	= 0.0f;
 		float	_cameraHeight			= 0.0f;
 
-		ComPtr<ID3D11Buffer>			_meshConstantBuffer;
+		ComPtr<ID3D11Buffer>			_worldCBuffer;
 		ComPtr<ID3D11InputLayout>		_inputLayout;
 		ComPtr<ID3D11VertexShader>		_vertexShader;
 		ComPtr<ID3D11PixelShader>		_pixelShader;
@@ -52,7 +51,7 @@ namespace pa
 		Camera*							_camera		= nullptr;
 		Mesh*							_pCubeMesh	= nullptr;
 		Mesh*							_pStickMesh	= nullptr;
-		Skeleton*						_pSkeleton	= nullptr;
+		Skeleton*						_skeleton	= nullptr;
 		Character*						_character	= nullptr;
 
 		std::vector<Animation>			_animations;
