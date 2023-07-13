@@ -173,7 +173,6 @@ void pa::ASF::parseRoot(std::istream& stream)
 	XMStoreFloat4(&_boneRotations.back(), XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation)));
 
 	_boneTranslations.push_back(XMFLOAT4(rootPosition));
-	//_skeleton->_boneList.push_back(bone);
 }
 
 void pa::ASF::parseBoneData(std::istream& stream)
@@ -201,7 +200,6 @@ void pa::ASF::parseBoneData(std::istream& stream)
 			if ("id" == buffer)
 			{
 				continue;
-				//line.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			}
 			else if ("name" == buffer)
 			{
@@ -265,10 +263,6 @@ void pa::ASF::parseHierarchy(std::istream& stream)
 	_boneHierarchy.reserve(getBoneCount());
 	_parentList.resize(getBoneCount(), std::numeric_limits<std::uint8_t>::max());
 
-	//_skeleton->_DFSPath.reserve(boneCount);
-	//_skeleton->_parentList.resize(boneCount, std::numeric_limits<std::uint8_t>::max());
-	//_skeleton->_DFSPath.push_back(static_cast<int>(rootBoneIndex));
-
 	const size_t rootBoneIndex = getBoneIndexFromName("root");
 	_boneHierarchy.push_back(static_cast<uint8_t>(rootBoneIndex));
 
@@ -296,8 +290,6 @@ void pa::ASF::parseHierarchy(std::istream& stream)
 			// get child bone index
 			const size_t childIndex = getBoneIndexFromName(buffer);
 
-			//_skeleton->_DFSPath.push_back(static_cast<uint8_t>(childBoneIndex));
-			//_skeleton->_parentList[childBoneIndex] = static_cast<uint8_t>(parentBoneIndex);
 			_boneHierarchy.push_back(static_cast<uint8_t>(childIndex));
 			_parentList[childIndex] = static_cast<uint8_t>(parentIndex);
 		}
@@ -337,9 +329,6 @@ void pa::ASF::correctSkeleton()
 	std::vector<XMFLOAT4> correctTranslations(boneCount, XMFLOAT4{ 0.f, 0.f, 0.f, 1.f });
 	for (size_t boneIndex = 1; boneIndex < boneCount; boneIndex++)
 	{
-		//const Skeleton::Bone& bone = _skeleton->getBone(i);
-		//const Skeleton::Bone& parentBone = _skeleton->getBone(_skeleton->getParentBoneIndex(i));
-		//size_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
 		size_t parentIndex = _parentList[boneIndex];
 
 		const XMVECTOR correctTranslation = XMVector3Transform(XMLoadFloat4(&_boneTranslations[boneIndex]), 
@@ -352,16 +341,11 @@ void pa::ASF::correctSkeleton()
 	}
 
 	_boneTranslations = correctTranslations;
-	//for (size_t i = 1; i < boneCount; i++)
-	//{
-	//	_skeleton->_boneList[i].rotation = convertedQuats[i];
-	//}
 
 
 	std::vector<uint8_t> newHierarchy;
 	for (size_t boneIndex : _boneHierarchy)
 	{
-		//_skeleton->_boneList[currentBonIndex].rotation = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
 		_boneRotations[boneIndex] = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
 
 		newHierarchy.push_back(static_cast<uint8_t>(boneIndex));
@@ -377,21 +361,16 @@ void pa::ASF::correctSkeleton()
 
 		if (childs.size() == 1)
 		{
-			//_skeleton->_boneList[currentBonIndex].rotation = _skeleton->getBone(childs.front()).rotation;
 			_boneRotations[boneIndex] = correctRotations[childs.front()];
 			continue;
 		}
 
 		for (size_t childIndex : childs)
 		{
-			//Skeleton::Bone dummyBone;
-			//dummyBone.rotation = _skeleton->getBone(childBoneIndex).rotation;
-
 			const size_t dummyBoneIndex = _boneRotations.size();
 			newHierarchy.push_back(static_cast<uint8_t>(dummyBoneIndex));
 			_parentList[childIndex] = static_cast<uint8_t>(dummyBoneIndex);
 
-			//_skeleton->_boneList.push_back(dummyBone);
 			_boneRotations.push_back(correctRotations[childIndex]);
 			_boneTranslations.emplace_back();
 

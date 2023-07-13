@@ -30,8 +30,8 @@ namespace pa
 
 		bool				initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void				compressAnimation();
-		inline size_t		getDuration() const { return _duration; }
-		inline size_t		getBoneAnimationCount() const { return _boneAnimation.size(); }
+		inline size_t		getDuration()				const { return _duration; }
+		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
 
 		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset = 0) const;
 		DirectX::XMVECTOR	playBoneAnimationCatmullRom(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);

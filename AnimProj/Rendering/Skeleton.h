@@ -5,11 +5,11 @@ namespace pa
 	class Skeleton
 	{
 		friend class ASF;
-		friend class AMC;
 
 	public:
 		~Skeleton() = default;
 
+	public:
 		DirectX::XMMATRIX					getBoneMatrix(size_t index)			const;
 
 		inline size_t						getBoneCount()						const { return _boneMatrices.size(); }
