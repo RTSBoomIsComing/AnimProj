@@ -10,7 +10,7 @@
 #include "ASFAMC/ASF.h"
 #include "ASFAMC/AMC.h"
 #include "Animation/Animation.h"
-
+#include "Animation/AnimationController.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -49,6 +49,9 @@ pa::MyApplication::MyApplication()
 		animation.compressAnimation();
 	}
 
+	_animCon = new AnimationController(&_animations[1]);
+	_animCon->play();
+
 	_worldTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
 }
@@ -69,6 +72,9 @@ pa::MyApplication::~MyApplication()
 
 	if (nullptr != _character)
 		delete _character;
+
+	if (nullptr != _animCon)
+		delete _animCon;
 }
 
 void pa::MyApplication::OnUpdate()
@@ -79,7 +85,7 @@ void pa::MyApplication::OnUpdate()
 	processInput(_timer.getDeltaTime());
 
 	_camera->update(_deviceContext.Get());
-
+	_animCon->update(_timer.getDeltaTime());
 
 	constexpr int	animationFrameRate	= 120;
 	static float	playTime			= 0.0f;
@@ -95,7 +101,7 @@ void pa::MyApplication::OnUpdate()
 
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation = _animations[_animationIndex].getBoneRotation(boneIndex, keyFrameIndex);
+		XMVECTOR animationRotation = _animCon->getRotations()[boneIndex];
 
 		animationRotation = XMQuaternionNormalize(
 			XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));

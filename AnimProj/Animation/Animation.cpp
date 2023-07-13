@@ -122,7 +122,7 @@ void pa::Animation::compressAnimation()
 	}
 }
 
-DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset)
+DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset) const
 {
 	using namespace DirectX;
 	//if (_boneAnimation[boneIndex].rotation.empty())
@@ -169,13 +169,10 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRom(std::vector<Animati
 	XMVECTOR quaternion = XMVectorCatmullRom(XMLoadFloat4(&frames[index0].v), XMLoadFloat4(&frames[index1].v),
 			XMLoadFloat4(&frames[index2].v), XMLoadFloat4(&frames[index3].v), t);
 	
-	// Is need normalize here ? 
-	// quaternion = XMQuaternionNormalize(quaternion);
-	
 	return quaternion;
 }
 
-DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset)
+DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset) const
 {
 	using namespace DirectX;
 
@@ -195,8 +192,8 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRomCyclic(std::vector<A
 
 	size_t	index2 = findIt != frames.end() ? std::distance(frames.begin(), findIt) : 0;
 	size_t	index3 = (index2 + 1) % frames.size();
-	size_t	index1 = (0 < index2) ? index2 - 1 : frames.size() - 1;
-	size_t	index0 = (0 < index1) ? index1 - 1 : frames.size() - 1;
+	size_t	index1 = (index2 > 0) ? index2 - 1 : frames.size() - 1;
+	size_t	index0 = (index1 > 0) ? index1 - 1 : frames.size() - 1;
 
 	int 	P0 = frames[index0].key;
 	int 	P1 = frames[index1].key;
@@ -204,16 +201,20 @@ DirectX::XMVECTOR pa::Animation::playBoneAnimationCatmullRomCyclic(std::vector<A
 	int 	P3 = frames[index3].key;
 
 	assert(P1 != P2);
-	//assert(P1 <= key && key <= P2);
-	//assert(P1 <= key);
-	float	t = static_cast<float>(key - P1) / std::abs(P2 - P1);
+	assert(P1 <= static_cast<int>(key));
+	
 
+	float	t = static_cast<float>(key - P1) / (P2 - P1);
+	
+	if (P2 < P1)
+	{
+		t = 0.5f;
+	}
+
+	assert(0.0f <= t && t <= 1.0f);
 
 	XMVECTOR quaternion = XMVectorCatmullRom(XMLoadFloat4(&frames[index0].v), XMLoadFloat4(&frames[index1].v),
 		XMLoadFloat4(&frames[index2].v), XMLoadFloat4(&frames[index3].v), t);
-
-	// Is need normalize here ? 
-	// quaternion = XMQuaternionNormalize(quaternion);
 
 	return quaternion;
 }
