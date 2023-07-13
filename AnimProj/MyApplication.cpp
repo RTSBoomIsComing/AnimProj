@@ -45,10 +45,10 @@ pa::MyApplication::MyApplication()
 	//_animations.push_back(Animation(&asf, &amcJump));
 	//_animations.push_back(Animation(&asf, &amcPunch));
 
-	for (auto& animation : _animations)
-	{
-		animation.compressAnimation();
-	}
+	//for (auto& animation : _animations)
+	//{
+	//	animation.compressAnimation();
+	//}
 
 	//_animCon = new AnimationController(&_animations[1]);
 	_animCon = new AnimationBlender(&_animations[1], &_animations[2]);
