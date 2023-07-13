@@ -2,6 +2,7 @@
 #include "StickMesh.h"
 
 pa::StickMesh::StickMesh(ID3D11Device* pDevice)
+	: Mesh(pDevice)
 {
 	using namespace DirectX;
 

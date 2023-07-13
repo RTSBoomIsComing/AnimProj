@@ -150,6 +150,8 @@
     <None Include="cpp.hint" />
     <None Include="Animation\IAnimation.cpp" />
     <None Include="Animation\IAnimation.h" />
+    <None Include="Rendering\SkeletonMesh.cpp" />
+    <None Include="Rendering\SkeletonMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicPixelShader.hlsl">

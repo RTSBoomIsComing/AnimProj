@@ -8,7 +8,7 @@ namespace pa
 		IAnimationController() = default;
 		~IAnimationController() = default;
 
-		virtual void update(float deltaTime)	abstract;
+		virtual void update(float deltaTime) {};
 
 
 		inline void play()					{ _isRunning = true;	}
@@ -17,7 +17,7 @@ namespace pa
 		inline void setCyclic(bool onoff)	{ _isCyclic = onoff;	}
 		inline bool isRunning() const		{ return _isRunning;	}
 
-		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const abstract;
+		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const { return DirectX::XMVECTOR{}; };
 	protected:
 		bool								_isCyclic		= true;
 		float								_runningTime	= 0.0f;

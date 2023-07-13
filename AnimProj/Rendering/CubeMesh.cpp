@@ -2,6 +2,7 @@
 #include "CubeMesh.h"
 
 pa::CubeMesh::CubeMesh(ID3D11Device* pDevice, float scale)
+	: Mesh(pDevice)
 {
 	using namespace DirectX;
 
@@ -29,18 +30,6 @@ pa::CubeMesh::CubeMesh(ID3D11Device* pDevice, float scale)
 		{ 1,  0,  0, 1 }, //6
 		{ 0,  0,  1, 1 }, //7
 	};
-
-	//std::vector<XMFLOAT4> colors =
-	//{
-	//	{ 1,  0,  0, 1 }, //0
-	//	{ 1,  0,  0, 1 }, //1
-	//	{ 1,  0,  0, 1 }, //2
-	//	{ 1,  0,  0, 1 }, //3
-	//	{ 1,  0,  0, 1 }, //4
-	//	{ 1,  0,  0, 1 }, //5
-	//	{ 1,  0,  0, 1 }, //6
-	//	{ 1,  0,  0, 1 }, //7
-	//};
 
 	processVertices(pDevice, positions, colors);
 

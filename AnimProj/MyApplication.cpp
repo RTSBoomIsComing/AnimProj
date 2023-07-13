@@ -7,11 +7,6 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Rendering/Character.h"
-#include "ASFAMC/ASF.h"
-#include "ASFAMC/AMC.h"
-#include "Animation/Animation.h"
-#include "Animation/AnimationController.h"
-#include "Animation/AnimationBlender.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -21,75 +16,22 @@ pa::MyApplication::MyApplication()
 	initializeGraphicsPipeline();
 
 	_camera		= new Camera(_device.Get());
-	_pStickMesh	= new StickMesh(_device.Get());
-	_pCubeMesh	= new CubeMesh(_device.Get(), 0.25f);
-
-	std::wstring asfFilePath = _SOLUTIONDIR;
-	ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
-	_skeleton = asf.createSkeleton();
-
-	_character = new Character();
-
-	std::wstring amcDirectory = _SOLUTIONDIR;
-	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
-
-	AMC amcIdle(amcDirectory	+ L"idle.amc");
-	AMC amcWalk(amcDirectory	+ L"walk.amc");
-	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
-	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
-	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
-
-	_animations.push_back(Animation(&asf, &amcIdle));
-	_animations.push_back(Animation(&asf, &amcWalk));
-	_animations.push_back(Animation(&asf, &amcRun));
-	_animations.push_back(Animation(&asf, &amcJump));
-	_animations.push_back(Animation(&asf, &amcPunch));
-
-	for (auto& animation : _animations)
-	{
-		animation.compressAnimation();
-	}
-
-	_animCon = new AnimationBlender(&_animations[1], &_animations[2]);
-
-	_worldTransforms.resize(_skeleton->getBoneCount());
-	_boneStickTransforms.resize(_skeleton->getBoneCount());
-
-
-	std::vector<bool> skeletonUpperBodyMask(_skeleton->getBoneCount());
-	skeletonUpperBodyMask[11] = true;
-	for (uint8_t boneIndex : _skeleton->getHierarchy())
-	{
-		uint8_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
-		if (parentIndex >= _skeleton->getBoneCount())
-			continue;
-		
-		if (skeletonUpperBodyMask[parentIndex])
-			skeletonUpperBodyMask[boneIndex] = true;
-	}
-	
-
+	_character = new Character(_device.Get());
 }
 
 pa::MyApplication::~MyApplication()
 {
 	if (nullptr != _camera)
+	{
 		delete _camera;
-
-	if (nullptr != _pCubeMesh)
-		delete _pCubeMesh;
-
-	if (nullptr != _pStickMesh)
-		delete _pStickMesh;
-
-	if (nullptr != _skeleton)
-		delete _skeleton;
+		_camera = nullptr;
+	}
 
 	if (nullptr != _character)
+	{
 		delete _character;
-
-	if (nullptr != _animCon)
-		delete _animCon;
+		_character = nullptr;	
+	}
 }
 
 void pa::MyApplication::OnUpdate()
@@ -100,62 +42,7 @@ void pa::MyApplication::OnUpdate()
 	processInput(_timer.getDeltaTime());
 
 	_camera->update(_deviceContext.Get());
-	_animCon->update(_timer.getDeltaTime());
-
-	constexpr int	animationFrameRate	= 120;
-	static float	playTime			= 0.0f;
-
-	int keyFrameIndex = static_cast<int>(playTime * animationFrameRate);
-	playTime += _timer.getDeltaTime();
-
-	if (keyFrameIndex > _animations[_animationIndex].getDuration())
-	{
-		keyFrameIndex = 0;
-		playTime = 0.0f;
-	}
-
-	for (const size_t boneIndex : _skeleton->getHierarchy())
-	{
-		XMVECTOR animationRotation = _animCon->getBoneRotation(boneIndex);
-
-		//animationRotation = XMQuaternionNormalize(
-		//	XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));
-
-		XMMATRIX animationMatrix = XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
-
-
-		const size_t parentBoneIndex = _skeleton->getParentBoneIndex(boneIndex);
-		const XMMATRIX& parentWorldTransform =
-			(parentBoneIndex < _skeleton->getBoneCount()) ? _worldTransforms[parentBoneIndex] : XMMatrixIdentity();
-
-		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneIndex);
-
-		XMVECTOR boneTranslation = {};
-		XMVECTOR dummyVector = {};
-		XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
-
-
-		_worldTransforms[boneIndex] = animationMatrix * boneMatrix * parentWorldTransform;
-
-		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
-		if (boneStickScale <= 0)
-		{
-			_boneStickTransforms[boneIndex] = XMMATRIX{};
-			continue;
-		}
-		
-		const XMVECTOR vec0 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
-		const XMVECTOR vec1 = XMVector3Normalize(boneTranslation);
-
-		const float		dotProduct = XMVectorGetX(XMVector3Dot(vec0, vec1));
-		const float		angle = std::acosf(dotProduct);
-		const XMVECTOR	rotationAxis = XMVector3Cross(vec0, vec1);
-
-
-		_boneStickTransforms[boneIndex] =
-			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
-			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform;
-	}
+	_character->update(_timer.getDeltaTime(), _deviceContext.Get());
 }
 
 void pa::MyApplication::OnRender()
@@ -174,33 +61,8 @@ void pa::MyApplication::OnRender()
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
 	_deviceContext->RSSetState(_rasterizerState.Get());
 
-	{
-		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 
-		_deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-		//  Update the vertex buffer here.
-		std::memcpy(mappedResource.pData, _boneStickTransforms.data(), sizeof(DirectX::XMMATRIX) * _boneStickTransforms.size());
-
-		//  Reenable GPU access to the vertex buffer data.
-		_deviceContext->Unmap(_worldCBuffer.Get(), 0);
-		_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
-	}
-	_pStickMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_skeleton->getBoneCount()));
-
-	{
-		D3D11_MAPPED_SUBRESOURCE mappedResource = {};
-
-		_deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-		//  Update the vertex buffer here.
-		std::memcpy(mappedResource.pData, _worldTransforms.data(), sizeof(DirectX::XMMATRIX) * _worldTransforms.size());
-
-		//  Reenable GPU access to the vertex buffer data.
-		_deviceContext->Unmap(_worldCBuffer.Get(), 0);
-		_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
-	}
-	_pCubeMesh->drawInstanced(_deviceContext.Get(), static_cast<UINT>(_skeleton->getBoneCount()));
+	_character->render(_deviceContext.Get());
 
 	// renderer
 	_swapChain->Present(0, 0);
@@ -216,24 +78,18 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 		_keyState[key - 37] = true;
 
 	// number 1
-	else if (49 == key)
-	{
-		if (++_animationIndex >= _animations.size())
-			_animationIndex = 0;
-	}
+	//else if (49 == key)
+	//{
+	//	if (++_animationIndex >= _animations.size())
+	//		_animationIndex = 0;
+	//}
 	else if ('W' == key)
 	{
 		_keyStateForward = true;
-		//_animationBlendFactor += 0.1f;
-		//if (_animationBlendFactor > 1.0f)
-		//	_animationBlendFactor = 1.0f;
 	}
 	else if ('S' == key)
 	{
 		_keyStateBackward = true;
-		//_animationBlendFactor -= 0.1f;
-		//if (_animationBlendFactor < 0.0f)
-		//	_animationBlendFactor = 0.0f;
 	}
 
 }
@@ -294,17 +150,6 @@ void pa::MyApplication::initializeGraphicsPipeline()
 		rasterizerDesc.FrontCounterClockwise = FALSE;
 		checkResult(_device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState));
 	}
-
-	{
-		// Create mesh constant buffer
-		D3D11_BUFFER_DESC bufferDesc;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = sizeof(DirectX::XMFLOAT4X4) * 100;
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bufferDesc.MiscFlags = 0;
-		checkResult(_device->CreateBuffer(&bufferDesc, nullptr, &_worldCBuffer));
-	}
 }
 
 void pa::MyApplication::processInput(float deltaTime)
@@ -330,10 +175,10 @@ void pa::MyApplication::processInput(float deltaTime)
 
 	_camera->setEyePosition(newEyePosition);
 
-	if (_keyStateForward)
-		static_cast<AnimationBlender*>(_animCon)->addBlendWeight(0.01f);
-	if (_keyStateBackward)
-		static_cast<AnimationBlender*>(_animCon)->addBlendWeight(-0.01f);
+	//if (_keyStateForward)
+	//	static_cast<AnimationBlender*>(_animCon)->addBlendWeight(0.01f);
+	//if (_keyStateBackward)
+	//	static_cast<AnimationBlender*>(_animCon)->addBlendWeight(-0.01f);
 
 }
 

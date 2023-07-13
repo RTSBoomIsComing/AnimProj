@@ -6,7 +6,7 @@ namespace pa
 	class Mesh
 	{
 	public:
-		Mesh() = default;
+		Mesh(ID3D11Device* device);
 		~Mesh() = default;
 
 		void draw(ID3D11DeviceContext* pDeviceContext);
@@ -16,6 +16,8 @@ namespace pa
 	public:
 		UINT getVertexCount() const;
 		UINT getIndexCount() const;
+
+		void updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX* matrices, UINT count);
 	protected:
 		void processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors);
 		void processIndices(ID3D11Device* pDevice, std::vector<UINT> const& indices);
@@ -24,6 +26,7 @@ namespace pa
 		ComPtr<ID3D11Buffer>		_indexBuffer;
 		ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
 		ComPtr<ID3D11Buffer>		_vertexColorBuffer;
+		ComPtr<ID3D11Buffer>		_worldCBuffer;
 
 		UINT _strides[2]	= {};
 		UINT _offsets[2]	= {};

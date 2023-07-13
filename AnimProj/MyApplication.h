@@ -7,9 +7,6 @@ namespace pa
 {
 	class Camera;
 	class Mesh;
-	class Skeleton;
-	class Animation;
-	class IAnimationController;
 	class Character;
 
 	class MyApplication : public Win32Application
@@ -36,6 +33,12 @@ namespace pa
 		ComPtr<ID3D11DepthStencilState>		_depthStencilState;
 		D3D11_VIEWPORT						_viewport;
 
+		ComPtr<ID3D11Buffer>				_worldCBuffer;
+		ComPtr<ID3D11InputLayout>			_inputLayout;
+		ComPtr<ID3D11VertexShader>			_vertexShader;
+		ComPtr<ID3D11PixelShader>			_pixelShader;
+		ComPtr<ID3D11RasterizerState>		_rasterizerState;
+
 	private:
 		Timer	_timer;
 
@@ -43,23 +46,9 @@ namespace pa
 		float	_cameraRotationFactor	= 0.0f;
 		float	_cameraHeight			= 0.0f;
 
-		ComPtr<ID3D11Buffer>			_worldCBuffer;
-		ComPtr<ID3D11InputLayout>		_inputLayout;
-		ComPtr<ID3D11VertexShader>		_vertexShader;
-		ComPtr<ID3D11PixelShader>		_pixelShader;
-		ComPtr<ID3D11RasterizerState>	_rasterizerState;
 
 		Camera*							_camera		= nullptr;
-		Mesh*							_pCubeMesh	= nullptr;
-		Mesh*							_pStickMesh	= nullptr;
-		Skeleton*						_skeleton	= nullptr;
 		Character*						_character	= nullptr;
-
-		std::vector<Animation>			_animations;
-		IAnimationController*			_animCon;
-
-		std::vector<DirectX::XMMATRIX> _worldTransforms;
-		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
 
 	private:
 		bool	_keyState[4]			= {};

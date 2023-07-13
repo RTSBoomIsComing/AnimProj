@@ -1,6 +1,18 @@
 #include "pch.h"
 #include "Mesh.h"
 
+pa::Mesh::Mesh(ID3D11Device* device)
+{
+	// Create mesh constant buffer
+	D3D11_BUFFER_DESC bufferDesc;
+	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	bufferDesc.ByteWidth = sizeof(DirectX::XMFLOAT4X4) * 100;
+	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bufferDesc.MiscFlags = 0;
+	checkResult(device->CreateBuffer(&bufferDesc, nullptr, &_worldCBuffer));	
+}
+
 void pa::Mesh::draw(ID3D11DeviceContext* pDeviceContext)
 {
 	setGraphicsPipeline(pDeviceContext);
@@ -22,6 +34,8 @@ void pa::Mesh::setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->IASetPrimitiveTopology(_primitiveTopology);
 	pDeviceContext->IASetVertexBuffers(0, ARRAYSIZE(vertexBuffers), vertexBuffers, _strides, _offsets);
 	pDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+	pDeviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 }
 
 UINT pa::Mesh::getVertexCount() const
@@ -32,6 +46,14 @@ UINT pa::Mesh::getVertexCount() const
 UINT pa::Mesh::getIndexCount() const
 {
 	return _indexCount;
+}
+
+void pa::Mesh::updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX* matrices, UINT count)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	memcpy(mappedResource.pData, matrices, sizeof(DirectX::XMFLOAT4X4) * count);
+	deviceContext->Unmap(_worldCBuffer.Get(), 0);
 }
 
 void pa::Mesh::processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors)
