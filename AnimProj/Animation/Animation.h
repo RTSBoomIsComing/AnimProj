@@ -5,7 +5,6 @@ namespace pa
 {
 	class ASF;
 	class AMC;
-	class Skeleton;
 	class Animation
 	{
 	public:
