@@ -17,15 +17,14 @@ namespace pa
 		inline void setCyclic(bool onoff)	{ _isCyclic = onoff;	}
 		inline bool isRunning() const		{ return _isRunning;	}
 
-		inline std::vector<DirectX::XMVECTOR> const& getRotations() const { return _rotations; }
-
+		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const abstract;
 	protected:
 		bool								_isCyclic		= true;
 		float								_runningTime	= 0.0f;
 		std::vector<DirectX::XMVECTOR>		_rotations;
 
 	private:
-		bool								_isRunning		= false;
+		bool								_isRunning		= true;
 	};
 
 }

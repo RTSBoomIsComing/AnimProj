@@ -17,7 +17,7 @@ namespace pa
 		~AnimationController() = default;
 
 		void update(float deltaTime)	override;
-
+		DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const override;
 	private:
 		const Animation*				_animation		= nullptr;
 		float							_playSpeed		= 1.0f;

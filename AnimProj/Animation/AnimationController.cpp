@@ -29,3 +29,8 @@ void pa::AnimationController::update(float deltaTime)
 		_rotations[boneIndex] = rotation;
 	}
 }
+
+DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const
+{
+	return _rotations[boneIndex];
+}

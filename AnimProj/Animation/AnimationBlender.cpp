@@ -58,3 +58,8 @@ void pa::AnimationBlender::addPlaySpeed(float speed)
 	else if (_playSpeed < 0.0f)
 		_playSpeed = 0.0f;
 }
+
+DirectX::XMVECTOR pa::AnimationBlender::getBoneRotation(size_t boneIndex, uint32_t offset) const
+{
+	return _rotations[boneIndex];
+}

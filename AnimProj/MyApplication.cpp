@@ -36,13 +36,13 @@ pa::MyApplication::MyApplication()
 	AMC amcIdle(amcDirectory	+ L"idle.amc");
 	AMC amcWalk(amcDirectory	+ L"walk.amc");
 	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
-	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
+	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
 	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcWalk));
 	_animations.push_back(Animation(&asf, &amcRun));
-	//_animations.push_back(Animation(&asf, &amcJump));
+	_animations.push_back(Animation(&asf, &amcJump));
 	_animations.push_back(Animation(&asf, &amcPunch));
 
 	for (auto& animation : _animations)
@@ -50,12 +50,25 @@ pa::MyApplication::MyApplication()
 		animation.compressAnimation();
 	}
 
-	//_animCon = new AnimationController(&_animations[1]);
 	_animCon = new AnimationBlender(&_animations[1], &_animations[2]);
-	_animCon->play();
 
 	_worldTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
+
+
+	std::vector<bool> skeletonUpperBodyMask(_skeleton->getBoneCount());
+	skeletonUpperBodyMask[11] = true;
+	for (uint8_t boneIndex : _skeleton->getHierarchy())
+	{
+		uint8_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
+		if (parentIndex >= _skeleton->getBoneCount())
+			continue;
+		
+		if (skeletonUpperBodyMask[parentIndex])
+			skeletonUpperBodyMask[boneIndex] = true;
+	}
+	
+
 }
 
 pa::MyApplication::~MyApplication()
@@ -103,7 +116,7 @@ void pa::MyApplication::OnUpdate()
 
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation = _animCon->getRotations()[boneIndex];
+		XMVECTOR animationRotation = _animCon->getBoneRotation(boneIndex);
 
 		//animationRotation = XMQuaternionNormalize(
 		//	XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));

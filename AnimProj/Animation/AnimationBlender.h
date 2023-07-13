@@ -10,9 +10,12 @@ namespace pa
 		AnimationBlender(const Animation* base, const Animation* blend);
 		~AnimationBlender() = default;
 
-		void update(float deltaTime)	override;
+		void update(float deltaTime)override;
 		void addBlendWeight(float weight);
 		void addPlaySpeed(float speed);
+
+		DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const override;
+
 	private:
 		const Animation*	_baseAnimation	= nullptr;
 		const Animation*	_blendAnimation	= nullptr;
