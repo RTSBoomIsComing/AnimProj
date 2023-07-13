@@ -16,7 +16,7 @@ void pa::AnimationController::update(float deltaTime)
 		return;
 
 	_runningTime += deltaTime;
-	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * _playSpeed * fps);
+	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * fps);
 	if (elipsedFrame > _animation->getDuration())
 	{
 		_runningTime = 0.0f;

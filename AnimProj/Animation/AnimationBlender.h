@@ -12,7 +12,6 @@ namespace pa
 
 		void update(float deltaTime)override;
 		void addBlendWeight(float weight);
-		void addPlaySpeed(float speed);
 
 		DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const override;
 
@@ -21,7 +20,6 @@ namespace pa
 		const Animation*	_blendAnimation	= nullptr;
 
 		float				_blendWeight	= 0.5f;
-		float				_playSpeed		= 1.0f;
 		float				_blendSync		= 1.0f;
 	};
 }
