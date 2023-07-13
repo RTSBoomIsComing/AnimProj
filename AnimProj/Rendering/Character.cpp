@@ -13,16 +13,17 @@ pa::Character::Character(ID3D11Device* device)
 {
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+
 	_skeleton = asf.createSkeleton();
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
-	AMC amcIdle(amcDirectory + L"idle.amc");
-	AMC amcWalk(amcDirectory + L"walk.amc");
-	AMC amcRun(amcDirectory + L"run_cyclic.amc");
-	AMC amcJump(amcDirectory + L"jumpbalance.amc");
-	AMC amcPunch(amcDirectory + L"punchstrike.amc");
+	AMC amcIdle(amcDirectory	+ L"idle.amc");
+	AMC amcWalk(amcDirectory	+ L"walk.amc");
+	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
+	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
+	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcWalk));
@@ -57,7 +58,6 @@ pa::Character::Character(ID3D11Device* device)
 
 	_boneMesh = new StickMesh(device);
 	_jointMesh = new CubeMesh(device, 0.25f);
-
 }
 
 pa::Character::~Character()
@@ -132,15 +132,10 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 
 	_boneMesh->updateInstanceData(deviceContext, _boneStickTransforms.data(), _boneStickTransforms.size());
 	_jointMesh->updateInstanceData(deviceContext, _jointTransforms.data(), _jointTransforms.size());
-	
 }
 
 void pa::Character::render(ID3D11DeviceContext* deviceContext)
 {
-	//_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 	_boneMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
-
-
-	//_deviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 	_jointMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
 }
