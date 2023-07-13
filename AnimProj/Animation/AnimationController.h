@@ -17,7 +17,6 @@ namespace pa
 		~AnimationController() = default;
 
 		void update(float deltaTime)	override;
-		void reset()					override;
 
 	private:
 		const Animation*				_animation		= nullptr;

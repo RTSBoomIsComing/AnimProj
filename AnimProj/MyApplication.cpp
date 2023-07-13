@@ -11,6 +11,7 @@
 #include "ASFAMC/AMC.h"
 #include "Animation/Animation.h"
 #include "Animation/AnimationController.h"
+#include "Animation/AnimationBlender.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -35,21 +36,22 @@ pa::MyApplication::MyApplication()
 	AMC amcIdle(amcDirectory	+ L"idle.amc");
 	AMC amcWalk(amcDirectory	+ L"walk.amc");
 	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
-	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
-	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
+	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
+	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcWalk));
 	_animations.push_back(Animation(&asf, &amcRun));
-	_animations.push_back(Animation(&asf, &amcJump));
-	_animations.push_back(Animation(&asf, &amcPunch));
+	//_animations.push_back(Animation(&asf, &amcJump));
+	//_animations.push_back(Animation(&asf, &amcPunch));
 
 	for (auto& animation : _animations)
 	{
 		animation.compressAnimation();
 	}
 
-	_animCon = new AnimationController(&_animations[1]);
+	//_animCon = new AnimationController(&_animations[1]);
+	_animCon = new AnimationBlender(&_animations[1], &_animations[2]);
 	_animCon->play();
 
 	_worldTransforms.resize(_skeleton->getBoneCount());
@@ -103,8 +105,8 @@ void pa::MyApplication::OnUpdate()
 	{
 		XMVECTOR animationRotation = _animCon->getRotations()[boneIndex];
 
-		animationRotation = XMQuaternionNormalize(
-			XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));
+		//animationRotation = XMQuaternionNormalize(
+		//	XMQuaternionSlerp(_animations[0].getBoneRotation(boneIndex, 0), animationRotation, _animationBlendFactor));
 
 		XMMATRIX animationMatrix = XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
@@ -208,15 +210,17 @@ void pa::MyApplication::OnKeyDown(UINT8 key)
 	}
 	else if ('W' == key)
 	{
-		_animationBlendFactor += 0.1f;
-		if (_animationBlendFactor > 1.0f)
-			_animationBlendFactor = 1.0f;
+		_keyStateForward = true;
+		//_animationBlendFactor += 0.1f;
+		//if (_animationBlendFactor > 1.0f)
+		//	_animationBlendFactor = 1.0f;
 	}
 	else if ('S' == key)
 	{
-		_animationBlendFactor -= 0.1f;
-		if (_animationBlendFactor < 0.0f)
-			_animationBlendFactor = 0.0f;
+		_keyStateBackward = true;
+		//_animationBlendFactor -= 0.1f;
+		//if (_animationBlendFactor < 0.0f)
+		//	_animationBlendFactor = 0.0f;
 	}
 
 }
@@ -229,6 +233,14 @@ void pa::MyApplication::OnKeyUp(UINT8 key)
 	// down  : 40
 	if (37 <= key && key <= 40)
 		_keyState[key - 37] = false;
+	else if ('W' == key)
+	{
+		_keyStateForward = false;
+	}
+	else if ('S' == key)
+	{
+		_keyStateBackward = false;
+	}
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
@@ -304,6 +316,12 @@ void pa::MyApplication::processInput(float deltaTime)
 		1.0f };
 
 	_camera->setEyePosition(newEyePosition);
+
+	if (_keyStateForward)
+		static_cast<AnimationBlender*>(_animCon)->addBlendWeight(0.01f);
+	if (_keyStateBackward)
+		static_cast<AnimationBlender*>(_animCon)->addBlendWeight(-0.01f);
+
 }
 
 void pa::MyApplication::initializeD3dDevices(HWND hWnd)

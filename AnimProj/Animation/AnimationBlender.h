@@ -11,11 +11,15 @@ namespace pa
 		~AnimationBlender() = default;
 
 		void update(float deltaTime)	override;
-		void reset()					override;
-
+		void addBlendWeight(float weight);
+		void addPlaySpeed(float speed);
 	private:
-		const Animation* _baseAnimation;
-		const Animation* _blendAnimation;
+		const Animation*	_baseAnimation	= nullptr;
+		const Animation*	_blendAnimation	= nullptr;
+
+		float				_blendWeight	= 0.5f;
+		float				_playSpeed		= 1.0f;
+		float				_blendSync		= 1.0f;
 	};
 }
 

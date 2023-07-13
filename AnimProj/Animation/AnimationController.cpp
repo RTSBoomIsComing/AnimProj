@@ -29,8 +29,3 @@ void pa::AnimationController::update(float deltaTime)
 		_rotations[boneIndex] = rotation;
 	}
 }
-
-void pa::AnimationController::reset()
-{
-	_runningTime = 0.0f;
-}

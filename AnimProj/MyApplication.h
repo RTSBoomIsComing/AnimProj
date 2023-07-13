@@ -9,7 +9,7 @@ namespace pa
 	class Mesh;
 	class Skeleton;
 	class Animation;
-	class AnimationController;
+	class IAnimationController;
 	class Character;
 
 	class MyApplication : public Win32Application
@@ -56,15 +56,17 @@ namespace pa
 		Character*						_character	= nullptr;
 
 		std::vector<Animation>			_animations;
-		AnimationController*			_animCon;
+		IAnimationController*			_animCon;
 
 		std::vector<DirectX::XMMATRIX> _worldTransforms;
 		std::vector<DirectX::XMMATRIX> _boneStickTransforms;
 
 	private:
 		bool	_keyState[4]			= {};
+		bool	_keyStateForward		= false;
+		bool	_keyStateBackward		= false;
 		int		_animationIndex			= 0;
-		float	_animationBlendFactor	= 1.0f;
+		float	_animationBlendFactor	= 0.0f;
 	};
 }
 
