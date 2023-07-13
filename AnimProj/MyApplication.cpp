@@ -37,18 +37,18 @@ pa::MyApplication::MyApplication()
 	AMC amcWalk(amcDirectory	+ L"walk.amc");
 	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
 	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
-	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
+	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcWalk));
 	_animations.push_back(Animation(&asf, &amcRun));
 	//_animations.push_back(Animation(&asf, &amcJump));
-	//_animations.push_back(Animation(&asf, &amcPunch));
+	_animations.push_back(Animation(&asf, &amcPunch));
 
-	//for (auto& animation : _animations)
-	//{
-	//	animation.compressAnimation();
-	//}
+	for (auto& animation : _animations)
+	{
+		animation.compressAnimation();
+	}
 
 	//_animCon = new AnimationController(&_animations[1]);
 	_animCon = new AnimationBlender(&_animations[1], &_animations[2]);

@@ -20,6 +20,8 @@ void pa::AnimationBlender::update(float deltaTime)
 		return;
 
 	_runningTime += deltaTime;
+	_playSpeed = 1.0f * (1 - _blendWeight) + 1 / _blendSync * _blendWeight;
+
 	uint32_t baseElipsedFrame = static_cast<uint32_t>(_runningTime * _playSpeed * fps);
 	uint32_t blendElipsedFrame = static_cast<uint32_t>(_runningTime * _playSpeed * _blendSync * fps);
 	if (_baseAnimation->getDuration() < baseElipsedFrame)
