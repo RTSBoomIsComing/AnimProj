@@ -36,8 +36,8 @@ namespace pa
 
 	private:
 		Skeleton*							_skeleton				= nullptr;
-		AnimationBlender*					_animationWalkRun		= nullptr;
-
+		IAnimationController*				_animationWalkRun		= nullptr;
+		IAnimationController*				_animationIdleWalk		= nullptr;
 
 		// will be removed
 		Mesh*								_jointMesh				= nullptr;

@@ -6,9 +6,10 @@ namespace pa
 	{
 	public:
 		IAnimationController() = default;
-		~IAnimationController() = default;
+		virtual ~IAnimationController() = default;
 
-		virtual void update(float deltaTime);
+		virtual void				update(float deltaTime);
+		virtual DirectX::XMVECTOR	getBoneRotation(size_t boneIndex, uint32_t offset = 0) const abstract;
 
 
 		void play();
@@ -18,16 +19,13 @@ namespace pa
 		bool isRunning() const;
 		void addBlendWeight(float weight);
 
-		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const;;
 	protected:
-		bool								_isCyclic		= true;
+		std::vector<DirectX::XMVECTOR>		_rotations;
 		float								_runningTime	= 0.0f;
 		float								_blendWeight	= 0.0f;
-		std::vector<DirectX::XMVECTOR>		_rotations;
-
-	private:
+		uint32_t							_duration		= 0;
 		bool								_isRunning		= true;
+		bool								_isCyclic		= true;
 	};
-
 }
 

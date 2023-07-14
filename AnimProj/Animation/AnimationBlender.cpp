@@ -7,9 +7,11 @@ pa::AnimationBlender::AnimationBlender(const Animation* base, const Animation* b
 	, _blendAnimation(blend)
 {
 	_rotations.resize(base->getBoneAnimationCount());
-
-	_blendSync = static_cast<float>(blend->getDuration()) / base->getDuration();
-
+	_duration	= base->getDuration();
+	if (blend->getDuration() < _duration)
+		_blendSync = 1.0f;
+	else
+		_blendSync	= static_cast<float>(blend->getDuration()) / base->getDuration();
 }
 
 void pa::AnimationBlender::update(float deltaTime)
@@ -21,12 +23,13 @@ void pa::AnimationBlender::update(float deltaTime)
 
 	float playSpeed = 1.0f * (1 - _blendWeight) + 1 / _blendSync * _blendWeight;
 
-	uint32_t baseElipsedFrame = static_cast<uint32_t>(_runningTime * playSpeed * fps);
-	uint32_t blendElipsedFrame = static_cast<uint32_t>(_runningTime * playSpeed * _blendSync * fps);
-	if (_baseAnimation->getDuration() < baseElipsedFrame)
+	uint32_t baseElipsedFrame	= static_cast<uint32_t>(_runningTime * playSpeed * fps);
+	uint32_t blendElipsedFrame	= static_cast<uint32_t>(_runningTime * playSpeed * _blendSync * fps);
+	if (_duration < baseElipsedFrame)
 	{
-		_runningTime = 0.0f;
-		baseElipsedFrame = 0;
+		_runningTime		= 0.0f;
+		baseElipsedFrame	= 0;
+		blendElipsedFrame	= 0;
 	}
 
 	for (size_t boneIndex = 0; boneIndex < _baseAnimation->getBoneAnimationCount(); boneIndex++)

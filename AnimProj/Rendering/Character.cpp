@@ -5,6 +5,7 @@
 #include "../Animation/Animation.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
+#include "../Animation/AnimationCapture.h"
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"
@@ -36,8 +37,8 @@ pa::Character::Character(ID3D11Device* device)
 	//{
 	//	animation.compressAnimation();
 	//}
-
-	_animationWalkRun = new AnimationBlender(&_animations[1], &_animations[2]);
+	_animationIdleWalk	= new AnimationBlender(&_animations[1], &_animations[0]);
+	_animationWalkRun	= new AnimationBlender(&_animations[1], &_animations[2]);
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -85,16 +86,23 @@ pa::Character::~Character()
 		delete _animationWalkRun;
 		_animationWalkRun = nullptr;
 	}
+
+	if (nullptr != _animationIdleWalk)
+	{
+		delete _animationIdleWalk;
+		_animationIdleWalk = nullptr;
+	}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
+	_animationIdleWalk->update(deltaTime);
 	_animationWalkRun->update(deltaTime);
 
 	using namespace DirectX;
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation	= _animationWalkRun->getBoneRotation(boneIndex);
+		XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneIndex(boneIndex);
@@ -144,7 +152,16 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 void pa::Character::processInput(float deltaTime)
 {
 	if (GKeyboard->keyState['W'])
+	{
+		_animationIdleWalk->addBlendWeight(-deltaTime * 0.5f);
 		_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
-	if (GKeyboard->keyState['S'])
+	}
+	if (!GKeyboard->keyState['W'])
+	{
+		_animationIdleWalk->addBlendWeight(deltaTime * 0.5f);
 		_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
+	}
+
+
+
 }

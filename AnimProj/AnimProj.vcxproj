@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\AnimationCapture.h" />
     <ClInclude Include="Animation\IAnimationController.h" />
     <ClInclude Include="Animation\AnimationBlender.h" />
     <ClInclude Include="ASFAMC\Acclaim.h" />
@@ -116,6 +117,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animation\AnimationCapture.cpp" />
     <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="Animation\IAnimationController.cpp" />
     <ClCompile Include="ASFAMC\Acclaim.cpp" />

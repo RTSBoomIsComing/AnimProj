@@ -6,6 +6,8 @@ pa::AnimationController::AnimationController(const Animation* animation)
 	: _animation(animation)
 {
 	_rotations.resize(animation->getBoneAnimationCount());
+	_duration = _animation->getDuration();
+	assert(_duration > 0);
 }
 
 void pa::AnimationController::update(float deltaTime)
@@ -16,7 +18,7 @@ void pa::AnimationController::update(float deltaTime)
 	IAnimationController::update(deltaTime);
 
 	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * fps);
-	if (elipsedFrame > _animation->getDuration())
+	if (elipsedFrame > _duration)
 	{
 		_runningTime = 0.0f;
 		elipsedFrame = 0;

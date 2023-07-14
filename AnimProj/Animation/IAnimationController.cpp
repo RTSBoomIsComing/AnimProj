@@ -11,7 +11,7 @@ void pa::IAnimationController::update(float deltaTime)
 
 void pa::IAnimationController::play()
 {
-	_isRunning = true; 
+	_isRunning = true;
 }
 
 void pa::IAnimationController::pause() 
@@ -20,8 +20,8 @@ void pa::IAnimationController::pause()
 }
 
 void pa::IAnimationController::reset() 
-{ 
-	_runningTime = 0.0f; 
+{
+	_runningTime = 0.0f;
 }
 
 void pa::IAnimationController::setCyclic(bool onoff) { 
@@ -41,9 +41,4 @@ void pa::IAnimationController::addBlendWeight(float weight)
 
 	else if (_blendWeight < 0.0f)
 		_blendWeight = 0.0f;
-}
-
-DirectX::XMVECTOR pa::IAnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const 
-{
-	return DirectX::XMVECTOR{}; 
 }
