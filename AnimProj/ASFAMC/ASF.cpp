@@ -370,11 +370,11 @@ void pa::ASF::correctSkeleton()
 			const size_t dummyBoneIndex = _boneRotations.size();
 			newHierarchy.push_back(static_cast<uint8_t>(dummyBoneIndex));
 			_parentList[childIndex] = static_cast<uint8_t>(dummyBoneIndex);
+			_parentList.push_back(static_cast<uint8_t>(boneIndex));
 
 			_boneRotations.push_back(correctRotations[childIndex]);
 			_boneTranslations.emplace_back();
 
-			_parentList.push_back(static_cast<uint8_t>(boneIndex));
 		}
 	}
 
