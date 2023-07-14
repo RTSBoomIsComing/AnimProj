@@ -7,6 +7,8 @@ namespace pa
 	class AMC;
 	class Animation
 	{
+		friend class AnimationController;
+
 	public:
 		struct Frame
 		{
@@ -32,9 +34,9 @@ namespace pa
 		inline size_t		getDuration()				const { return _duration; }
 		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
 
-		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex, uint32_t key, uint32_t offset = 0) const;
+		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex) const;
 		DirectX::XMVECTOR	playBoneAnimationCatmullRom(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0);
-		DirectX::XMVECTOR	playBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0) const;
+		//DirectX::XMVECTOR	playBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset = 0) const;
 	private:
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);

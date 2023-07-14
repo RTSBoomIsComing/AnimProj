@@ -11,7 +11,7 @@ pa::AnimationCapture::AnimationCapture(const Animation* animation, uint32_t fram
 	_rotations.reserve(_animation->getBoneAnimationCount());
 	for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
 	{
-		_rotations.push_back(_animation->getBoneRotation(boneIndex, frameIndex));
+		_rotations.push_back(_animation->getBoneRotation(boneIndex));
 	}
 }
 
