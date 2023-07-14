@@ -33,7 +33,6 @@ namespace pa
 		ComPtr<ID3D11DepthStencilState>		_depthStencilState;
 		D3D11_VIEWPORT						_viewport;
 
-		ComPtr<ID3D11Buffer>				_worldCBuffer;
 		ComPtr<ID3D11InputLayout>			_inputLayout;
 		ComPtr<ID3D11VertexShader>			_vertexShader;
 		ComPtr<ID3D11PixelShader>			_pixelShader;
@@ -43,17 +42,11 @@ namespace pa
 		Timer	_timer;
 
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
-		float	_cameraRotationFactor	= 0.0f;
-		float	_cameraHeight			= 0.0f;
-
 
 		Camera*							_camera		= nullptr;
 		Character*						_character	= nullptr;
 
 	private:
-		bool	_keyState[4]			= {};
-		bool	_keyStateForward		= false;
-		bool	_keyStateBackward		= false;
 		int		_animationIndex			= 0;
 		float	_animationBlendFactor	= 0.0f;
 	};

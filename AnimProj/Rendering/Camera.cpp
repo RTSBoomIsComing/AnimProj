@@ -1,6 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "Camera.h"
+#include "../Keyboard.h"
 
 pa::Camera::Camera(ID3D11Device* device)
 {
@@ -24,7 +25,8 @@ void pa::Camera::initialize()
 	_aspectRatio = aspectRatio;
 
 	using namespace DirectX;
-	XMStoreFloat4(&_eyePosition, XMVECTOR{ 0.0f, 0.0f, -3.0f, 1.0f });
+	XMStoreFloat4(&_eyePosition, XMVECTOR{ 0.0f, 0.0f, -10.0f, 1.0f });
+	XMStoreFloat4(&_eyeRotation, XMVECTOR{ 0.0f, 0.0f,   0.0f, 1.0f });
 	XMStoreFloat4(&_focusPosition, XMVECTOR{ 0.0f, 0.0f,  0.0f, 1.0f });
 
 	calculateMatrices();
@@ -34,19 +36,16 @@ void pa::Camera::initialize()
 void pa::Camera::setAspectRatio(float aspectRatio)
 {
 	_aspectRatio = aspectRatio;
-	_dirtyBit = true;
 }
 
 void pa::Camera::setEyePosition(const DirectX::XMVECTOR& eyePosition)
 {
 	DirectX::XMStoreFloat4(&_eyePosition, eyePosition);
-	_dirtyBit = true;
 }
 
 void pa::Camera::setFocusPosition(const DirectX::XMVECTOR& focusPosition)
 {
 	DirectX::XMStoreFloat4(&_focusPosition, focusPosition);
-	_dirtyBit = true;
 }
 
 void pa::Camera::update(ID3D11DeviceContext* deviceContext)
@@ -54,6 +53,37 @@ void pa::Camera::update(ID3D11DeviceContext* deviceContext)
 	calculateMatrices();
 	deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_matrices, 0, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
+}
+
+void pa::Camera::processInput(float deltaTime)
+{
+	using namespace DirectX;
+	// need to move to Camera class
+	// arrow keys
+	// left  : 37
+	// up    : 38
+	// right : 39
+	// down  : 40
+	float rotationY = 0.0f;
+	float rotationX = 0.0f;
+	if (GKeyboard->keyState[37])
+		rotationX -= deltaTime;
+	if (GKeyboard->keyState[39])
+		rotationX += deltaTime;
+	if (GKeyboard->keyState[38])
+		rotationY += deltaTime;
+	if (GKeyboard->keyState[40])
+		rotationY -= deltaTime;
+
+	XMVECTOR quaternion = XMQuaternionRotationNormal({ 1.0f, 0.0f, 0.0f, 0.0f }, rotationY * 3.0f);
+	quaternion = XMQuaternionMultiply(quaternion, XMQuaternionRotationNormal({ 0.0f, 1.0f, 0.0f, 0.0f }, rotationX * 3.0f));
+
+	//XMVECTOR currentEyeRotation = XMLoadFloat4(&_eyeRotation);
+	//currentEyeRotation = XMQuaternionMultiply(currentEyeRotation, quaternion);
+	//XMStoreFloat4(&_eyeRotation, currentEyeRotation);
+
+	XMVECTOR currentEyePosition = XMLoadFloat4(&_eyePosition);
+	XMStoreFloat4(&_eyePosition, XMVector4Transform(currentEyePosition, XMMatrixRotationQuaternion(quaternion)));
 }
 
 void pa::Camera::calculateMatrices()
@@ -68,12 +98,9 @@ void pa::Camera::calculateMatrices()
 	constexpr float farZ = 100.0f;
 	XMStoreFloat4x4(&_matrices.Projection,
 		XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, _aspectRatio, nearZ, farZ));
-
-	_dirtyBit = false;
 }
 
 const pa::Camera::Matrices& pa::Camera::getMatrices(void)
 {
-	calculateMatrices();
 	return _matrices;
 }

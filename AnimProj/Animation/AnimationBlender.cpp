@@ -16,10 +16,9 @@ void pa::AnimationBlender::update(float deltaTime)
 {
 	using namespace DirectX;
 	constexpr int fps = 120;
-	if (false == isRunning())
-		return;
 
-	_runningTime += deltaTime;
+	IAnimationController::update(deltaTime);
+
 	float playSpeed = 1.0f * (1 - _blendWeight) + 1 / _blendSync * _blendWeight;
 
 	uint32_t baseElipsedFrame = static_cast<uint32_t>(_runningTime * playSpeed * fps);
@@ -39,15 +38,6 @@ void pa::AnimationBlender::update(float deltaTime)
 	}
 }
 
-void pa::AnimationBlender::addBlendWeight(float weight)
-{
-	_blendWeight += weight;
-	if (_blendWeight > 1.0f)
-		_blendWeight = 1.0f;
-
-	else if (_blendWeight < 0.0f)
-		_blendWeight = 0.0f;
-}
 
 DirectX::XMVECTOR pa::AnimationBlender::getBoneRotation(size_t boneIndex, uint32_t offset) const
 {

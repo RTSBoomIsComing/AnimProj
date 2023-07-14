@@ -12,10 +12,9 @@ void pa::AnimationController::update(float deltaTime)
 {
 	using namespace DirectX;
 	constexpr int fps = 120;
-	if (false == isRunning())
-		return;
 
-	_runningTime += deltaTime;
+	IAnimationController::update(deltaTime);
+
 	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * fps);
 	if (elipsedFrame > _animation->getDuration())
 	{

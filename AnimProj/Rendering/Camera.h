@@ -21,6 +21,7 @@ namespace pa
 		void setEyePosition(const DirectX::XMVECTOR& eyePosition);
 		void setFocusPosition(const DirectX::XMVECTOR& focusPosition);
 		void update(ID3D11DeviceContext* deviceContext);
+		void processInput(float deltaTime);
 
 		const Matrices& getMatrices(void);
 
@@ -33,9 +34,9 @@ namespace pa
 
 		Matrices						_matrices;
 		DirectX::XMFLOAT4				_eyePosition;
+		DirectX::XMFLOAT4				_eyeRotation;
 		DirectX::XMFLOAT4				_focusPosition;
 		float							_aspectRatio;
-		bool							_dirtyBit;
 	};
 }
 

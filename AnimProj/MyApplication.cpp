@@ -7,6 +7,7 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Skeleton.h"
 #include "Rendering/Character.h"
+#include "Keyboard.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -16,7 +17,7 @@ pa::MyApplication::MyApplication()
 	initializeGraphicsPipeline();
 
 	_camera		= new Camera(_device.Get());
-	_character = new Character(_device.Get());
+	_character	= new Character(_device.Get());
 }
 
 pa::MyApplication::~MyApplication()
@@ -70,46 +71,12 @@ void pa::MyApplication::OnRender()
 
 void pa::MyApplication::OnKeyDown(UINT8 key)
 {
-	// left  : 37
-	// up    : 38
-	// right : 39
-	// down  : 40
-	if (37 <= key && key <= 40)
-		_keyState[key - 37] = true;
-
-	// number 1
-	//else if (49 == key)
-	//{
-	//	if (++_animationIndex >= _animations.size())
-	//		_animationIndex = 0;
-	//}
-	else if ('W' == key)
-	{
-		_keyStateForward = true;
-	}
-	else if ('S' == key)
-	{
-		_keyStateBackward = true;
-	}
-
+	GKeyboard->keyState[key] = true;
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
 {
-	// left  : 37
-	// up    : 38
-	// right : 39
-	// down  : 40
-	if (37 <= key && key <= 40)
-		_keyState[key - 37] = false;
-	else if ('W' == key)
-	{
-		_keyStateForward = false;
-	}
-	else if ('S' == key)
-	{
-		_keyStateBackward = false;
-	}
+	GKeyboard->keyState[key] = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
@@ -156,30 +123,9 @@ void pa::MyApplication::processInput(float deltaTime)
 {
 	using namespace DirectX;
 	float cameraDistance = 10.f;
-	if (_keyState[0])
-		_cameraRotationFactor += deltaTime;
-	if (_keyState[2])
-		_cameraRotationFactor -= deltaTime;
-	if (_keyState[1])
-		_cameraHeight += deltaTime;
-	if (_keyState[3])
-		_cameraHeight -= deltaTime;
 
-
-
-	XMVECTOR newEyePosition = XMVECTOR{
-		cameraDistance * std::cosf(-XM_PIDIV2 + _cameraRotationFactor * 3),
-		_cameraHeight * 15,
-		cameraDistance * std::sinf(-XM_PIDIV2 + _cameraRotationFactor * 3),
-		1.0f };
-
-	_camera->setEyePosition(newEyePosition);
-
-	//if (_keyStateForward)
-	//	static_cast<AnimationBlender*>(_animCon)->addBlendWeight(0.01f);
-	//if (_keyStateBackward)
-	//	static_cast<AnimationBlender*>(_animCon)->addBlendWeight(-0.01f);
-
+	_character->processInput(deltaTime);
+	_camera->processInput(deltaTime);
 }
 
 void pa::MyApplication::initializeD3dDevices(HWND hWnd)

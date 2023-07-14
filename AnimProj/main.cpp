@@ -2,16 +2,24 @@
 #include "pch.h"
 #include "App/Win32Framework.h"
 #include "MyApplication.h"
+#include "Keyboard.h"
 
-#include "ASFAMC/AMC.h"
-#include "ASFAMC/ASF.h"
-
-#include <iostream>
+pa::Keyboard* GKeyboard = nullptr;
 
 int main()
 {
+	GKeyboard = new pa::Keyboard();
+
+
 	pa::MyApplication myApplication{};
 	pa::Win32Framework myFramework{ &myApplication };
+	int result = myFramework.Run();
 
-	return myFramework.Run();
+	if (nullptr != GKeyboard)
+	{
+		delete GKeyboard;
+		GKeyboard = nullptr;
+	}
+
+	return result;
 }

@@ -8,6 +8,7 @@
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"
+#include "../Keyboard.h"
 
 pa::Character::Character(ID3D11Device* device)
 {
@@ -31,12 +32,12 @@ pa::Character::Character(ID3D11Device* device)
 	_animations.push_back(Animation(&asf, &amcJump));
 	_animations.push_back(Animation(&asf, &amcPunch));
 
-	for (auto& animation : _animations)
-	{
-		animation.compressAnimation();
-	}
+	//for (auto& animation : _animations)
+	//{
+	//	animation.compressAnimation();
+	//}
 
-	_animationControllers = new AnimationBlender(&_animations[1], &_animations[2]);
+	_animationWalkRun = new AnimationBlender(&_animations[1], &_animations[2]);
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -79,21 +80,21 @@ pa::Character::~Character()
 		_jointMesh = nullptr;
 	}
 
-	if (nullptr != _animationControllers)
+	if (nullptr != _animationWalkRun)
 	{
-		delete _animationControllers;
-		_animationControllers = nullptr;
+		delete _animationWalkRun;
+		_animationWalkRun = nullptr;
 	}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
-	_animationControllers->update(deltaTime);
+	_animationWalkRun->update(deltaTime);
 
 	using namespace DirectX;
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation	= _animationControllers->getBoneRotation(boneIndex);
+		XMVECTOR animationRotation	= _animationWalkRun->getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneIndex(boneIndex);
@@ -138,4 +139,12 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 {
 	_boneMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
 	_jointMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
+}
+
+void pa::Character::processInput(float deltaTime)
+{
+	if (GKeyboard->keyState['W'])
+		_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
+	if (GKeyboard->keyState['S'])
+		_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
 }

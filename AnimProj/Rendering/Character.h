@@ -9,6 +9,7 @@ namespace pa
 {
 	class Mesh;
 	class IAnimationController;
+	class AnimationBlender;
 	class Character
 	{
 	public:
@@ -29,12 +30,13 @@ namespace pa
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
 		void render(ID3D11DeviceContext* deviceContext);
+		void processInput(float deltaTime);
 
 		//void transitState();
 
 	private:
 		Skeleton*							_skeleton				= nullptr;
-		IAnimationController*				_animationControllers	= nullptr;
+		AnimationBlender*					_animationWalkRun		= nullptr;
 
 
 		// will be removed

@@ -8,19 +8,21 @@ namespace pa
 		IAnimationController() = default;
 		~IAnimationController() = default;
 
-		virtual void update(float deltaTime) {};
+		virtual void update(float deltaTime);
 
 
-		inline void play()					{ _isRunning = true;	}
-		inline void pause()					{ _isRunning = false;	}
-		inline void reset()					{ _runningTime = 0.0f;	}
-		inline void setCyclic(bool onoff)	{ _isCyclic = onoff;	}
-		inline bool isRunning() const		{ return _isRunning;	}
+		void play();
+		void pause();
+		void reset();
+		void setCyclic(bool onoff);
+		bool isRunning() const;
+		void addBlendWeight(float weight);
 
-		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const { return DirectX::XMVECTOR{}; };
+		virtual DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const;;
 	protected:
 		bool								_isCyclic		= true;
 		float								_runningTime	= 0.0f;
+		float								_blendWeight	= 0.0f;
 		std::vector<DirectX::XMVECTOR>		_rotations;
 
 	private:
