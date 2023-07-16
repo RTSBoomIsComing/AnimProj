@@ -2,7 +2,7 @@
 #include "AnimationBlender.h"
 #include "Animation.h"
 
-pa::AnimationBlender::AnimationBlender(const Animation* base, const Animation* blend)
+pa::AnimationBlender::AnimationBlender(const AnimationController* base, const AnimationController* blend)
 	: _baseAnimation(base)
 	, _blendAnimation(blend)
 {

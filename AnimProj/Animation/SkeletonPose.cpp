@@ -8,7 +8,7 @@ pa::SkeletonPose::SkeletonPose(Skeleton* skeleton, Animation* animation, uint32_
 	_rotationsPerBone.resize(_skeleton->getBoneCount());
 	for (size_t boneIndex = 0; boneIndex < _skeleton->getBoneCount(); boneIndex++)
 	{
-		DirectX::XMStoreFloat4(&_rotationsPerBone[boneIndex],animation->getBoneRotation(boneIndex, key));
+		DirectX::XMStoreFloat4(&_rotationsPerBone[boneIndex],animation->getBoneRotation(boneIndex));
 	}
 }
 

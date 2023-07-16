@@ -3,11 +3,11 @@
 #include "IAnimationController.h"
 namespace pa
 {
-	class Animation;
+	class AnimationController;
 	class AnimationBlender : public IAnimationController
 	{
 	public:
-		AnimationBlender(const Animation* base, const Animation* blend);
+		AnimationBlender(const AnimationController* base, const AnimationController* blend);
 		~AnimationBlender() = default;
 
 		void update(float deltaTime)override;
@@ -15,9 +15,9 @@ namespace pa
 		DirectX::XMVECTOR getBoneRotation(size_t boneIndex, uint32_t offset = 0) const override;
 
 	private:
-		const Animation*	_baseAnimation	= nullptr;
-		const Animation*	_blendAnimation	= nullptr;
-		float				_blendSync		= 1.0f;
+		const AnimationController*	_baseAnimation	= nullptr;
+		const AnimationController*	_blendAnimation	= nullptr;
+		float						_blendSync		= 1.0f;
 	};
 }
 
