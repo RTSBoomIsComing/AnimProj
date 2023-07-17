@@ -2,7 +2,7 @@
 #include "Animation.h"
 #include "../ASFAMC/ASF.h"
 #include "../ASFAMC/AMC.h"
-#include "../Rendering/Skeleton.h"
+#include "Skeleton.h"
 
 pa::Animation::Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
 {

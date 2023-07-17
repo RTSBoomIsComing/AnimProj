@@ -2,7 +2,7 @@
 // Character has a skeleton and can hold several animations that are compatible with the skeleton
 
 #pragma once
-#include "Skeleton.h"
+#include "../Animation/Skeleton.h"
 //#include "../Animation/IAnimationController.h"
 #include "../Animation/Animation.h"
 #include "../Animation/AnimationController.h"

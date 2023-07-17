@@ -20,9 +20,9 @@ namespace pa
 
 		struct BoneAnimation
 		{
-			std::vector<Animation::Frame>	scale;
-			std::vector<Animation::Frame>	rotation;
-			std::vector<Animation::Frame>	position;
+			std::vector<Frame>	scale;
+			std::vector<Frame>	rotation;
+			std::vector<Frame>	position;
 		};
 	public:
 		Animation() = default;

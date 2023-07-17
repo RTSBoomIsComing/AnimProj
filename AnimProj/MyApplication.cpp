@@ -5,7 +5,6 @@
 #include "Rendering/Mesh.h"
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
-#include "Rendering/Skeleton.h"
 #include "Rendering/Character.h"
 #include "Keyboard.h"
 

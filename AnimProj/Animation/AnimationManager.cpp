@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "AnimationManager.h"
-#include "../Rendering/Skeleton.h"
+#include "Skeleton.h"
 
 pa::AnimationManager::AnimationManager()
 {

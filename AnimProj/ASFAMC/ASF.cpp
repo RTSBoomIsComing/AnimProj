@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "ASF.h"
-#include "../Rendering/Skeleton.h"
+#include "../Animation/Skeleton.h"
 
 static std::istream& ignoreEmptyChar(std::istream& stream)
 {

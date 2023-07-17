@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "AMC.h"
 #include "ASF.h"
-#include "../Rendering/Skeleton.h"
+#include "../Animation/Skeleton.h"
 
 pa::AMC::AMC(const wchar_t* filePath)
 {
