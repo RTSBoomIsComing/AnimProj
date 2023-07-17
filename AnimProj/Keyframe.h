@@ -12,7 +12,7 @@ namespace pa
 		};
 	public:
 		uint16_t			_keytime	= std::numeric_limits<uint16_t>::max();
-		uint16_t			_boneIndex	= std::numeric_limits<uint16_t>::max();
+		uint16_t			_bone		= std::numeric_limits<uint16_t>::max();
 		Channel				_channel	= Channel::None;
 
 		DirectX::XMFLOAT4	_v;
