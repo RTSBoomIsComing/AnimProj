@@ -8,7 +8,7 @@ namespace pa
 	public:
 		enum class Channel : uint16_t
 		{
-			Scale, Rotation, Translation, None
+			Rotation, Translation, Scale, None
 		};
 	public:
 		uint16_t			_keytime	= std::numeric_limits<uint16_t>::max();

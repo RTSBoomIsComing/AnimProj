@@ -34,8 +34,6 @@ namespace pa
 		inline size_t		getDuration()				const { return _duration; }
 		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
 
-		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex) const;
-
 		void				testCreateTrack();
 	private:
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);

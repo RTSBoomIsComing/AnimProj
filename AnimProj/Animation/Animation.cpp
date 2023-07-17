@@ -122,20 +122,19 @@ void pa::Animation::compressAnimation()
 	}
 }
 
-DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex) const
-{
-	using namespace DirectX;
-	if (_boneAnimation[boneIndex].rotation.empty())
-		return XMVECTOR{ 0.0f, 0.0f, 0.0f, 1.0f };
-
-	return XMLoadFloat4(&_boneAnimation[boneIndex].rotation.front().v);
-}
-
 void pa::Animation::testCreateTrack()
 {
-	for (const auto& boneAnimation : _boneAnimation)
-	{
+	std::vector<int> headers(_boneAnimation.size());
 
+	for (int i = 0; i < headers.size(); i++)
+	{
+		const auto& rotationTrack = _boneAnimation[i].rotation;
+		if (rotationTrack.empty())
+			continue;
+
+		Keyframe keyframe{ rotationTrack.front().key, i, Keyframe::Channel::Rotation, rotationTrack.front().v };
+		_track.push_back(keyframe);
+		_track.push_back(keyframe);
 	}
 }
 
