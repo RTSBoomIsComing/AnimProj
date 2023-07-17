@@ -71,12 +71,12 @@ void pa::MyApplication::OnRender()
 
 void pa::MyApplication::OnKeyDown(UINT8 key)
 {
-	GKeyboard->keyState[key] = true;
+	Keyboard::get()->getKeyState(key) = true;
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
 {
-	GKeyboard->keyState[key] = false;
+	Keyboard::get()->getKeyState(key) = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

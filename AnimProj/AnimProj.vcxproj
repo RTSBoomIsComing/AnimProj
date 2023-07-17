@@ -97,7 +97,6 @@
     <ClInclude Include="Animation\CompressedFrame.h" />
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\AnimationController.h" />
-    <ClInclude Include="Animation\KeyFrame.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
@@ -125,7 +124,6 @@
     <ClCompile Include="Animation\CompressedFrame.cpp" />
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
-    <ClCompile Include="Animation\KeyFrame.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
@@ -149,8 +147,14 @@
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Animation\AnimationManager.cpp" />
-    <None Include="Animation\AnimationManager.h" />
+    <ClCompile Include="Animation\AnimationManager.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClInclude Include="Animation\AnimationManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <None Include="cpp.hint" />
     <None Include="Rendering\SkeletonMesh.cpp" />
     <None Include="Rendering\SkeletonMesh.h" />

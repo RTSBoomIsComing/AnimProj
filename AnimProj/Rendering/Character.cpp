@@ -33,12 +33,18 @@ pa::Character::Character(ID3D11Device* device)
 	_animations.push_back(Animation(&asf, &amcJump));
 	_animations.push_back(Animation(&asf, &amcPunch));
 
+	_animationControllers.push_back(AnimationController(&_animations[0]));
+	_animationControllers.push_back(AnimationController(&_animations[1]));
+	_animationControllers.push_back(AnimationController(&_animations[2]));
+	_animationControllers.push_back(AnimationController(&_animations[3]));
+	_animationControllers.push_back(AnimationController(&_animations[4]));
+
 	//for (auto& animation : _animations)
 	//{
 	//	animation.compressAnimation();
 	//}
-	_animationIdleWalk	= new AnimationBlender(&_animations[1], &_animations[0]);
-	_animationWalkRun	= new AnimationBlender(&_animations[1], &_animations[2]);
+	_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
+	_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -96,6 +102,11 @@ pa::Character::~Character()
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
+	for (auto& animationController : _animationControllers)
+	{
+		animationController.update(deltaTime);
+	}
+
 	_animationIdleWalk->update(deltaTime);
 	_animationWalkRun->update(deltaTime);
 
@@ -151,12 +162,12 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
-	if (GKeyboard->keyState['W'])
+	if (Keyboard::get()->getKeyState('W'))
 	{
 		_animationIdleWalk->addBlendWeight(-deltaTime * 0.5f);
 		_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
 	}
-	if (!GKeyboard->keyState['W'])
+	if (!Keyboard::get()->getKeyState('W'))
 	{
 		_animationIdleWalk->addBlendWeight(deltaTime * 0.5f);
 		_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);

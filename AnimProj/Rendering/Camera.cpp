@@ -66,13 +66,13 @@ void pa::Camera::processInput(float deltaTime)
 	// down  : 40
 	float rotationY = 0.0f;
 	float rotationX = 0.0f;
-	if (GKeyboard->keyState[37])
+	if (Keyboard::get()->getKeyState(37))
 		rotationX -= deltaTime;
-	if (GKeyboard->keyState[39])
+	if (Keyboard::get()->getKeyState(39))
 		rotationX += deltaTime;
-	if (GKeyboard->keyState[38])
+	if (Keyboard::get()->getKeyState(38))
 		rotationY += deltaTime;
-	if (GKeyboard->keyState[40])
+	if (Keyboard::get()->getKeyState(40))
 		rotationY -= deltaTime;
 
 	XMVECTOR quaternion = XMQuaternionRotationNormal({ 1.0f, 0.0f, 0.0f, 0.0f }, rotationY * 3.0f);

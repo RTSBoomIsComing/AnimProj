@@ -84,13 +84,13 @@
     <ClInclude Include="Animation\AnimationController.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\KeyFrame.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Keyboard.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\AnimationCapture.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\AnimationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,24 +167,18 @@
     <ClCompile Include="Animation\AnimationController.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\KeyFrame.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Animation\IAnimationController.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AnimationCapture.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Animation\AnimationManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="Animation\AnimationManager.h">
-      <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="Animation\AnimationManager.cpp">
-      <Filter>소스 파일</Filter>
-    </None>
     <None Include="Rendering\SkeletonMesh.cpp">
       <Filter>소스 파일</Filter>
     </None>

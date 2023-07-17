@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "AnimationBlender.h"
-#include "Animation.h"
+#include "AnimationController.h"
 
 pa::AnimationBlender::AnimationBlender(const AnimationController* base, const AnimationController* blend)
 	: _baseAnimation(base)

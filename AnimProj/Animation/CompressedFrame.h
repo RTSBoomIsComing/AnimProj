@@ -26,8 +26,11 @@ namespace pa
 		uint64_t		getQuantized()						const;
 
 	private:
-		uint16_t _keyTime		= 0;		// The time interval is 1/120 second. 
-		uint16_t _jointIndex	= 0;		// Most significant two bits of this 8bit index contains channel type info.
+		// The time interval is 1/120 second.
+		uint16_t _keyTime		= 0;
+
+		// Most significant two bits of this 8bit index contains channel type info.
+		uint16_t _jointIndex	= 0;		
 
 		// Payload, which can be a quantized 3d vector or a quantized quaternion
 		// depending on what type of channel this data belongs to
