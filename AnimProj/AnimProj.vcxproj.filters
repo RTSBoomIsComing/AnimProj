@@ -72,9 +72,6 @@
     <ClInclude Include="Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\SkeletonPose.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\AnimationBlender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -93,7 +90,7 @@
     <ClInclude Include="Animation\AnimationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Keyframe.h">
+    <ClInclude Include="Animation\Keyframe.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -161,9 +158,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\SkeletonPose.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Animation\AnimationBlender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -179,7 +173,7 @@
     <ClCompile Include="Animation\AnimationManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Keyframe.cpp">
+    <ClCompile Include="Animation\Keyframe.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
