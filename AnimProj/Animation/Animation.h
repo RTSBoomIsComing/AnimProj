@@ -1,6 +1,6 @@
 // author: Changwan Yu
 #pragma once
-
+#include "Keyframe.h"
 namespace pa
 {
 	class ASF;
@@ -35,6 +35,8 @@ namespace pa
 		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
 
 		DirectX::XMVECTOR 	getBoneRotation(size_t boneIndex) const;
+
+		void				testCreateTrack();
 	private:
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
@@ -42,6 +44,8 @@ namespace pa
 	private:
 		size_t							_duration			= 0;
 		std::vector<BoneAnimation>		_boneAnimation;
+
+		std::vector<Keyframe>			_track;
 	};
 }
 

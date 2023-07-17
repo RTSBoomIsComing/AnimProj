@@ -5,7 +5,6 @@
 #include "../Animation/Animation.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
-#include "../Animation/AnimationCapture.h"
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"

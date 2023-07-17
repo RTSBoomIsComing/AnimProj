@@ -131,6 +131,14 @@ DirectX::XMVECTOR pa::Animation::getBoneRotation(size_t boneIndex) const
 	return XMLoadFloat4(&_boneAnimation[boneIndex].rotation.front().v);
 }
 
+void pa::Animation::testCreateTrack()
+{
+	for (const auto& boneAnimation : _boneAnimation)
+	{
+
+	}
+}
+
 void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold)
 {
 	using namespace DirectX;
