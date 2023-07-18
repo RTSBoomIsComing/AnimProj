@@ -122,50 +122,90 @@ void pa::Animation::compressAnimation()
 	}
 
 	testCreateTrack();
+	std::vector<std::array<Keyframe, 4>> active(_trackCount);
 
-	int sum = 0;
-	for (auto& boneAnimation : _boneAnimation)
+	for (uint16_t i = 0; i < _trackCount * 4; i++)
 	{
-		sum += boneAnimation.rotation.size();
+		auto const& keyframe = _rotationTrack[i];
+		active[i / 4][i % 4] = keyframe;
+	}
+
+	uint16_t cursor = _trackCount * 4;
+	for (uint16_t t = 0; t < _duration; t++)
+	{
+		for (auto& cp : active)
+		{
+			if (cp[2]._keytime < t)
+			{
+				cp[0] = cp[1];
+				cp[1] = cp[2];
+				cp[2] = cp[3];
+				cp[3] = _rotationTrack[cursor++];
+			}
+			assert(cp[2]._bone == cp[3]._bone);
+		}
 	}
 }
 
 void pa::Animation::testCreateTrack()
 {
 
+	std::vector<uint16_t> cursors(_boneAnimation.size(), 0ui16);
 	for (uint16_t i = 0; i < _boneAnimation.size(); i++)
 	{
 		const auto& currentTrack = _boneAnimation[i].rotation;
 		if (currentTrack.empty())
 			continue;
 
-		const Frame& currentFrame = currentTrack.front();
+		_trackCount++;
 
-		Keyframe keyframe{ currentFrame.key, i, currentFrame.v };
+		Keyframe keyframe{ currentTrack.front().key, i, currentTrack.front().v };
 		_rotationTrack.push_back(keyframe);
 		_rotationTrack.push_back(keyframe);
+
+		keyframe._keytime	= currentTrack[1].key;
+		keyframe._v			= currentTrack[1].v;
+		_rotationTrack.push_back(keyframe);
+
+		if (2 < currentTrack.size())
+		{
+			keyframe._keytime	= currentTrack[2].key;
+			keyframe._v			= currentTrack[2].v;
+		}
+
+		_rotationTrack.push_back(keyframe);
+		cursors[i] = 2;
+
 	}
 
 	
-	std::vector<uint16_t> cursors(_boneAnimation.size(), 0ui16);
 	for (uint16_t currentKeytime = 0; currentKeytime < _duration; currentKeytime++)
 	{
 		for (uint16_t i = 0; i < _boneAnimation.size(); i++)
 		{
 			const auto& currentTrack = _boneAnimation[i].rotation;
 			uint16_t& cursor = cursors[i];
-			if (currentTrack.empty())
+			if (currentTrack.size() == cursor)
 				continue;
 
-			if (currentTrack[cursor].key == currentKeytime)
+			if (currentTrack[cursor - 1].key == currentKeytime)
 			{
 				cursor += 1;
-				assert(cursor < currentTrack.size());
-				Keyframe keyframe{ currentTrack[cursor].key, i, currentTrack[cursor].v };
-				_rotationTrack.push_back(keyframe);
+				//assert(cursor < currentTrack.size());
+				if (cursor == currentTrack.size())
+				{
 
-				if (cursor == currentTrack.size() - 1)
+					Keyframe keyframe{ currentTrack.back().key , i, currentTrack.back().v };
 					_rotationTrack.push_back(keyframe);
+				}
+				else
+				{
+					Keyframe keyframe{ currentTrack[cursor].key, i, currentTrack[cursor].v };
+					_rotationTrack.push_back(keyframe);
+				}
+
+				//if (cursor == currentTrack.size() - 1)
+				//	_rotationTrack.push_back(keyframe);
 			}
 		}
 	}

@@ -43,6 +43,7 @@ namespace pa
 		size_t							_duration			= 0;
 		std::vector<BoneAnimation>		_boneAnimation;
 
+		uint16_t						_trackCount			= 0;
 		std::vector<Keyframe>			_rotationTrack;
 	};
 }

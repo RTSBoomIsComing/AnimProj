@@ -33,6 +33,8 @@ void pa::AnimationController::update(float deltaTime)
 		elipsedFrame = 0;
 	}
 
+
+
 	for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
 	{
 

@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <chrono>
 #include <algorithm>
-#include <bitset>
+#include <array>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
