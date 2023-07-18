@@ -16,6 +16,16 @@ void pa::AnimationController::update(float deltaTime)
 
 	IAnimationController::update(deltaTime);
 
+
+	static uint16_t trackIndicator;
+	uint16_t nControlPoits = _animation->getBoneAnimationCount() * 4 /* P0, P1, P2, P3*/;
+
+	struct ControlPoint
+	{
+		uint16_t keytime;
+		XMFLOAT4 data;
+	};
+
 	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * fps);
 	if (elipsedFrame > _duration)
 	{
@@ -25,10 +35,15 @@ void pa::AnimationController::update(float deltaTime)
 
 	for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
 	{
-		XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
-			_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
-		_rotations[boneIndex] = rotation;
+
 	}
+
+	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
+	//{
+	//	XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
+	//		_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
+	//	_rotations[boneIndex] = rotation;
+	//}
 }
 
 DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const

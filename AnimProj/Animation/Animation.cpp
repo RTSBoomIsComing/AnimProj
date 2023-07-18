@@ -116,25 +116,58 @@ void pa::Animation::compressAnimation()
 {
 	for (auto& boneAnimation : _boneAnimation)
 	{
-		fitBoneAnimationCatmullRomCyclic(boneAnimation.rotation);
-		//fitBoneAnimationCatmullRom(boneAnimation.position);
-		//fitBoneAnimationCatmullRom(boneAnimation.scale);
+		fitBoneAnimationCatmullRom(boneAnimation.rotation);
+		fitBoneAnimationCatmullRom(boneAnimation.position);
+		fitBoneAnimationCatmullRom(boneAnimation.scale);
+	}
+
+	testCreateTrack();
+
+	int sum = 0;
+	for (auto& boneAnimation : _boneAnimation)
+	{
+		sum += boneAnimation.rotation.size();
 	}
 }
 
 void pa::Animation::testCreateTrack()
 {
-	std::vector<int> headers(_boneAnimation.size());
 
-	for (int i = 0; i < headers.size(); i++)
+	for (uint16_t i = 0; i < _boneAnimation.size(); i++)
 	{
-		const auto& rotationTrack = _boneAnimation[i].rotation;
-		if (rotationTrack.empty())
+		const auto& currentTrack = _boneAnimation[i].rotation;
+		if (currentTrack.empty())
 			continue;
 
-		Keyframe keyframe{ rotationTrack.front().key, i, Keyframe::Channel::Rotation, rotationTrack.front().v };
-		_track.push_back(keyframe);
-		_track.push_back(keyframe);
+		const Frame& currentFrame = currentTrack.front();
+
+		Keyframe keyframe{ currentFrame.key, i, currentFrame.v };
+		_rotationTrack.push_back(keyframe);
+		_rotationTrack.push_back(keyframe);
+	}
+
+	
+	std::vector<uint16_t> cursors(_boneAnimation.size(), 0ui16);
+	for (uint16_t currentKeytime = 0; currentKeytime < _duration; currentKeytime++)
+	{
+		for (uint16_t i = 0; i < _boneAnimation.size(); i++)
+		{
+			const auto& currentTrack = _boneAnimation[i].rotation;
+			uint16_t& cursor = cursors[i];
+			if (currentTrack.empty())
+				continue;
+
+			if (currentTrack[cursor].key == currentKeytime)
+			{
+				cursor += 1;
+				assert(cursor < currentTrack.size());
+				Keyframe keyframe{ currentTrack[cursor].key, i, currentTrack[cursor].v };
+				_rotationTrack.push_back(keyframe);
+
+				if (cursor == currentTrack.size() - 1)
+					_rotationTrack.push_back(keyframe);
+			}
+		}
 	}
 }
 
@@ -145,32 +178,30 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 	if (frames.empty())
 		return;
 
-	std::vector<bool>		picked(frames.size(), false);
-	picked.front()			= true;
-	picked.back()			= true;
+	std::vector<bool>		samples(frames.size(), false);
+	samples.front()			= true;
+	samples.back()			= true;
 
 	while(true)
 	{
-		std::vector<size_t>	sectionMiddles;
-		std::vector<float>	errorSums;
+		std::vector<size_t>	midPoints;
+		std::vector<float>	errors;
 
 		size_t P0 = 0;
 
-		auto iterator = std::find(picked.begin(), picked.end(), true);
-		size_t P1 = std::distance(picked.begin(), iterator);
+		auto iterator = std::find(samples.begin(), samples.end(), true);
+		size_t P1 = std::distance(samples.begin(), iterator);
 
-		iterator = std::find(++iterator, picked.end(), true);
-		size_t P2 = std::distance(picked.begin(), iterator);
+		iterator = std::find(++iterator, samples.end(), true);
+		size_t P2 = std::distance(samples.begin(), iterator);
 
-		if (iterator != picked.end())
-			iterator = std::find(++iterator, picked.end(), true);
-
-		size_t P3 = (iterator != picked.end()) ? std::distance(picked.begin(), iterator) : P2;
+		iterator = std::find(++iterator, samples.end(), true);
+		size_t P3 = (iterator != samples.end()) ? std::distance(samples.begin(), iterator) : P2;
 
 		while (P1 < P2)
 		{
-			sectionMiddles.push_back((P1 + P2) / 2);
-			errorSums.push_back(0.0f);
+			midPoints.push_back((P1 + P2) / 2);
+			errors.push_back(0.0f);
 
 			for (size_t between = P1 + 1; between < P2; between++)
 			{
@@ -181,41 +212,42 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 					XMLoadFloat4(&frames[P2].v),
 					XMLoadFloat4(&frames[P3].v), t);
 
-				catmullRom = XMQuaternionNormalize(catmullRom);
-
 				const XMVECTOR	difference = XMLoadFloat4(&frames[between].v) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
-				//errorSums.back() += error;
+				errors.back() += error;
 
-				if (errorSums.back() < error)
-				{
-					errorSums.back() = error;
-					sectionMiddles.back() = between;
-				}
+				//if (errorSums.back() < error)
+				//{
+				//	errorSums.back() = error;
+				//	sectionMiddles.back() = between;
+				//}
 			}
 
 			P0 = P1;
 			P1 = P2;
 			P2 = P3;
 
-			if (iterator < picked.end())
-				iterator = std::find(++iterator, picked.end(), true);
+			if (iterator != samples.end())
+				iterator = std::find(++iterator, samples.end(), true);
 			
-			P3 = (iterator != picked.end()) ? static_cast<int>(std::distance(picked.begin(), iterator)) : P2;
+			if (iterator != samples.end())
+				P3 = std::distance(samples.begin(), iterator);
 		}
 
-		auto errorIterator = std::max_element(errorSums.begin(), errorSums.end());
-		if (*errorIterator < threshold)
+		if (errors.empty())
 			break;
 
-		picked[sectionMiddles[std::distance(errorSums.begin(), errorIterator)]] = true;
+		auto findMaxError = std::max_element(errors.begin(), errors.end());
+		if (*findMaxError < threshold)
+			break;
+
+		samples[midPoints[std::distance(errors.begin(), findMaxError)]] = true;
 	}
 
-	
 	std::vector<Animation::Frame> newframes;
 	for (size_t point = 0; point < frames.size(); point++)
 	{
-		if (picked[point])
+		if (samples[point])
 			newframes.push_back(frames[point]);
 	}
 	frames = newframes;

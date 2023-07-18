@@ -6,15 +6,10 @@ namespace pa
 	class Keyframe
 	{
 	public:
-		enum class Channel : uint16_t
-		{
-			Rotation, Translation, Scale, None
-		};
-	public:
 		uint16_t			_keytime	= std::numeric_limits<uint16_t>::max();
+		
+		// Would be substitute for quantization
 		uint16_t			_bone		= std::numeric_limits<uint16_t>::max();
-		Channel				_channel	= Channel::None;
-
 		DirectX::XMFLOAT4	_v;
 	};
 }

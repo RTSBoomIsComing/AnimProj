@@ -12,7 +12,7 @@ namespace pa
 	public:
 		struct Frame
 		{
-			uint32_t			key		= std::numeric_limits<uint32_t>::max();
+			uint16_t			key		= std::numeric_limits<uint16_t>::max();
 
 			// scale, position or rotation(quaternion)
 			DirectX::XMFLOAT4	v		= {};
@@ -43,7 +43,7 @@ namespace pa
 		size_t							_duration			= 0;
 		std::vector<BoneAnimation>		_boneAnimation;
 
-		std::vector<Keyframe>			_track;
+		std::vector<Keyframe>			_rotationTrack;
 	};
 }
 

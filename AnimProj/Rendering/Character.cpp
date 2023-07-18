@@ -38,10 +38,10 @@ pa::Character::Character(ID3D11Device* device)
 	_animationControllers.push_back(AnimationController(&_animations[3]));
 	_animationControllers.push_back(AnimationController(&_animations[4]));
 
-	//for (auto& animation : _animations)
-	//{
-	//	animation.compressAnimation();
-	//}
+	for (auto& animation : _animations)
+	{
+		animation.compressAnimation();
+	}
 	_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
 	_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
 
