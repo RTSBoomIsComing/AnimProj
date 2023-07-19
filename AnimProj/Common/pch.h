@@ -25,4 +25,5 @@
 using Microsoft::WRL::ComPtr;
 
 #include <DirectXMath.h>
+#include <DirectXPackedVector.h>
 #include "DirectX11Helper.h"
