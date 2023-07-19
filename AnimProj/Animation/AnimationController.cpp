@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AnimationController.h"
+#include "CompactKeyframe.h"
 
 pa::AnimationController::AnimationController(const Animation* animation)
 	: _animation(animation)
@@ -17,27 +18,63 @@ void pa::AnimationController::update(float deltaTime)
 	IAnimationController::update(deltaTime);
 
 
-	static uint16_t trackIndicator;
-	uint16_t nControlPoits = _animation->getBoneAnimationCount() * 4 /* P0, P1, P2, P3*/;
-
-	struct ControlPoint
+	static std::vector<std::array<CompactKeyframe, 4>> active(_animation->_trackDescriptors.size());
+	static uint16_t cursor = 0;
+	//float elipsedFrame = _runningTime * fps;
+	static float elipsedFrame = 0.0f;
+	elipsedFrame += 2.0f;
+	static bool startup = true;
+	if (startup || _isCyclic && _duration < elipsedFrame)
 	{
-		uint16_t keytime;
-		XMFLOAT4 data;
-	};
-
-	uint32_t elipsedFrame = static_cast<uint32_t>(_runningTime * fps);
-	if (elipsedFrame > _duration)
-	{
-		_runningTime = 0.0f;
+		startup = false;
 		elipsedFrame = 0;
+		_runningTime = 0;
+		cursor = 0;
 	}
 
-
-
-	for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
+	if (0 == cursor)
 	{
+		cursor = _animation->_trackDescriptors.size() * 4;
+		std::memcpy(active.data(), _animation->_compactTrack.data(), sizeof(CompactKeyframe) * cursor);
+		
+	}
 
+	bool done = false;
+	while (!done)
+	{
+		done = true;
+		for (auto& cp : active)
+		{
+			if (cursor == _animation->_compactTrack.size())
+				break;
+
+			if (static_cast<float>(cp[2].keytime) < elipsedFrame)
+			{
+				cp[0] = cp[1];
+				cp[1] = cp[2];
+				cp[2] = cp[3];
+				cp[3] = _animation->_compactTrack[cursor++];
+
+				if (cp[2].keytime < elipsedFrame)
+					done = false;
+			}
+		}
+	}
+	
+	for (int i = 0; i < active.size(); i++)
+	{
+		const auto& cp = active[i];
+		if (!(cp[1].keytime < cp[2].keytime))
+			DebugBreak();
+		if (!(cp[1].keytime <= elipsedFrame && elipsedFrame <= cp[2].keytime))
+			DebugBreak();
+
+		float weight = (elipsedFrame - cp[1].keytime) / (cp[2].keytime - cp[1].keytime);
+		_rotations[_animation->_trackDescriptors[i]] = XMQuaternionNormalize(XMVectorCatmullRom(
+			cp[0].decompressAsQuaternion(),
+			cp[1].decompressAsQuaternion(),
+			cp[2].decompressAsQuaternion(),
+			cp[3].decompressAsQuaternion(), weight));
 	}
 
 	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)

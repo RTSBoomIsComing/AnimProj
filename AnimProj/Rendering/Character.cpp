@@ -22,46 +22,46 @@ pa::Character::Character(ID3D11Device* device)
 
 	AMC amcIdle(amcDirectory	+ L"idle.amc");
 	AMC amcWalk(amcDirectory	+ L"walk.amc");
-	AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
-	AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
-	AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
+	//AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
+	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
+	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
 	_animations.push_back(Animation(&asf, &amcWalk));
-	_animations.push_back(Animation(&asf, &amcRun));
-	_animations.push_back(Animation(&asf, &amcJump));
-	_animations.push_back(Animation(&asf, &amcPunch));
+	//_animations.push_back(Animation(&asf, &amcRun));
+	//_animations.push_back(Animation(&asf, &amcJump));
+	//_animations.push_back(Animation(&asf, &amcPunch));
 
 	_animationControllers.push_back(AnimationController(&_animations[0]));
 	_animationControllers.push_back(AnimationController(&_animations[1]));
-	_animationControllers.push_back(AnimationController(&_animations[2]));
-	_animationControllers.push_back(AnimationController(&_animations[3]));
-	_animationControllers.push_back(AnimationController(&_animations[4]));
+	//_animationControllers.push_back(AnimationController(&_animations[2]));
+	//_animationControllers.push_back(AnimationController(&_animations[3]));
+	//_animationControllers.push_back(AnimationController(&_animations[4]));
 
 	for (auto& animation : _animations)
 	{
 		animation.compressAnimation();
 	}
-	_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
-	_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
+	//_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
+	//_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
 
 
-	std::vector<bool> _skeletonUpperBodyMask(_skeleton->getBoneCount());
+	//std::vector<bool> _skeletonUpperBodyMask(_skeleton->getBoneCount());
 
-	// bone index 11 is the lower back
-	_skeletonUpperBodyMask[11] = true;
-	for (uint8_t boneIndex : _skeleton->getHierarchy())
-	{
-		uint8_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
-		if (parentIndex >= _skeleton->getBoneCount())
-			continue;
+	//// bone index 11 is the lower back
+	//_skeletonUpperBodyMask[11] = true;
+	//for (uint8_t boneIndex : _skeleton->getHierarchy())
+	//{
+	//	uint8_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
+	//	if (parentIndex >= _skeleton->getBoneCount())
+	//		continue;
 
-		if (_skeletonUpperBodyMask[parentIndex])
-			_skeletonUpperBodyMask[boneIndex] = true;
-	}
+	//	if (_skeletonUpperBodyMask[parentIndex])
+	//		_skeletonUpperBodyMask[boneIndex] = true;
+	//}
 
 	_boneMesh = new StickMesh(device);
 	_jointMesh = new CubeMesh(device, 0.25f);
@@ -101,18 +101,20 @@ pa::Character::~Character()
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
-	for (auto& animationController : _animationControllers)
-	{
-		animationController.update(deltaTime);
-	}
+	_animationControllers[1].update(deltaTime);
+	//for (auto& animationController : _animationControllers)
+	//{
+	//	animationController.update(deltaTime);
+	//}
 
-	_animationIdleWalk->update(deltaTime);
-	_animationWalkRun->update(deltaTime);
+	//_animationIdleWalk->update(deltaTime);
+	//_animationWalkRun->update(deltaTime);
 
 	using namespace DirectX;
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
+		//XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
+		XMVECTOR animationRotation = _animationControllers[1].getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneIndex(boneIndex);
@@ -161,16 +163,16 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
-	if (Keyboard::get()->getKeyState('W'))
-	{
-		_animationIdleWalk->addBlendWeight(-deltaTime * 0.5f);
-		_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
-	}
-	if (!Keyboard::get()->getKeyState('W'))
-	{
-		_animationIdleWalk->addBlendWeight(deltaTime * 0.5f);
-		_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
-	}
+	//if (Keyboard::get()->getKeyState('W'))
+	//{
+	//	_animationIdleWalk->addBlendWeight(-deltaTime * 0.5f);
+	//	_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
+	//}
+	//if (!Keyboard::get()->getKeyState('W'))
+	//{
+	//	_animationIdleWalk->addBlendWeight(deltaTime * 0.5f);
+	//	_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
+	//}
 
 
 

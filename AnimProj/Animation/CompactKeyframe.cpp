@@ -6,12 +6,12 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
-	float v[4] = {};
+	float elements[4] = {};
 
-	v[0] = XMVectorGetX(Q);
-	v[1] = XMVectorGetY(Q);
-	v[2] = XMVectorGetZ(Q);
-	v[3] = XMVectorGetW(Q);
+	elements[0] = XMVectorGetX(Q);
+	elements[1] = XMVectorGetY(Q);
+	elements[2] = XMVectorGetZ(Q);
+	elements[3] = XMVectorGetW(Q);
 	
 	int		maxIndex	= -1;
 	bool	maxSign		= false;
@@ -19,12 +19,12 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 
 	for (int i = 0; i < 4; i++)
 	{
-		float fabs = std::fabs(v[i]);
+		float fabs = std::fabs(elements[i]);
 		if (maxAbsValue < fabs)
 		{
 			maxAbsValue = fabs;
 			maxIndex	= i;
-			maxSign		= (v[i] < 0.0f);
+			maxSign		= (elements[i] < 0.0f);
 		}
 	}
 
@@ -114,23 +114,23 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	if (maxSign)
 		biggest = biggest * -1;
 
-	XMFLOAT4 decompressed = {};
-	XMStoreFloat4(&decompressed, Q);
+	XMFLOAT4 result = {};
+	XMStoreFloat4(&result, Q);
 
-	float *pDecompressed = &decompressed.x;
+	float *elements = &result.x;
 
 	for (int i = 3; 0 <= i; i--)
 	{
 		if (maxIndex == i)
 		{
-			pDecompressed[i] = biggest;
+			elements[i] = biggest;
 			break;
 		}
 
-		pDecompressed[i] = pDecompressed[i - 1];
+		elements[i] = elements[i - 1];
 	}
 
-	return XMLoadFloat4(&decompressed);
+	return XMLoadFloat4(&result);
 }
 
 DirectX::XMVECTOR pa::CompactKeyframe::decompressAsVector() const

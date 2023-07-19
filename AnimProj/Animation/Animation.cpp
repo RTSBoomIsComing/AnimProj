@@ -127,6 +127,15 @@ void pa::Animation::compressAnimation()
 	{
 		auto compact = CompactKeyframe::createFromQuaternion(XMLoadFloat4(&keyframe._v));
 		compact.keytime = keyframe._keytime;
+		using namespace DirectX;
+		XMVECTOR decomp = compact.decompressAsQuaternion();
+		XMVECTOR origin = XMLoadFloat4(&keyframe._v);
+		XMVECTOR comp = XMVectorNearEqual(origin, decomp, XMVectorReplicate(0.00003f));
+		assert(XMVectorGetX(comp));
+		assert(XMVectorGetY(comp));
+		assert(XMVectorGetZ(comp));
+		assert(XMVectorGetW(comp));
+		
 		_compactTrack.push_back(compact);
 	}
 }
@@ -141,7 +150,7 @@ void pa::Animation::testCreateTrack()
 		if (currentTrack.empty())
 			continue;
 
-		_trackCount++;
+		_trackDescriptors.push_back(i);
 
 		Keyframe keyframe{ currentTrack.front().key, i, currentTrack.front().v };
 		_rotationTrack.push_back(keyframe);
@@ -360,16 +369,16 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 
 bool pa::Animation::validateAnimationCompression()
 {
-	std::vector<std::array<Keyframe, 4>> active(_trackCount);
+	std::vector<std::array<Keyframe, 4>> active(_trackDescriptors.size());
 
 	//for (uint16_t i = 0; i < _trackCount * 4; i++)
 	//{
 	//	auto const& keyframe = _rotationTrack[i];
 	//	active[i / 4][i % 4] = keyframe;
 	//}
-	std::memcpy(active.data(), _rotationTrack.data(), sizeof(Keyframe) * 4 * _trackCount);
+	std::memcpy(active.data(), _rotationTrack.data(), sizeof(Keyframe) * 4 * _trackDescriptors.size());
 	
-	uint16_t cursor = _trackCount * 4;
+	uint16_t cursor = _trackDescriptors.size() * 4;
 	for (uint16_t t = 0; t < _duration; t++)
 	{
 		for (auto& cp : active)
