@@ -48,9 +48,6 @@
     <ClInclude Include="Rendering\Rendering.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Quantization.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ASFAMC\Acclaim.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -129,9 +126,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\Rendering.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\Quantization.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Sandbox.cpp">

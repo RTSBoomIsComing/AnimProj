@@ -93,10 +93,6 @@
     <ClInclude Include="Animation\IAnimationController.h" />
     <ClInclude Include="Animation\AnimationBlender.h" />
     <ClInclude Include="ASFAMC\Acclaim.h" />
-    <ClInclude Include="Animation\Quantization.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\AnimationController.h" />
     <ClInclude Include="Animation\CompactKeyframe.h" />
@@ -123,10 +119,6 @@
     <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="Animation\IAnimationController.cpp" />
     <ClCompile Include="ASFAMC\Acclaim.cpp" />
-    <ClCompile Include="Animation\Quantization.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
     <ClCompile Include="Animation\Keyframe.cpp" />
