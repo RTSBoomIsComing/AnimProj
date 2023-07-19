@@ -203,9 +203,6 @@ void pa::Animation::testCreateTrack()
 					Keyframe keyframe{ currentTrack[cursor].key, i, currentTrack[cursor].v };
 					_rotationTrack.push_back(keyframe);
 				}
-
-				//if (cursor == currentTrack.size() - 1)
-				//	_rotationTrack.push_back(keyframe);
 			}
 		}
 	}
