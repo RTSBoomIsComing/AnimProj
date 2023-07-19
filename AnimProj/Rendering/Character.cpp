@@ -13,27 +13,30 @@
 pa::Character::Character(ID3D11Device* device)
 {
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
+	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 	_skeleton = asf.createSkeleton();
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
-	amcDirectory += LR"(Assets\ASFAMC\subject02\)";
+	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
+	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
-	AMC amcIdle(amcDirectory	+ L"idle.amc");
-	AMC amcWalk(amcDirectory	+ L"walk.amc");
-	//AMC amcRun(amcDirectory		+ L"run_cyclic.amc");
+	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
+	//AMC amcIdle(amcDirectory	+ L"idle.amc");
+	//AMC amcWalk(amcDirectory	+ L"walk.amc");
+	//AMC amcRun(amcDirectory	+ L"run_cyclic.amc");
 	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
 	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
 	_animations.push_back(Animation(&asf, &amcIdle));
-	_animations.push_back(Animation(&asf, &amcWalk));
+	//_animations.push_back(Animation(&asf, &amcWalk));
 	//_animations.push_back(Animation(&asf, &amcRun));
 	//_animations.push_back(Animation(&asf, &amcJump));
 	//_animations.push_back(Animation(&asf, &amcPunch));
 
 	_animationControllers.push_back(AnimationController(&_animations[0]));
-	_animationControllers.push_back(AnimationController(&_animations[1]));
+	//_animationControllers.push_back(AnimationController(&_animations[1]));
 	//_animationControllers.push_back(AnimationController(&_animations[2]));
 	//_animationControllers.push_back(AnimationController(&_animations[3]));
 	//_animationControllers.push_back(AnimationController(&_animations[4]));
@@ -101,7 +104,7 @@ pa::Character::~Character()
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
-	_animationControllers[1].update(deltaTime);
+	_animationControllers[0].update(deltaTime);
 	//for (auto& animationController : _animationControllers)
 	//{
 	//	animationController.update(deltaTime);
@@ -114,7 +117,7 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
 		//XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
-		XMVECTOR animationRotation = _animationControllers[1].getBoneRotation(boneIndex);
+		XMVECTOR animationRotation = _animationControllers[0].getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneIndex(boneIndex);

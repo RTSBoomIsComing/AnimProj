@@ -91,7 +91,7 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 			if (hasRotation)
 			{
-				XMMATRIX rotation = ASF::eulerRotation(dataBuffer, acclaimSkeleton->_axisOrders[boneIndex]);
+				XMMATRIX rotation = ASF::eulerRotation(&dataBuffer[0], acclaimSkeleton->_axisOrders[boneIndex]);
 				XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
 
 				// move pre-rotation data of current bone to parent bone
@@ -114,12 +114,12 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 void pa::Animation::compressAnimation()
 {
-	for (auto& boneAnimation : _boneAnimation)
-	{
-		fitBoneAnimationCatmullRom(boneAnimation.rotation);
-		fitBoneAnimationCatmullRom(boneAnimation.position);
-		fitBoneAnimationCatmullRom(boneAnimation.scale);
-	}
+	//for (auto& boneAnimation : _boneAnimation)
+	//{
+	//	fitBoneAnimationCatmullRom(boneAnimation.rotation);
+	//	fitBoneAnimationCatmullRom(boneAnimation.position);
+	//	fitBoneAnimationCatmullRom(boneAnimation.scale);
+	//}
 
 	testCreateTrack();
 	bool isOk = this->validateAnimationCompression();
@@ -244,13 +244,13 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 
 				const XMVECTOR	difference = XMLoadFloat4(&frames[between].v) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
-				errors.back() += error;
+				//errors.back() += error;
 
-				//if (errorSums.back() < error)
-				//{
-				//	errorSums.back() = error;
-				//	sectionMiddles.back() = between;
-				//}
+				if (errors.back() < error)
+				{
+					errors.back() = error;
+					midPoints.back() = between;
+				}
 			}
 
 			P0 = P1;
@@ -378,7 +378,7 @@ bool pa::Animation::validateAnimationCompression()
 	//}
 	std::memcpy(active.data(), _rotationTrack.data(), sizeof(Keyframe) * 4 * _trackDescriptors.size());
 	
-	uint16_t cursor = _trackDescriptors.size() * 4;
+	uint32_t cursor = _trackDescriptors.size() * 4;
 	for (uint16_t t = 0; t < _duration; t++)
 	{
 		for (auto& cp : active)

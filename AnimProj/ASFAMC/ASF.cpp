@@ -337,7 +337,7 @@ void pa::ASF::correctSkeleton()
 
 		const XMVECTOR correctRotation = XMQuaternionMultiply(XMLoadFloat4(&_boneRotations[boneIndex]),
 			XMQuaternionInverse(XMLoadFloat4(&_boneRotations[parentIndex])));
-		XMStoreFloat4(&correctRotations[boneIndex], correctRotation);
+		XMStoreFloat4(&correctRotations[boneIndex], XMQuaternionNormalize(correctRotation));
 	}
 
 	_boneTranslations = correctTranslations;
