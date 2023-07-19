@@ -90,7 +90,7 @@
     <ClInclude Include="Animation\AnimationPose.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CompactKeyframe.h">
+    <ClInclude Include="Animation\CompactKeyframe.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -173,7 +173,7 @@
     <ClCompile Include="Animation\AnimationPose.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="CompactKeyframe.cpp">
+    <ClCompile Include="Animation\CompactKeyframe.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

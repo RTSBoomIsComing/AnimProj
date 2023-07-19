@@ -99,7 +99,7 @@
     </ClInclude>
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\AnimationController.h" />
-    <ClInclude Include="CompactKeyframe.h" />
+    <ClInclude Include="Animation\CompactKeyframe.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Animation\Keyframe.h" />
     <ClInclude Include="Rendering\Character.h" />
@@ -130,7 +130,7 @@
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
     <ClCompile Include="Animation\Keyframe.cpp" />
-    <ClCompile Include="CompactKeyframe.cpp" />
+    <ClCompile Include="Animation\CompactKeyframe.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />

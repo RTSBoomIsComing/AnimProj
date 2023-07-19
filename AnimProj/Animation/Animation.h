@@ -1,6 +1,7 @@
 // author: Changwan Yu
 #pragma once
 #include "Keyframe.h"
+#include "CompactKeyframe.h"
 namespace pa
 {
 	class ASF;
@@ -38,13 +39,14 @@ namespace pa
 	private:
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
-
+		bool				validateAnimationCompression();
 	private:
 		size_t							_duration			= 0;
 		std::vector<BoneAnimation>		_boneAnimation;
 
 		uint16_t						_trackCount			= 0;
 		std::vector<Keyframe>			_rotationTrack;
+		std::vector<CompactKeyframe>	_compactTrack;
 	};
 }
 
