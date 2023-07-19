@@ -22,7 +22,10 @@ namespace pa
 			};
 		};
 
-		static CompactKeyframe createQuaternion(DirectX::XMVECTOR Q);
-		static CompactKeyframe createVector(DirectX::XMVECTOR V);
+		static CompactKeyframe createFromQuaternion(DirectX::XMVECTOR Q);
+		static CompactKeyframe createFromVector(DirectX::XMVECTOR V);
+
+		DirectX::XMVECTOR decompressAsQuaternion()	const;
+		DirectX::XMVECTOR decompressAsVector()		const;
 	};
 }
