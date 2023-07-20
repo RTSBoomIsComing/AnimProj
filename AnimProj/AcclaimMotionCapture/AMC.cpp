@@ -48,7 +48,7 @@ bool pa::AMC::loadFromFile(const wchar_t* filePath)
 		// so when read data of first frame, get the names of the bones
 		subStream >> boneName;
 		if (1 == _frameCount)
-			_dataOrder.push_back(boneName);
+			_boneNames.push_back(boneName);
 
 		float buffer;
 		while (subStream >> buffer)

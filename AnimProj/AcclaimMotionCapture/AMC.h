@@ -23,7 +23,7 @@ namespace pa
 	private:
 		int								_frameCount;
 		std::vector<float>				_data;
-		std::vector<std::string>		_dataOrder;
+		std::vector<std::string>		_boneNames;
 	};
 }
 

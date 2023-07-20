@@ -81,9 +81,6 @@
     <ClInclude Include="Animation\AnimationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Keyframe.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\AnimationPose.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -165,9 +162,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AnimationManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\Keyframe.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AnimationPose.cpp">

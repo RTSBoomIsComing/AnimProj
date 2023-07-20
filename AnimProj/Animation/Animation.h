@@ -36,8 +36,8 @@ namespace pa
 
 		bool				initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void				compressAnimation();
-		inline size_t		getDuration()				const { return _duration; }
-		inline size_t		getBoneCount()				const { return _boneCount; }
+		inline uint16_t		getDuration()				const { return _duration; }
+		inline uint16_t		getBoneCount()				const { return _boneCount; }
 
 		void				createDetailedStream();
 		void				createCompactStream();
@@ -46,7 +46,7 @@ namespace pa
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe>& frames, float threshold = 0.00005f);
 		bool				validateDetailedStream();
 	private:
-		size_t							_duration			= 0;
+		uint16_t							_duration			= 0;
 		uint16_t						_boneCount			= 0;
 
 		// raw animation tracks

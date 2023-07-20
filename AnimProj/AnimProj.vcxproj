@@ -99,10 +99,6 @@
     <ClInclude Include="Animation\AnimationController.h" />
     <ClInclude Include="Animation\CompactKeyframe.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Animation\Keyframe.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
@@ -128,10 +124,6 @@
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
-    <ClCompile Include="Animation\Keyframe.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Animation\CompactKeyframe.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />

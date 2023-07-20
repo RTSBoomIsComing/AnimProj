@@ -21,26 +21,22 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 	if (nullptr == acclaimMotion)
 		return false;
 
-	_boneCount = acclaimSkeleton->getBoneCount();
-
 	// If frameCount is 121 then total duration is 120
 	// Because the frameIndex 0 is just base pose and not included in duration
 	_duration = acclaimMotion->getFrameCount() - 1;
+	_boneCount = acclaimSkeleton->getBoneCount();
 
-	std::vector<size_t> fitBones;
-	fitBones.reserve(acclaimMotion->_dataOrder.size());
+	std::vector<uint16_t> boneOrder;
+	boneOrder.reserve(acclaimMotion->_boneNames.size());
 
-	for (const auto& name : acclaimMotion->_dataOrder)
+	for (const auto& name : acclaimMotion->_boneNames)
 	{
-		auto findIterator = std::find(acclaimSkeleton->_boneNameList.begin(), acclaimSkeleton->_boneNameList.end(), name);
-		size_t index = std::distance(acclaimSkeleton->_boneNameList.begin(), findIterator);
-		fitBones.push_back(index);
+		auto findIt		= std::find(acclaimSkeleton->_boneNameList.begin(), acclaimSkeleton->_boneNameList.end(), name);
+		size_t boneID	= std::distance(acclaimSkeleton->_boneNameList.begin(), findIt);
+		boneOrder.push_back(boneID);
 	}
 
-	std::vector<uint16_t> boneToRotationTrack(_boneCount);
-	std::vector<uint16_t> boneToTranslationTrack(_boneCount);
-
-	for (size_t boneIndex : fitBones)
+	for (size_t boneID : boneOrder)
 	{
 		bool hasTranslation = false;
 		bool hasRotation = false;
@@ -49,7 +45,7 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 		float dataBuffer[7] = {};
 		for (int j = 0; j < 7; j++)
 		{
-			const ASF::Channel& channel = acclaimSkeleton->_DOFs[boneIndex].channels[j];
+			const ASF::Channel& channel = acclaimSkeleton->_DOFs[boneID].channels[j];
 			if (ASF::Channel::LN == channel)
 				DebugBreak();
 
@@ -62,20 +58,15 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 			if (ASF::Channel::RX == channel || ASF::Channel::RY == channel || ASF::Channel::RZ == channel)
 				hasRotation = true;
 		}
+
 		if (hasRotation)
 		{
-			uint16_t parentIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
-			// exception about root that has no parent
-			if (boneIndex == 0)
-				parentIndex = 0;
-
-			boneToRotationTrack[parentIndex] = _rotationTrackDescriptors.size();
-			_rotationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(parentIndex), 1 });
+			_rotationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(boneID), 1 });
 		}
 
 		if (hasTranslation)
 		{
-			_translationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(boneIndex), 2 });
+			_translationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(boneID), 2 });
 		}
 	}
 
@@ -86,7 +77,9 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 	size_t dataIndex = 0;
 	for (int frameIndex = 0; frameIndex < acclaimMotion->getFrameCount(); frameIndex++)
 	{
-		for (size_t boneIndex : fitBones)
+		size_t rotationTrackCursor		= 0;
+		size_t translationTrackCursor	= 0;
+		for (size_t boneIndex : boneOrder)
 		{
 			bool hasTranslation = false;
 			bool hasRotation = false;
@@ -132,10 +125,7 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 				XMVECTOR position = XMVectorSet(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
 				XMStoreFloat4(&frame.v, position);
 
-				uint16_t trackID = boneToTranslationTrack[boneIndex];
-				//frame.id = trackID;
-				_translationTracks[trackID].push_back(frame);
-				//_boneAnimation[boneIndex].position.push_back(frame);
+				_translationTracks[translationTrackCursor++].push_back(frame);
 			}
 
 			if (hasRotation)
@@ -144,34 +134,15 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 				XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
 				XMStoreFloat4(&frame.v, quaternion);
 
-				// move pre-rotation data of current bone to parent bone
-				uint16_t parentIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
-				// exception about root that has no parent
-				if (boneIndex == 0)
-					parentIndex = 0;
-				
-				
-				uint16_t trackID = boneToRotationTrack[parentIndex];
-				//frame.id = trackID;
-
-				_rotationTracks[trackID].push_back(frame);
+				_rotationTracks[rotationTrackCursor++].push_back(frame);
 			}
 		}
 	}
 
-	// populate translation tracks
-	//for (const auto& boneAnimation : _boneAnimation)
-	//{
-	//	if (!boneAnimation.position.empty())
-	//		_translationTracks.push_back(boneAnimation.position);
-	//	
-	//	if (!boneAnimation.rotation.empty())
-	//		_rotationTracks.push_back(boneAnimation.rotation);
-	//
-	//	if (!boneAnimation.scale.empty())
-	//		_scaleTracks.push_back(boneAnimation.scale);
-	//}
-
+	for (auto& descriptor : _rotationTrackDescriptors)
+	{
+		descriptor.id = (descriptor.id > 0) ? acclaimSkeleton->getParentBoneIndex(descriptor.id) : 0;
+	}
 
 	return true;
 }
