@@ -4,7 +4,7 @@
 
 pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR Q)
 {
-	// decompress error is 0.000021579
+	// max compression error is 0.000021579
 	// 1 * sqrt(2) / 65535 = 0.000021579
 
 
@@ -32,10 +32,9 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 		}
 	}
 	
-	// 1 / sqrt(2)
-	constexpr float		sqrt1_2 = 0.707106781186547524401f;
-	// from	: -1/sqrt2	<= X <=	1/sqrt2
+	// from	: -1/sqrt(2)<= X <=	1/sqrt(2)
 	// to	: -1/2		<= X <=	1/2
+	constexpr float		sqrt1_2 = 0.707106781186547524401f; /* 1/sqrt(2) */
 	Q = Q * sqrt1_2;
 
 	// from : -1/2		<= X <=	1/2
@@ -47,23 +46,30 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 	// to	: 0			<= X <= 65535
 	Q = Q * std::numeric_limits<uint16_t>::max();
 
+	switch (biggestPosition)
+	{
+	case 3:
+		// Do nothing
+		// Q = XMVectorSwizzle<0, 1, 2, 3>(Q);
+		break;
+	case 0:
+		Q = XMVectorSwizzle<3, 1, 2, 0>(Q);
+		break;
+	case 1:
+		Q = XMVectorSwizzle<0, 3, 2, 1>(Q);
+		break;	
+	case 2:
+		Q = XMVectorSwizzle<0, 1, 3, 2>(Q);
+		break;
+	}
+
+	Q = XMVectorSetW(Q, 0.0f);
+
 	CompactKeyframe keyframe = {};
 	XMStoreUShort4(&keyframe.asUShort4, Q);
 
-	int needShift = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		if (biggestPosition == i)
-			needShift = 1;
-
-		keyframe.v[i] = keyframe.v[i + needShift];
-	}
-	
-	keyframe.v[3] = 0;
 	keyframe.opt_0 = static_cast<uint16_t>(biggestSign);
 	keyframe.opt_1 = static_cast<uint16_t>(biggestPosition);
-
-
 
 	return keyframe;
 }
@@ -100,12 +106,14 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	Q = Q - XMVectorReplicate(0.5f);
 
 	// from	: -1/2		<= X <=	1/2
-	// to	: -1/sqrt2	<= X <=	1/sqrt2 
-	// NOTE : 1/sqrt2 == sqrt2 / 2
+	// to	: -1/sqrt(2)<= X <=	1/sqrt(2) 
+	// NOTE : 1/sqrt(2)	== sqrt(2)/2
 	constexpr float		sqrt2 = 1.41421356237309504880f;
 	Q = Q * sqrt2;
 
-	XMVectorSetW(Q, 0.0f);
+	// Can skip this
+	// XMVector3LengthSq only use X,Y,Z components
+	//Q = XMVectorSetW(Q, 0.0f);
 
 	const float lengthSq = XMVectorGetX(XMVector3LengthSq(Q));
 	float biggest = 1 - lengthSq;
@@ -114,23 +122,26 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	if (biggestSign)
 		biggest = biggest * -1;
 
-	XMFLOAT4 result = {};
-	XMStoreFloat4(&result, Q);
+	Q = XMVectorSetW(Q, biggest);
 
-	float *elements = &result.x;
-
-	for (int i = 3; 0 <= i; i--)
+	switch (biggestPosition)
 	{
-		if (biggestPosition == i)
-		{
-			elements[i] = biggest;
-			break;
-		}
-
-		elements[i] = elements[i - 1];
+	case 3:
+		// Do nothing
+		// Q = XMVectorSwizzle<0, 1, 2, 3>(Q);
+		break;
+	case 0:
+		Q = XMVectorSwizzle<3, 1, 2, 0>(Q);
+		break;
+	case 1:
+		Q = XMVectorSwizzle<0, 3, 2, 1>(Q);
+		break;
+	case 2:
+		Q = XMVectorSwizzle<0, 1, 3, 2>(Q);
+		break;
 	}
 
-	return XMLoadFloat4(&result);
+	return Q;
 }
 
 DirectX::XMVECTOR pa::CompactKeyframe::decompressAsVector() const
@@ -139,7 +150,7 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsVector() const
 	using namespace DirectX::PackedVector;
 
 	XMVECTOR V = XMLoadHalf4(&this->asHalf4);
-	XMVectorSetW(V, 0.0f);
+	V = XMVectorSetW(V, 0.0f);
 
 	return V;
 }
