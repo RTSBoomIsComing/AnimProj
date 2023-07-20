@@ -2,20 +2,14 @@
 #include "pch.h"
 #include "CompactKeyframe.h"
 
+// max compression error is 0.000021579
+// 1 * sqrt(2) / 65535 = 0.000021579
 pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR Q)
 {
-	// max compression error is 0.000021579
-	// 1 * sqrt(2) / 65535 = 0.000021579
-
-
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
-	float elements[4] = {};
-
-	elements[0] = XMVectorGetX(Q);
-	elements[1] = XMVectorGetY(Q);
-	elements[2] = XMVectorGetZ(Q);
-	elements[3] = XMVectorGetW(Q);
+	XMFLOAT4 elements = {};
+	XMStoreFloat4(&elements, Q);
 	
 	int		biggestPosition	= -1;
 	bool	biggestSign		= false;
@@ -23,12 +17,13 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 
 	for (int i = 0; i < 4; i++)
 	{
-		float fabs = std::fabs(elements[i]);
+		const float element	= (&elements.x)[i];
+		const float fabs	= std::fabs(element);
 		if (biggestValue < fabs)
 		{
 			biggestValue = fabs;
 			biggestPosition	= i;
-			biggestSign		= (elements[i] < 0.0f);
+			biggestSign		= (element < 0.0f);
 		}
 	}
 	
@@ -86,6 +81,8 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromVector(DirectX::XMVECTOR V)
 	return keyframe;
 }
 
+// max compression error is 0.000021579
+// 1 * sqrt(2) / 65535 = 0.000021579
 DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 {
 	using namespace DirectX;
