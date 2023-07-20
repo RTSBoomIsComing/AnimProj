@@ -13,11 +13,21 @@ namespace pa
 	public:
 		struct Frame
 		{
-			uint16_t			key		= std::numeric_limits<uint16_t>::max();
-
 			// scale, position or rotation(quaternion)
-			DirectX::XMFLOAT4	v		= {};
+			uint16_t			keytime		= std::numeric_limits<uint16_t>::max();
+			uint16_t			id			= std::numeric_limits<uint16_t>::max();
+			DirectX::XMFLOAT4	v			= {};
 		};
+
+		struct TrackDescriptor
+		{
+			uint16_t	id		: 14;
+
+			// scale : 0, rotation: 1, tanslation: 2
+			uint16_t	channel	: 2;	
+		};
+
+		using Track			= std::vector<Frame>;
 
 		struct BoneAnimation
 		{
@@ -35,17 +45,22 @@ namespace pa
 		inline size_t		getDuration()				const { return _duration; }
 		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
 
-		void				testCreateTrack();
+		void				createDetailedTrack();
 	private:
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
-		bool				validateAnimationCompression();
+		bool				validateDetailedTrack();
 	private:
 		size_t							_duration			= 0;
 		std::vector<BoneAnimation>		_boneAnimation;
 
-		std::vector<uint16_t>			_trackDescriptors;
-		std::vector<Keyframe>			_rotationTrack;
+		// raw animation tracks
+		std::vector<Track>				_scaleTracks;
+		std::vector<Track>				_rotationTracks;
+		std::vector<Track>				_translationTracks;
+
+		std::vector<TrackDescriptor>	_trackDescriptors;
+		std::vector<Keyframe>			_detailedTrack;
 		std::vector<CompactKeyframe>	_compactTrack;
 	};
 }

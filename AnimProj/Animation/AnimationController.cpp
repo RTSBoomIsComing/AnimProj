@@ -69,7 +69,7 @@ void pa::AnimationController::update(float deltaTime)
 
 		//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
-		_rotations[_animation->_trackDescriptors[i]] = 
+		_rotations[_animation->_trackDescriptors[i].id] = 
 			XMQuaternionSlerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
 		
 		//_rotations[_animation->_trackDescriptors[i]] = 
@@ -110,7 +110,7 @@ DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std
 	Animation::Frame findFrame{ key };
 	auto findIt = std::upper_bound(frames.begin() + offset, frames.end(), findFrame,
 		[](Animation::Frame const& f1, Animation::Frame const& f2) {
-			return f1.key < f2.key;
+			return f1.keytime < f2.keytime;
 		});
 
 	size_t	index2 = findIt != frames.end() ? std::distance(frames.begin(), findIt) : 0;
@@ -118,10 +118,10 @@ DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std
 	size_t	index1 = (index2 > 0) ? index2 - 1 : frames.size() - 1;
 	size_t	index0 = (index1 > 0) ? index1 - 1 : frames.size() - 1;
 
-	int 	P0 = frames[index0].key;
-	int 	P1 = frames[index1].key;
-	int 	P2 = frames[index2].key;
-	int 	P3 = frames[index3].key;
+	int 	P0 = frames[index0].keytime;
+	int 	P1 = frames[index1].keytime;
+	int 	P2 = frames[index2].keytime;
+	int 	P3 = frames[index3].keytime;
 
 	assert(P1 != P2);
 	assert(P1 <= static_cast<int>(key));

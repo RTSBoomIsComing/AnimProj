@@ -80,11 +80,13 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 			dataBuffer[6] *= acclaimSkeleton->_unitLength;
 
+			Animation::Frame frame = {};
+			frame.keytime = frameIndex;
+			frame.id = boneIndex;
+
 			if (hasTranslation)
 			{
-				XMVECTOR position = XMVECTOR{ dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f };
-				Animation::Frame frame = {};
-				frame.key = frameIndex;
+				XMVECTOR position = XMVectorSet(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
 				XMStoreFloat4(&frame.v, position);
 				_boneAnimation[boneIndex].position.push_back(frame);
 			}
@@ -101,13 +103,26 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 				if (boneIndex == 0)
 					preRotationPropagateBoneIndex = 0;
 				
-				Animation::Frame frame = {};
-				frame.key = frameIndex;
+
 				XMStoreFloat4(&frame.v, quaternion);
 				_boneAnimation[preRotationPropagateBoneIndex].rotation.push_back(frame);
 			}
 		}
 	}
+
+	// populate translation tracks
+	for (const auto& boneAnimation : _boneAnimation)
+	{
+		if (!boneAnimation.position.empty())
+			_translationTracks.push_back(boneAnimation.position);
+		
+		if (!boneAnimation.rotation.empty())
+			_rotationTracks.push_back(boneAnimation.rotation);
+		
+		if (!boneAnimation.scale.empty())
+			_scaleTracks.push_back(boneAnimation.scale);
+	}
+
 
 	return true;
 }
@@ -121,9 +136,10 @@ void pa::Animation::compressAnimation()
 		fitBoneAnimationCatmullRom(boneAnimation.scale);
 	}
 
-	testCreateTrack();
-	bool isOk = this->validateAnimationCompression();
-	for (const auto& keyframe : _rotationTrack)
+	createDetailedTrack();
+
+
+	for (const auto& keyframe : _detailedTrack)
 	{
 		auto compact = CompactKeyframe::createFromQuaternion(XMLoadFloat4(&keyframe._v));
 		compact.keytime = keyframe._keytime;
@@ -140,7 +156,7 @@ void pa::Animation::compressAnimation()
 	}
 }
 
-void pa::Animation::testCreateTrack()
+void pa::Animation::createDetailedTrack()
 {
 
 	std::vector<uint16_t> cursors(_boneAnimation.size(), 0ui16);
@@ -150,23 +166,24 @@ void pa::Animation::testCreateTrack()
 		if (currentTrack.empty())
 			continue;
 
-		_trackDescriptors.push_back(i);
+		
+		_trackDescriptors.push_back(TrackDescriptor{ i, 1 });
 
-		Keyframe keyframe{ currentTrack.front().key, i, currentTrack.front().v };
-		_rotationTrack.push_back(keyframe);
-		_rotationTrack.push_back(keyframe);
+		Keyframe keyframe{ currentTrack.front().keytime, i, currentTrack.front().v };
+		_detailedTrack.push_back(keyframe);
+		_detailedTrack.push_back(keyframe);
 
-		keyframe._keytime	= currentTrack[1].key;
+		keyframe._keytime	= currentTrack[1].keytime;
 		keyframe._v			= currentTrack[1].v;
-		_rotationTrack.push_back(keyframe);
+		_detailedTrack.push_back(keyframe);
 
 		if (2 < currentTrack.size())
 		{
-			keyframe._keytime	= currentTrack[2].key;
+			keyframe._keytime	= currentTrack[2].keytime;
 			keyframe._v			= currentTrack[2].v;
 		}
 
-		_rotationTrack.push_back(keyframe);
+		_detailedTrack.push_back(keyframe);
 		cursors[i] = 2;
 
 	}
@@ -181,24 +198,27 @@ void pa::Animation::testCreateTrack()
 			if (currentTrack.size() == cursor)
 				continue;
 
-			if (currentTrack[cursor - 1].key == currentKeytime)
+			if (currentTrack[cursor - 1].keytime == currentKeytime)
 			{
 				cursor += 1;
 				//assert(cursor < currentTrack.size());
 				if (cursor == currentTrack.size())
 				{
 
-					Keyframe keyframe{ currentTrack.back().key , i, currentTrack.back().v };
-					_rotationTrack.push_back(keyframe);
+					Keyframe keyframe{ currentTrack.back().keytime , i, currentTrack.back().v };
+					_detailedTrack.push_back(keyframe);
 				}
 				else
 				{
-					Keyframe keyframe{ currentTrack[cursor].key, i, currentTrack[cursor].v };
-					_rotationTrack.push_back(keyframe);
+					Keyframe keyframe{ currentTrack[cursor].keytime, i, currentTrack[cursor].v };
+					_detailedTrack.push_back(keyframe);
 				}
 			}
 		}
 	}
+
+	if (!this->validateDetailedTrack())
+		DebugBreak();
 }
 
 void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold)
@@ -367,16 +387,16 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 
 }
 
-bool pa::Animation::validateAnimationCompression()
+bool pa::Animation::validateDetailedTrack()
 {
 	std::vector<std::array<Keyframe, 4>> active(_trackDescriptors.size());
 
 	//for (uint16_t i = 0; i < _trackCount * 4; i++)
 	//{
-	//	auto const& keyframe = _rotationTrack[i];
+	//	auto const& keyframe = _detailedTrack[i];
 	//	active[i / 4][i % 4] = keyframe;
 	//}
-	std::memcpy(active.data(), _rotationTrack.data(), sizeof(Keyframe) * 4 * _trackDescriptors.size());
+	std::memcpy(active.data(), _detailedTrack.data(), sizeof(Keyframe) * 4 * _trackDescriptors.size());
 	
 	uint32_t cursor = _trackDescriptors.size() * 4;
 	for (uint16_t t = 0; t < _duration; t++)
@@ -388,7 +408,7 @@ bool pa::Animation::validateAnimationCompression()
 				cp[0] = cp[1];
 				cp[1] = cp[2];
 				cp[2] = cp[3];
-				cp[3] = _rotationTrack[cursor++];
+				cp[3] = _detailedTrack[cursor++];
 			}
 			assert(cp[0]._bone == cp[1]._bone 
 				&& cp[1]._bone == cp[2]._bone
