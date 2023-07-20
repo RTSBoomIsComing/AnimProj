@@ -5,7 +5,7 @@
 pa::AnimationController::AnimationController(const Animation* animation)
 	: _animation(animation)
 {
-	_rotations.resize(animation->getBoneAnimationCount(), {0.0f, 0.0f, 0.0f, 1.0f});
+	_rotations.resize(animation->getBoneCount(), {0.0f, 0.0f, 0.0f, 1.0f});
 	_duration = static_cast<uint32_t>(_animation->getDuration());
 	assert(_duration > 0);
 }
@@ -18,7 +18,7 @@ void pa::AnimationController::update(float deltaTime)
 	IAnimationController::update(deltaTime);
 
 
-	static std::vector<std::array<CompactKeyframe, 4>> active(_animation->_trackDescriptors.size());
+	static std::vector<std::array<CompactKeyframe, 4>> active(_animation->_rotationTrackDescriptors.size());
 	static uint32_t cursor = 0;
 	static uint32_t timeCursor = 0;
 	float elipsedFrame = _runningTime * fps;
@@ -36,15 +36,15 @@ void pa::AnimationController::update(float deltaTime)
 
 	if (0 == cursor)
 	{
-		cursor = _animation->_trackDescriptors.size() * 4;
-		std::memcpy(active.data(), _animation->_compactTrack.data(), sizeof(CompactKeyframe) * cursor);
+		cursor = _animation->_rotationTrackDescriptors.size() * 4;
+		std::memcpy(active.data(), _animation->_compactStream.data(), sizeof(CompactKeyframe) * cursor);
 	}
 
 	for (; timeCursor <= 1 + static_cast<uint32_t>(elipsedFrame); timeCursor++)
 	{
 		for (auto& cp : active)
 		{
-			if (cursor == _animation->_compactTrack.size())
+			if (cursor == _animation->_compactStream.size())
 				break;
 
 			if (static_cast<float>(cp[2].keytime) < timeCursor)
@@ -52,7 +52,7 @@ void pa::AnimationController::update(float deltaTime)
 				cp[0] = cp[1];
 				cp[1] = cp[2];
 				cp[2] = cp[3];
-				cp[3] = _animation->_compactTrack[cursor++];
+				cp[3] = _animation->_compactStream[cursor++];
 			}
 		}
 	}
@@ -69,7 +69,7 @@ void pa::AnimationController::update(float deltaTime)
 
 		//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
-		_rotations[_animation->_trackDescriptors[i].id] = 
+		_rotations[_animation->_rotationTrackDescriptors[i].id] =
 			XMQuaternionSlerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
 		
 		//_rotations[_animation->_trackDescriptors[i]] = 
@@ -82,7 +82,8 @@ void pa::AnimationController::update(float deltaTime)
 		//	cp[3].decompressAsQuaternion(), weight));
 	}
 
-	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
+	// regacy, catmullrom with binary search
+	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneCount(); boneIndex++)
 	//{
 	//	XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
 	//		_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
@@ -95,7 +96,7 @@ DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uin
 	return _rotations[boneIndex];
 }
 
-DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame> const& frames, uint32_t key, uint32_t offset) const
+DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe> const& frames, uint32_t key, uint32_t offset) const
 {
 	using namespace DirectX;
 
@@ -107,9 +108,9 @@ DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std
 	uint32_t keyModular = static_cast<uint32_t>(_duration) + 1;
 	key = key % keyModular;
 
-	Animation::Frame findFrame{ key };
+	Animation::Keyframe findFrame{ key };
 	auto findIt = std::upper_bound(frames.begin() + offset, frames.end(), findFrame,
-		[](Animation::Frame const& f1, Animation::Frame const& f2) {
+		[](Animation::Keyframe const& f1, Animation::Keyframe const& f2) {
 			return f1.keytime < f2.keytime;
 		});
 

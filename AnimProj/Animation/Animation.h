@@ -1,6 +1,6 @@
 // author: Changwan Yu
 #pragma once
-#include "Keyframe.h"
+//#include "Keyframe.h"
 #include "CompactKeyframe.h"
 namespace pa
 {
@@ -11,7 +11,7 @@ namespace pa
 		friend class AnimationController;
 
 	public:
-		struct Frame
+		struct Keyframe
 		{
 			// scale, position or rotation(quaternion)
 			uint16_t			keytime		= std::numeric_limits<uint16_t>::max();
@@ -27,14 +27,8 @@ namespace pa
 			uint16_t	channel	: 2;	
 		};
 
-		using Track			= std::vector<Frame>;
+		using Track			= std::vector<Keyframe>;
 
-		struct BoneAnimation
-		{
-			std::vector<Frame>	scale;
-			std::vector<Frame>	rotation;
-			std::vector<Frame>	position;
-		};
 	public:
 		Animation() = default;
 		Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
@@ -43,25 +37,32 @@ namespace pa
 		bool				initializeAnimation(const ASF* acclaimSkeleton, const AMC* acclaimMotion);
 		void				compressAnimation();
 		inline size_t		getDuration()				const { return _duration; }
-		inline size_t		getBoneAnimationCount()		const { return _boneAnimation.size(); }
+		inline size_t		getBoneCount()				const { return _boneCount; }
 
-		void				createDetailedTrack();
+		void				createDetailedStream();
+		void				createCompactStream();
 	private:
-		void				fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
-		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold = 0.00005f);
-		bool				validateDetailedTrack();
+		void				fitBoneAnimationCatmullRom(std::vector<Animation::Keyframe>& frames, float threshold = 0.00005f);
+		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe>& frames, float threshold = 0.00005f);
+		bool				validateDetailedStream();
 	private:
 		size_t							_duration			= 0;
-		std::vector<BoneAnimation>		_boneAnimation;
+		uint16_t						_boneCount			= 0;
 
 		// raw animation tracks
 		std::vector<Track>				_scaleTracks;
 		std::vector<Track>				_rotationTracks;
 		std::vector<Track>				_translationTracks;
 
-		std::vector<TrackDescriptor>	_trackDescriptors;
-		std::vector<Keyframe>			_detailedTrack;
-		std::vector<CompactKeyframe>	_compactTrack;
+		std::vector<TrackDescriptor>	_scaleTrackDescriptors;
+		std::vector<TrackDescriptor>	_rotationTrackDescriptors;
+		std::vector<TrackDescriptor>	_translationTrackDescriptors;
+
+
+
+
+		std::vector<Keyframe>			_detailedStream;
+		std::vector<CompactKeyframe>	_compactStream;
 	};
 }
 

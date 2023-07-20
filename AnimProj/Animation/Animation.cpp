@@ -21,12 +21,11 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 	if (nullptr == acclaimMotion)
 		return false;
 
+	_boneCount = acclaimSkeleton->getBoneCount();
 
 	// If frameCount is 121 then total duration is 120
 	// Because the frameIndex 0 is just base pose and not included in duration
 	_duration = acclaimMotion->getFrameCount() - 1;
-	_boneAnimation.resize(acclaimSkeleton->getBoneCount());
-
 
 	std::vector<size_t> fitBones;
 	fitBones.reserve(acclaimMotion->_dataOrder.size());
@@ -38,6 +37,51 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 		fitBones.push_back(index);
 	}
 
+	std::vector<uint16_t> boneToRotationTrack(_boneCount);
+	std::vector<uint16_t> boneToTranslationTrack(_boneCount);
+
+	for (size_t boneIndex : fitBones)
+	{
+		bool hasTranslation = false;
+		bool hasRotation = false;
+
+		// rx, ry, rz, tx, ty, tz, l
+		float dataBuffer[7] = {};
+		for (int j = 0; j < 7; j++)
+		{
+			const ASF::Channel& channel = acclaimSkeleton->_DOFs[boneIndex].channels[j];
+			if (ASF::Channel::LN == channel)
+				DebugBreak();
+
+			if (ASF::Channel::None == channel)
+				break;
+
+			if (ASF::Channel::TX == channel || ASF::Channel::TY == channel || ASF::Channel::TZ == channel)
+				hasTranslation = true;
+
+			if (ASF::Channel::RX == channel || ASF::Channel::RY == channel || ASF::Channel::RZ == channel)
+				hasRotation = true;
+		}
+		if (hasRotation)
+		{
+			uint16_t parentIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
+			// exception about root that has no parent
+			if (boneIndex == 0)
+				parentIndex = 0;
+
+			boneToRotationTrack[parentIndex] = _rotationTrackDescriptors.size();
+			_rotationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(parentIndex), 1 });
+		}
+
+		if (hasTranslation)
+		{
+			_translationTrackDescriptors.push_back(TrackDescriptor{ static_cast<uint16_t>(boneIndex), 2 });
+		}
+	}
+
+	_scaleTracks.resize(_scaleTrackDescriptors.size());
+	_rotationTracks.resize(_rotationTrackDescriptors.size());
+	_translationTracks.resize(_translationTrackDescriptors.size());
 
 	size_t dataIndex = 0;
 	for (int frameIndex = 0; frameIndex < acclaimMotion->getFrameCount(); frameIndex++)
@@ -80,48 +124,53 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 			dataBuffer[6] *= acclaimSkeleton->_unitLength;
 
-			Animation::Frame frame = {};
+			Animation::Keyframe frame = {};
 			frame.keytime = frameIndex;
-			frame.id = boneIndex;
 
 			if (hasTranslation)
 			{
 				XMVECTOR position = XMVectorSet(dataBuffer[3], dataBuffer[4], dataBuffer[5], 1.0f);
 				XMStoreFloat4(&frame.v, position);
-				_boneAnimation[boneIndex].position.push_back(frame);
+
+				uint16_t trackID = boneToTranslationTrack[boneIndex];
+				//frame.id = trackID;
+				_translationTracks[trackID].push_back(frame);
+				//_boneAnimation[boneIndex].position.push_back(frame);
 			}
 
 			if (hasRotation)
 			{
 				XMMATRIX rotation = ASF::eulerRotation(&dataBuffer[0], acclaimSkeleton->_axisOrders[boneIndex]);
 				XMVECTOR quaternion = XMQuaternionNormalize(XMQuaternionRotationMatrix(rotation));
+				XMStoreFloat4(&frame.v, quaternion);
 
 				// move pre-rotation data of current bone to parent bone
-				size_t preRotationPropagateBoneIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
-				
+				uint16_t parentIndex = acclaimSkeleton->getParentBoneIndex(boneIndex);
 				// exception about root that has no parent
 				if (boneIndex == 0)
-					preRotationPropagateBoneIndex = 0;
+					parentIndex = 0;
 				
+				
+				uint16_t trackID = boneToRotationTrack[parentIndex];
+				//frame.id = trackID;
 
-				XMStoreFloat4(&frame.v, quaternion);
-				_boneAnimation[preRotationPropagateBoneIndex].rotation.push_back(frame);
+				_rotationTracks[trackID].push_back(frame);
 			}
 		}
 	}
 
 	// populate translation tracks
-	for (const auto& boneAnimation : _boneAnimation)
-	{
-		if (!boneAnimation.position.empty())
-			_translationTracks.push_back(boneAnimation.position);
-		
-		if (!boneAnimation.rotation.empty())
-			_rotationTracks.push_back(boneAnimation.rotation);
-		
-		if (!boneAnimation.scale.empty())
-			_scaleTracks.push_back(boneAnimation.scale);
-	}
+	//for (const auto& boneAnimation : _boneAnimation)
+	//{
+	//	if (!boneAnimation.position.empty())
+	//		_translationTracks.push_back(boneAnimation.position);
+	//	
+	//	if (!boneAnimation.rotation.empty())
+	//		_rotationTracks.push_back(boneAnimation.rotation);
+	//
+	//	if (!boneAnimation.scale.empty())
+	//		_scaleTracks.push_back(boneAnimation.scale);
+	//}
 
 
 	return true;
@@ -129,61 +178,54 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 void pa::Animation::compressAnimation()
 {
-	for (auto& boneAnimation : _boneAnimation)
+	for (auto& track : _scaleTracks)
 	{
-		fitBoneAnimationCatmullRom(boneAnimation.rotation);
-		fitBoneAnimationCatmullRom(boneAnimation.position);
-		fitBoneAnimationCatmullRom(boneAnimation.scale);
+		fitBoneAnimationCatmullRom(track);
 	}
 
-	createDetailedTrack();
-
-
-	for (const auto& keyframe : _detailedTrack)
+	for (auto& track : _rotationTracks)
 	{
-		auto compact = CompactKeyframe::createFromQuaternion(XMLoadFloat4(&keyframe._v));
-		compact.keytime = keyframe._keytime;
-		using namespace DirectX;
-		XMVECTOR decomp = compact.decompressAsQuaternion();
-		XMVECTOR origin = XMLoadFloat4(&keyframe._v);
-		XMVECTOR comp = XMVectorNearEqual(origin, decomp, XMVectorReplicate(0.000022f));
-		assert(XMVectorGetX(comp));
-		assert(XMVectorGetY(comp));
-		assert(XMVectorGetZ(comp));
-		assert(XMVectorGetW(comp));
-		
-		_compactTrack.push_back(compact);
+		fitBoneAnimationCatmullRom(track);
 	}
+
+	for (auto& track : _translationTracks)
+	{
+		fitBoneAnimationCatmullRom(track);
+	}
+
+	createDetailedStream();
+	createCompactStream();
+
 }
 
-void pa::Animation::createDetailedTrack()
+void pa::Animation::createDetailedStream()
 {
 
-	std::vector<uint16_t> cursors(_boneAnimation.size(), 0ui16);
-	for (uint16_t i = 0; i < _boneAnimation.size(); i++)
+	std::vector<uint16_t> cursors(_rotationTracks.size(), 0ui16);
+	for (uint16_t i = 0; i < _rotationTracks.size(); i++)
 	{
-		const auto& currentTrack = _boneAnimation[i].rotation;
+		const auto& currentTrack = _rotationTracks[i];
 		if (currentTrack.empty())
-			continue;
+			DebugBreak();
 
-		
-		_trackDescriptors.push_back(TrackDescriptor{ i, 1 });
+		// 
+		Keyframe keyframe = currentTrack.front();
+		keyframe.id = i;
 
-		Keyframe keyframe{ currentTrack.front().keytime, i, currentTrack.front().v };
-		_detailedTrack.push_back(keyframe);
-		_detailedTrack.push_back(keyframe);
+		_detailedStream.push_back(keyframe);
+		_detailedStream.push_back(keyframe);
 
-		keyframe._keytime	= currentTrack[1].keytime;
-		keyframe._v			= currentTrack[1].v;
-		_detailedTrack.push_back(keyframe);
+		keyframe.keytime	= currentTrack[1].keytime;
+		keyframe.v			= currentTrack[1].v;
+		_detailedStream.push_back(keyframe);
 
 		if (2 < currentTrack.size())
 		{
-			keyframe._keytime	= currentTrack[2].keytime;
-			keyframe._v			= currentTrack[2].v;
+			keyframe.keytime	= currentTrack[2].keytime;
+			keyframe.v			= currentTrack[2].v;
 		}
 
-		_detailedTrack.push_back(keyframe);
+		_detailedStream.push_back(keyframe);
 		cursors[i] = 2;
 
 	}
@@ -191,9 +233,9 @@ void pa::Animation::createDetailedTrack()
 	
 	for (uint16_t currentKeytime = 0; currentKeytime < _duration; currentKeytime++)
 	{
-		for (uint16_t i = 0; i < _boneAnimation.size(); i++)
+		for (uint16_t i = 0; i < _rotationTracks.size(); i++)
 		{
-			const auto& currentTrack = _boneAnimation[i].rotation;
+			const auto& currentTrack = _rotationTracks[i];
 			uint16_t& cursor = cursors[i];
 			if (currentTrack.size() == cursor)
 				continue;
@@ -206,22 +248,41 @@ void pa::Animation::createDetailedTrack()
 				{
 
 					Keyframe keyframe{ currentTrack.back().keytime , i, currentTrack.back().v };
-					_detailedTrack.push_back(keyframe);
+					_detailedStream.push_back(keyframe);
 				}
 				else
 				{
 					Keyframe keyframe{ currentTrack[cursor].keytime, i, currentTrack[cursor].v };
-					_detailedTrack.push_back(keyframe);
+					_detailedStream.push_back(keyframe);
 				}
 			}
 		}
 	}
 
-	if (!this->validateDetailedTrack())
+	if (!this->validateDetailedStream())
 		DebugBreak();
 }
 
-void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& frames, float threshold)
+void pa::Animation::createCompactStream()
+{
+	for (const auto& keyframe : _detailedStream)
+	{
+		auto compact = CompactKeyframe::createFromQuaternion(XMLoadFloat4(&keyframe.v));
+		compact.keytime = keyframe.keytime;
+		using namespace DirectX;
+		XMVECTOR decomp = compact.decompressAsQuaternion();
+		XMVECTOR origin = XMLoadFloat4(&keyframe.v);
+		XMVECTOR comp = XMVectorNearEqual(origin, decomp, XMVectorReplicate(0.000022f));
+		assert(XMVectorGetX(comp));
+		assert(XMVectorGetY(comp));
+		assert(XMVectorGetZ(comp));
+		assert(XMVectorGetW(comp));
+
+		_compactStream.push_back(compact);
+	}
+}
+
+void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Keyframe>& frames, float threshold)
 {
 	using namespace DirectX;
 
@@ -294,7 +355,7 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 		samples[midPoints[std::distance(errors.begin(), findMaxError)]] = true;
 	}
 
-	std::vector<Animation::Frame> newframes;
+	std::vector<Animation::Keyframe> newframes;
 	for (size_t point = 0; point < frames.size(); point++)
 	{
 		if (samples[point])
@@ -303,7 +364,7 @@ void pa::Animation::fitBoneAnimationCatmullRom(std::vector<Animation::Frame>& fr
 	frames = newframes;
 }
 
-void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Frame>& frames, float threshold)
+void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe>& frames, float threshold)
 {
 	using namespace DirectX;
 
@@ -377,7 +438,7 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 	}
 
 
-	std::vector<Animation::Frame> newframes;
+	std::vector<Animation::Keyframe> newframes;
 	for (size_t point = 0; point < frames.size(); point++)
 	{
 		if (picked[point])
@@ -387,36 +448,36 @@ void pa::Animation::fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Fram
 
 }
 
-bool pa::Animation::validateDetailedTrack()
+bool pa::Animation::validateDetailedStream()
 {
-	std::vector<std::array<Keyframe, 4>> active(_trackDescriptors.size());
+	std::vector<std::array<Keyframe, 4>> active(_rotationTrackDescriptors.size());
 
 	//for (uint16_t i = 0; i < _trackCount * 4; i++)
 	//{
-	//	auto const& keyframe = _detailedTrack[i];
+	//	auto const& keyframe = _detailedStream[i];
 	//	active[i / 4][i % 4] = keyframe;
 	//}
-	std::memcpy(active.data(), _detailedTrack.data(), sizeof(Keyframe) * 4 * _trackDescriptors.size());
+	std::memcpy(active.data(), _detailedStream.data(), sizeof(Keyframe) * 4 * _rotationTrackDescriptors.size());
 	
-	uint32_t cursor = _trackDescriptors.size() * 4;
+	uint32_t cursor = _rotationTrackDescriptors.size() * 4;
 	for (uint16_t t = 0; t < _duration; t++)
 	{
 		for (auto& cp : active)
 		{
-			if (cp[2]._keytime < t)
+			if (cp[2].keytime < t)
 			{
 				cp[0] = cp[1];
 				cp[1] = cp[2];
 				cp[2] = cp[3];
-				cp[3] = _detailedTrack[cursor++];
+				cp[3] = _detailedStream[cursor++];
 			}
-			assert(cp[0]._bone == cp[1]._bone 
-				&& cp[1]._bone == cp[2]._bone
-				&& cp[2]._bone == cp[3]._bone);
+			assert(cp[0].id == cp[1].id
+				&& cp[1].id == cp[2].id
+				&& cp[2].id == cp[3].id);
 
-			assert(cp[0]._keytime <= cp[1]._keytime
-				&& cp[1]._keytime <= cp[2]._keytime
-				&& cp[2]._keytime <= cp[3]._keytime);
+			assert(cp[0].keytime <= cp[1].keytime
+				&& cp[1].keytime <= cp[2].keytime
+				&& cp[2].keytime <= cp[3].keytime);
 		}
 	}
 
