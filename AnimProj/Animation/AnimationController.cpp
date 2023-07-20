@@ -20,7 +20,8 @@ void pa::AnimationController::update(float deltaTime)
 
 	static std::vector<std::array<CompactKeyframe, 4>> active(_animation->_trackDescriptors.size());
 	static uint32_t cursor = 0;
-	uint32_t elipsedFrame = _runningTime * fps * 0.4f;
+	static uint32_t timeCursor = 0;
+	float elipsedFrame = _runningTime * fps;
 	//static float elipsedFrame = 0.0f;
 	//elipsedFrame += 0.1f;
 	static bool startup = true;
@@ -30,33 +31,28 @@ void pa::AnimationController::update(float deltaTime)
 		elipsedFrame = 0;
 		_runningTime = 0;
 		cursor = 0;
+		timeCursor = 0;
 	}
 
 	if (0 == cursor)
 	{
 		cursor = _animation->_trackDescriptors.size() * 4;
 		std::memcpy(active.data(), _animation->_compactTrack.data(), sizeof(CompactKeyframe) * cursor);
-		
 	}
 
-	bool done = false;
-	while (!done)
+	for (; timeCursor <= 1 + static_cast<uint32_t>(elipsedFrame); timeCursor++)
 	{
-		done = true;
 		for (auto& cp : active)
 		{
 			if (cursor == _animation->_compactTrack.size())
 				break;
 
-			if (static_cast<float>(cp[2].keytime) < elipsedFrame)
+			if (static_cast<float>(cp[2].keytime) < timeCursor)
 			{
 				cp[0] = cp[1];
 				cp[1] = cp[2];
 				cp[2] = cp[3];
 				cp[3] = _animation->_compactTrack[cursor++];
-
-				if (cp[2].keytime < elipsedFrame)
-					done = false;
 			}
 		}
 	}
@@ -73,8 +69,8 @@ void pa::AnimationController::update(float deltaTime)
 
 		//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
-		//_rotations[_animation->_trackDescriptors[i]] = 
-		//	XMQuaternionSlerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
+		_rotations[_animation->_trackDescriptors[i]] = 
+			XMQuaternionSlerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
 		
 		//_rotations[_animation->_trackDescriptors[i]] = 
 		//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
@@ -86,12 +82,12 @@ void pa::AnimationController::update(float deltaTime)
 		//	cp[3].decompressAsQuaternion(), weight));
 	}
 
-	for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
-	{
-		XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
-			_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
-		_rotations[boneIndex] = rotation;
-	}
+	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneAnimationCount(); boneIndex++)
+	//{
+	//	XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
+	//		_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
+	//	_rotations[boneIndex] = rotation;
+	//}
 }
 
 DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const

@@ -4,6 +4,10 @@
 
 pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR Q)
 {
+	// decompress error is 0.000021579
+	// 1 * sqrt(2) / 65535 = 0.000021579
+
+
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
 	float elements[4] = {};
@@ -13,22 +17,20 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 	elements[2] = XMVectorGetZ(Q);
 	elements[3] = XMVectorGetW(Q);
 	
-	int		maxIndex	= -1;
-	bool	maxSign		= false;
-	float	maxAbsValue	= -1.0f;
+	int		biggestPosition	= -1;
+	bool	biggestSign		= false;
+	float	biggestValue	= -1.0f;
 
 	for (int i = 0; i < 4; i++)
 	{
 		float fabs = std::fabs(elements[i]);
-		if (maxAbsValue < fabs)
+		if (biggestValue < fabs)
 		{
-			maxAbsValue = fabs;
-			maxIndex	= i;
-			maxSign		= (elements[i] < 0.0f);
+			biggestValue = fabs;
+			biggestPosition	= i;
+			biggestSign		= (elements[i] < 0.0f);
 		}
 	}
-
-	assert(maxIndex > -1);
 	
 	// 1 / sqrt(2)
 	constexpr float		sqrt1_2 = 0.707106781186547524401f;
@@ -51,15 +53,15 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 	int needShift = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		if (maxIndex == i)
+		if (biggestPosition == i)
 			needShift = 1;
 
 		keyframe.v[i] = keyframe.v[i + needShift];
 	}
 	
 	keyframe.v[3] = 0;
-	keyframe.opt_0 = static_cast<uint16_t>(maxSign);
-	keyframe.opt_1 = static_cast<uint16_t>(maxIndex);
+	keyframe.opt_0 = static_cast<uint16_t>(biggestSign);
+	keyframe.opt_1 = static_cast<uint16_t>(biggestPosition);
 
 
 
@@ -83,8 +85,8 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
 
-	uint16_t maxSign	= this->opt_0;
-	uint16_t maxIndex	= this->opt_1;
+	const uint16_t biggestSign		= this->opt_0;
+	const uint16_t biggestPosition	= this->opt_1;
 
 
 	XMVECTOR Q = XMLoadUShort4(&this->asUShort4);
@@ -97,12 +99,10 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	// to	: -1/2		<= X <=	1/2
 	Q = Q - XMVectorReplicate(0.5f);
 
-	// sqrt(2)
-	constexpr float		sqrt2 = 1.41421356237309504880f;
-
 	// from	: -1/2		<= X <=	1/2
 	// to	: -1/sqrt2	<= X <=	1/sqrt2 
 	// NOTE : 1/sqrt2 == sqrt2 / 2
+	constexpr float		sqrt2 = 1.41421356237309504880f;
 	Q = Q * sqrt2;
 
 	XMVectorSetW(Q, 0.0f);
@@ -111,7 +111,7 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	float biggest = 1 - lengthSq;
 	biggest = std::sqrtf(biggest);
 
-	if (maxSign)
+	if (biggestSign)
 		biggest = biggest * -1;
 
 	XMFLOAT4 result = {};
@@ -121,7 +121,7 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 
 	for (int i = 3; 0 <= i; i--)
 	{
-		if (maxIndex == i)
+		if (biggestPosition == i)
 		{
 			elements[i] = biggest;
 			break;

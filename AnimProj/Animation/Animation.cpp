@@ -114,12 +114,12 @@ bool pa::Animation::initializeAnimation(const ASF* acclaimSkeleton, const AMC* a
 
 void pa::Animation::compressAnimation()
 {
-	//for (auto& boneAnimation : _boneAnimation)
-	//{
-	//	fitBoneAnimationCatmullRom(boneAnimation.rotation);
-	//	fitBoneAnimationCatmullRom(boneAnimation.position);
-	//	fitBoneAnimationCatmullRom(boneAnimation.scale);
-	//}
+	for (auto& boneAnimation : _boneAnimation)
+	{
+		fitBoneAnimationCatmullRom(boneAnimation.rotation);
+		fitBoneAnimationCatmullRom(boneAnimation.position);
+		fitBoneAnimationCatmullRom(boneAnimation.scale);
+	}
 
 	testCreateTrack();
 	bool isOk = this->validateAnimationCompression();
@@ -130,7 +130,7 @@ void pa::Animation::compressAnimation()
 		using namespace DirectX;
 		XMVECTOR decomp = compact.decompressAsQuaternion();
 		XMVECTOR origin = XMLoadFloat4(&keyframe._v);
-		XMVECTOR comp = XMVectorNearEqual(origin, decomp, XMVectorReplicate(0.00003f));
+		XMVECTOR comp = XMVectorNearEqual(origin, decomp, XMVectorReplicate(0.000022f));
 		assert(XMVectorGetX(comp));
 		assert(XMVectorGetY(comp));
 		assert(XMVectorGetZ(comp));
