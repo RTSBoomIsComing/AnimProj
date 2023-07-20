@@ -36,10 +36,10 @@
     <ClInclude Include="Common\DirectX11Helper.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ASFAMC\ASF.h">
+    <ClInclude Include="AcclaimMotionCapture\ASF.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ASFAMC\AMC.h">
+    <ClInclude Include="AcclaimMotionCapture\AMC.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\Skeleton.h">
@@ -48,7 +48,7 @@
     <ClInclude Include="Rendering\Rendering.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ASFAMC\Acclaim.h">
+    <ClInclude Include="AcclaimMotionCapture\Acclaim.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\StickMesh.h">
@@ -90,6 +90,12 @@
     <ClInclude Include="Animation\CompactKeyframe.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\Win32Application.cpp">
@@ -116,10 +122,10 @@
     <ClCompile Include="Common\DirectX11Helper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ASFAMC\ASF.cpp">
+    <ClCompile Include="AcclaimMotionCapture\ASF.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ASFAMC\AMC.cpp">
+    <ClCompile Include="AcclaimMotionCapture\AMC.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\Skeleton.cpp">
@@ -131,7 +137,7 @@
     <ClCompile Include="Sandbox.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ASFAMC\Acclaim.cpp">
+    <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\StickMesh.cpp">
@@ -168,6 +174,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\CompactKeyframe.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

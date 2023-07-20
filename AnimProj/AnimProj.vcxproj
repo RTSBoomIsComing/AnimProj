@@ -89,10 +89,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
+    <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
     <ClInclude Include="Animation\AnimationPose.h" />
     <ClInclude Include="Animation\IAnimationController.h" />
     <ClInclude Include="Animation\AnimationBlender.h" />
-    <ClInclude Include="ASFAMC\Acclaim.h" />
+    <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\Animation.h" />
     <ClInclude Include="Animation\AnimationController.h" />
     <ClInclude Include="Animation\CompactKeyframe.h" />
@@ -101,10 +103,10 @@
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
-    <ClInclude Include="ASFAMC\AMC.h" />
+    <ClInclude Include="AcclaimMotionCapture\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
-    <ClInclude Include="ASFAMC\ASF.h" />
+    <ClInclude Include="AcclaimMotionCapture\ASF.h" />
     <ClInclude Include="Rendering\Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
     <ClInclude Include="Rendering\Mesh.h" />
@@ -115,10 +117,12 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
+    <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
     <ClCompile Include="Animation\AnimationPose.cpp" />
     <ClCompile Include="Animation\AnimationBlender.cpp" />
     <ClCompile Include="Animation\IAnimationController.cpp" />
-    <ClCompile Include="ASFAMC\Acclaim.cpp" />
+    <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
     <ClCompile Include="Animation\Keyframe.cpp" />
@@ -126,10 +130,10 @@
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
-    <ClCompile Include="ASFAMC\AMC.cpp" />
+    <ClCompile Include="AcclaimMotionCapture\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />
-    <ClCompile Include="ASFAMC\ASF.cpp" />
+    <ClCompile Include="AcclaimMotionCapture\ASF.cpp" />
     <ClCompile Include="Rendering\Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />

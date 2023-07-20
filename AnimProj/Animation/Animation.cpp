@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Animation.h"
-#include "../ASFAMC/ASF.h"
-#include "../ASFAMC/AMC.h"
+#include "../AcclaimMotionCapture/ASF.h"
+#include "../AcclaimMotionCapture/AMC.h"
 #include "Skeleton.h"
 
 pa::Animation::Animation(const ASF* acclaimSkeleton, const AMC* acclaimMotion)
