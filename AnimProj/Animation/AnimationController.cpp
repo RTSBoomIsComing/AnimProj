@@ -8,6 +8,9 @@ pa::AnimationController::AnimationController(const Animation* animation)
 	_rotations.resize(animation->getBoneCount(), {0.0f, 0.0f, 0.0f, 1.0f});
 	_duration = static_cast<uint32_t>(_animation->getDuration());
 	assert(_duration > 0);
+
+	_hotKeyframes.resize(_animation->_rotationTrackDescriptors.size());
+	initializeHotKeyframes();
 }
 
 void pa::AnimationController::update(float deltaTime)
@@ -16,50 +19,35 @@ void pa::AnimationController::update(float deltaTime)
 	constexpr int fps = 120;
 
 	IAnimationController::update(deltaTime);
-
-
-	static std::vector<std::array<CompactKeyframe, 4>> active(_animation->_rotationTrackDescriptors.size());
-	static uint32_t cursor = 0;
-	static uint32_t timeCursor = 0;
 	float elipsedFrame = _runningTime * fps;
-	//static float elipsedFrame = 0.0f;
-	//elipsedFrame += 0.1f;
-	static bool startup = true;
-	if (startup || _isCyclic && _duration < elipsedFrame)
+	if (_isCyclic && _duration < elipsedFrame)
 	{
-		startup = false;
 		elipsedFrame = 0;
 		_runningTime = 0;
-		cursor = 0;
-		timeCursor = 0;
+		_timeCursor = 0;
+		initializeHotKeyframes();
 	}
 
-	if (0 == cursor)
+	for (; _timeCursor <= 1 + static_cast<uint32_t>(elipsedFrame); _timeCursor++)
 	{
-		cursor = _animation->_rotationTrackDescriptors.size() * 4;
-		std::memcpy(active.data(), _animation->_compactStream.data(), sizeof(CompactKeyframe) * cursor);
-	}
-
-	for (; timeCursor <= 1 + static_cast<uint32_t>(elipsedFrame); timeCursor++)
-	{
-		for (auto& cp : active)
+		for (auto& cp : _hotKeyframes)
 		{
-			if (cursor == _animation->_compactStream.size())
+			if (_cursor == _animation->_compactStream.size())
 				break;
 
-			if (static_cast<float>(cp[2].keytime) < timeCursor)
+			if (static_cast<float>(cp[2].keytime) < _timeCursor)
 			{
 				cp[0] = cp[1];
 				cp[1] = cp[2];
 				cp[2] = cp[3];
-				cp[3] = _animation->_compactStream[cursor++];
+				cp[3] = _animation->_compactStream[_cursor++];
 			}
 		}
 	}
 	
-	for (int i = 0; i < active.size(); i++)
+	for (int i = 0; i < _hotKeyframes.size(); i++)
 	{
-		const auto& cp = active[i];
+		const auto& cp = _hotKeyframes[i];
 		if (!(cp[1].keytime < cp[2].keytime))
 			DebugBreak();
 		if (!(cp[1].keytime <= elipsedFrame && elipsedFrame <= cp[2].keytime))
@@ -94,6 +82,12 @@ void pa::AnimationController::update(float deltaTime)
 DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const
 {
 	return _rotations[boneIndex];
+}
+
+void pa::AnimationController::initializeHotKeyframes()
+{
+	_cursor = _animation->_rotationTrackDescriptors.size() * 4;
+	std::memcpy(_hotKeyframes.data(), _animation->_compactStream.data(), sizeof(CompactKeyframe) * _cursor);
 }
 
 DirectX::XMVECTOR pa::AnimationController::playBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe> const& frames, uint32_t key, uint32_t offset) const

@@ -18,10 +18,15 @@ namespace pa
 		inline size_t		getDuration()				const { return _animation->getDuration(); }
 
 	private:
+		void				initializeHotKeyframes();
 		DirectX::XMVECTOR	playBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe> const& frames, uint32_t key, uint32_t offset = 0) const;
 
 	private:
-		const Animation*				_animation		= nullptr;
+		const Animation*							_animation		= nullptr;
+		uint32_t									_cursor			= 0;
+		uint32_t									_timeCursor		= 0;
+
+		std::vector<std::array<CompactKeyframe, 4>>	_hotKeyframes;
 	};
 
 }

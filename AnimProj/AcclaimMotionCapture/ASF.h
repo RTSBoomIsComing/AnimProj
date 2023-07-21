@@ -44,8 +44,8 @@ namespace pa
 		void			correctSkeleton();
 
 	private:
-		std::vector<uint8_t>					_boneHierarchy;
-		std::vector<uint8_t>					_parentList;
+		std::vector<uint16_t>					_hierarchy;
+		std::vector<uint16_t>					_parentList;
 		std::vector<DirectX::XMFLOAT4>			_boneRotations;
 		std::vector<DirectX::XMFLOAT4>			_boneTranslations;
 		std::vector<std::string>				_boneNameList;

@@ -66,7 +66,7 @@ pa::Skeleton* pa::ASF::createSkeleton()
 	using namespace DirectX;
 
 	Skeleton* skeleton = new Skeleton();
-	skeleton->_boneHierarchy	= _boneHierarchy;
+	skeleton->_boneHierarchy	= _hierarchy;
 	skeleton->_parentList		= _parentList;
 	
 	for (size_t boneIndex = 0; boneIndex < getBoneCount(); boneIndex++)
@@ -260,11 +260,11 @@ void pa::ASF::parseBoneData(std::istream& stream)
 
 void pa::ASF::parseHierarchy(std::istream& stream)
 {
-	_boneHierarchy.reserve(getBoneCount());
+	_hierarchy.reserve(getBoneCount());
 	_parentList.resize(getBoneCount(), std::numeric_limits<std::uint8_t>::max());
 
 	const size_t rootBoneIndex = getBoneIndexFromName("root");
-	_boneHierarchy.push_back(static_cast<uint8_t>(rootBoneIndex));
+	_hierarchy.push_back(static_cast<uint8_t>(rootBoneIndex));
 
 	std::string buffer;
 	stream >> buffer;
@@ -290,7 +290,7 @@ void pa::ASF::parseHierarchy(std::istream& stream)
 			// get child bone index
 			const size_t childIndex = getBoneIndexFromName(buffer);
 
-			_boneHierarchy.push_back(static_cast<uint8_t>(childIndex));
+			_hierarchy.push_back(static_cast<uint8_t>(childIndex));
 			_parentList[childIndex] = static_cast<uint8_t>(parentIndex);
 		}
 	}
@@ -343,42 +343,42 @@ void pa::ASF::correctSkeleton()
 	_boneTranslations = correctTranslations;
 
 
-	std::vector<uint8_t> newHierarchy;
-	for (size_t boneIndex : _boneHierarchy)
+	std::vector<uint16_t> newHierarchy;
+	for (uint16_t boneID : _hierarchy)
 	{
-		_boneRotations[boneIndex] = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
+		_boneRotations[boneID] = XMFLOAT4{ 0.f, 0.f, 0.f, 1.f };
 
-		newHierarchy.push_back(static_cast<uint8_t>(boneIndex));
+		newHierarchy.push_back(static_cast<uint16_t>(boneID));
 
 		// find all children of this bone
-		std::vector<size_t> childs;
+		std::vector<uint16_t> childs;
 		auto it = _parentList.begin();
-		while ((it = std::find(it, _parentList.end(), static_cast<uint8_t>(boneIndex))) != _parentList.end())
+		while ((it = std::find(it, _parentList.end(), boneID)) != _parentList.end())
 		{
-			childs.push_back(std::distance(_parentList.begin(), it));
+			childs.push_back(static_cast<uint16_t>(std::distance(_parentList.begin(), it)));
 			it++;
 		}
 
 		if (childs.size() == 1)
 		{
-			_boneRotations[boneIndex] = correctRotations[childs.front()];
+			_boneRotations[boneID] = correctRotations[childs.front()];
 			continue;
 		}
-
-		for (size_t childIndex : childs)
+		
+		for (uint16_t childID : childs)
 		{
-			const size_t dummyBoneIndex = _boneRotations.size();
-			newHierarchy.push_back(static_cast<uint8_t>(dummyBoneIndex));
-			_parentList[childIndex] = static_cast<uint8_t>(dummyBoneIndex);
-			_parentList.push_back(static_cast<uint8_t>(boneIndex));
+			const uint16_t dummyBoneID = static_cast<uint16_t>(_boneRotations.size());
+			newHierarchy.push_back(dummyBoneID);
+			_parentList[childID] = dummyBoneID;
+			_parentList.push_back(boneID);
 
-			_boneRotations.push_back(correctRotations[childIndex]);
+			_boneRotations.push_back(correctRotations[childID]);
 			_boneTranslations.emplace_back();
 
 		}
 	}
 
-	_boneHierarchy = newHierarchy;
+	_hierarchy = newHierarchy;
 }
 
 size_t pa::ASF::getBoneCount() const {

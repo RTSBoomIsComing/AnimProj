@@ -17,7 +17,7 @@ pa::Character::Character(ID3D11Device* device)
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 	_skeleton = asf.createSkeleton();
-
+	_skeleton->generateBoneMasks();
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
@@ -58,7 +58,7 @@ pa::Character::Character(ID3D11Device* device)
 	//_skeletonUpperBodyMask[11] = true;
 	//for (uint8_t boneIndex : _skeleton->getHierarchy())
 	//{
-	//	uint8_t parentIndex = _skeleton->getParentBoneIndex(boneIndex);
+	//	uint8_t parentIndex = _skeleton->getParentBoneID(boneIndex);
 	//	if (parentIndex >= _skeleton->getBoneCount())
 	//		continue;
 
@@ -120,7 +120,7 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 		XMVECTOR animationRotation = _animationControllers[0].getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
-		const size_t parentBoneIndex			= _skeleton->getParentBoneIndex(boneIndex);
+		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);
 		const XMMATRIX& parentWorldTransform	= (parentBoneIndex < _skeleton->getBoneCount()) ? 
 			_jointTransforms[parentBoneIndex] : XMMatrixIdentity();
 
