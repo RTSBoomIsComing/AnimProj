@@ -27,7 +27,7 @@ namespace pa
 	public:
 		static Acclaim::DOF			convertStringToDOF(std::string const& s);
 		static Acclaim::AxisOrder	convertStringToAxisOrder(std::string const& s);
-	private:
+		static DirectX::XMMATRIX	getRotationFromAxis(DirectX::XMFLOAT3 axis, AxisOrder order, float unit = 1.0f);
 
 	private:
 		Acclaim() = delete;

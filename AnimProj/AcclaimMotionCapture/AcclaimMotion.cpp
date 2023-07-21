@@ -12,29 +12,7 @@ pa::Acclaim::Motion::Motion(const Acclaim::Skeleton* skeleton, std::wstring cons
 		DebugBreak();
 
 	parseBoneNames(stream);
-
-	std::vector<uint16_t> orderTable;
-	std::vector<Skeleton::Bone> const& boneData = _skeleton->_boneData;
-	for (std::string const& name : _boneNames)
-	{
-		orderTable.push_back(_skeleton->findBoneIDFromName(name));
-	}
-
-	//size_t cursor = 0;
-	//std::stringstream subStream(buffer);
-
-	//subStream >> buffer;
-	//if (!isCompleteParsingNames)
-	//	_boneNames.push_back(buffer);
-
-	//float floatBuffer;
-	//while (subStream >> floatBuffer)
-	//{
-	//	_data.push_back(floatBuffer);
-	//}
-
-
-
+	parseMotionData(stream);
 }
 
 void pa::Acclaim::Motion::parseBoneNames(std::istream& stream)
@@ -57,4 +35,45 @@ void pa::Acclaim::Motion::parseBoneNames(std::istream& stream)
 		std::getline(stream, buffer);
 	}
 	stream.seekg(0);
+}
+
+void pa::Acclaim::Motion::parseMotionData(std::istream& stream)
+{
+	_boneIDs.resize(_boneNames.size());
+	for (std::string const& name : _boneNames)
+	{
+		_boneIDs.push_back(_skeleton->findBoneIDFromName(name));
+	}
+
+	std::vector<Skeleton::Bone> const& boneData = _skeleton->_boneData;
+	_data.resize(_boneNames.size());
+
+	std::string buffer;
+	while (stream >> buffer)
+	{
+		if ("root" != buffer)
+			continue;
+
+		for (int i{}; i < boneData[0].dof.size(); i++)
+		{
+			float floatBuffer;
+			stream >> floatBuffer;
+			_data[0].push_back(floatBuffer);
+		}
+
+		for (int i = 1; i < _boneNames.size(); i++)
+		{
+			uint16_t boneID = _boneIDs[i];
+
+			if (stream >> buffer && _boneNames[i] != buffer)
+				DebugBreak();
+
+			for (int j = 0; j < boneData[boneID].dof.size(); j++)
+			{
+				float floatBuffer;
+				stream >> floatBuffer;
+				_data[i].push_back(floatBuffer);
+			}
+		}
+	}
 }

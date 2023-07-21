@@ -50,3 +50,36 @@ pa::Acclaim::AxisOrder pa::Acclaim::convertStringToAxisOrder(std::string const& 
     DebugBreak();
     return Acclaim::AxisOrder();
 }
+
+DirectX::XMMATRIX pa::Acclaim::getRotationFromAxis(DirectX::XMFLOAT3 axis, AxisOrder order, float unit)
+{
+    using namespace DirectX;
+    // Use row major matrix
+    const XMMATRIX rotationX = XMMatrixRotationX(axis.x);
+    const XMMATRIX rotationY = XMMatrixRotationY(axis.y);
+    const XMMATRIX rotationZ = XMMatrixRotationZ(axis.z);
+
+    switch (order)
+    {
+    case AxisOrder::XYZ:
+        return rotationX * rotationY * rotationZ;
+
+    case AxisOrder::XZY:
+        return rotationX * rotationZ * rotationY;
+
+    case AxisOrder::YZX:
+        return rotationY * rotationZ * rotationX;
+
+    case AxisOrder::YXZ:
+        return rotationY * rotationX * rotationZ;
+
+    case AxisOrder::ZXY:
+        return rotationZ * rotationX * rotationY;
+
+    case AxisOrder::ZYX:
+        return rotationZ * rotationY * rotationX;
+    }
+
+    DebugBreak();
+    return DirectX::XMMATRIX();
+}
