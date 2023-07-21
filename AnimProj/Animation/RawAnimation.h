@@ -1,6 +1,6 @@
 // author: Changwan Yu
 #pragma once
-class PrimitiveAnimation
+class RawAnimation
 {
 	friend class Acclaim;
 public:
@@ -18,8 +18,8 @@ public:
 
 	using AnimationTrack = std::vector<Keyframe>;
 public:
-	PrimitiveAnimation() = default;
-	~PrimitiveAnimation() = default;
+	RawAnimation() = default;
+	~RawAnimation() = default;
 
 private:
 	std::vector<AnimationTrack> _tracks;

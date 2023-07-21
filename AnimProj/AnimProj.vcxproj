@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Animation\AcclaimImporter.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
     <ClInclude Include="Animation\AnimationBuilder.h" />
@@ -100,7 +101,7 @@
     <ClInclude Include="Animation\AnimationController.h" />
     <ClInclude Include="Animation\CompactKeyframe.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Animation\PrimitiveAnimation.h" />
+    <ClInclude Include="Animation\RawAnimation.h" />
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
@@ -118,6 +119,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Animation\AcclaimImporter.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
     <ClCompile Include="Animation\AnimationBuilder.cpp" />
@@ -128,7 +130,7 @@
     <ClCompile Include="Animation\Animation.cpp" />
     <ClCompile Include="Animation\AnimationController.cpp" />
     <ClCompile Include="Animation\CompactKeyframe.cpp" />
-    <ClCompile Include="Animation\PrimitiveAnimation.cpp" />
+    <ClCompile Include="Animation\RawAnimation.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
