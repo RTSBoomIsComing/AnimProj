@@ -19,8 +19,8 @@ namespace pa
 		{
 			std::string					name;
 			std::vector<Acclaim::DOF>	dof;
-			DirectX::XMFLOAT3			direction	= {};
 			DirectX::XMFLOAT3			axis		= {};
+			DirectX::XMFLOAT3			direction	= {};
 			float						length		= 0.0f;
 			Acclaim::AxisOrder			axisOrder	= {};
 		};
@@ -28,11 +28,10 @@ namespace pa
 		Skeleton(std::wstring const& filePath);
 		~Skeleton() = default;
 
+	public:
+		uint16_t findBoneIDFromName(std::string const& name) const;
 	private:
-		void			parseUnits(std::istream& stream);
-		void			parseRoot(std::istream& stream);
-		void			parseBoneData(std::istream& stream);
-		void			parseHierarchy(std::istream& stream);
+		static Bone convertRootToBone(const Root& root);
 
 	private:
 		Acclaim::Unit				_unit = {};

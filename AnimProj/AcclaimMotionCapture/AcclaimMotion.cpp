@@ -17,16 +17,7 @@ pa::Acclaim::Motion::Motion(const Acclaim::Skeleton* skeleton, std::wstring cons
 	std::vector<Skeleton::Bone> const& boneData = _skeleton->_boneData;
 	for (std::string const& name : _boneNames)
 	{
-		const auto iter = std::find_if(boneData.begin(), boneData.end(),
-			[&name](Skeleton::Bone const& bone)
-			{
-				return bone.name == name;
-			});
-
-		if (iter == boneData.end())
-			DebugBreak();
-
-		orderTable.push_back(std::distance(boneData.begin(), iter));
+		orderTable.push_back(_skeleton->findBoneIDFromName(name));
 	}
 
 	//size_t cursor = 0;

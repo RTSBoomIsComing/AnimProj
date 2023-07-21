@@ -17,7 +17,7 @@ pa::Character::Character(ID3D11Device* device)
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
-	Acclaim::Skeleton acclaimSkeleton(asfFilePath + L"(Assets\ASFAMC\131-dance\131-dance.asf)");
+	Acclaim::Skeleton acclaimSkeleton(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 
 	_skeleton = asf.createSkeleton();
