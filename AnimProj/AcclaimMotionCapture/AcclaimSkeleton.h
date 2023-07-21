@@ -6,6 +6,7 @@ namespace pa
 	class Acclaim::Skeleton
 	{
 		friend class Acclaim::Motion;
+		friend class AcclaimImporter;
 
 		struct Root
 		{
@@ -29,7 +30,10 @@ namespace pa
 		~Skeleton() = default;
 
 	public:
-		uint16_t findBoneIDFromName(std::string const& name) const;
+		uint16_t			findBoneIDFromName(std::string const& name) const;
+		uint16_t			getParentID(uint16_t boneID) const;
+		DirectX::XMVECTOR	getBoneTranslation(uint16_t boneID) const;
+		DirectX::XMVECTOR	getBoneRotation(uint16_t boneID) const;
 	private:
 		static Bone convertRootToBone(const Root& root);
 

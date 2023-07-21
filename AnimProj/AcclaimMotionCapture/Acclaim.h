@@ -9,9 +9,9 @@ namespace pa
 
 		struct Unit
 		{
-			float angle = 1.0f;
 			float length = 1.0f;
 			float mass = 1.0f;
+			float angle = 1.0f;
 		};
 
 		enum class DOF : uint16_t
@@ -27,7 +27,7 @@ namespace pa
 	public:
 		static Acclaim::DOF			convertStringToDOF(std::string const& s);
 		static Acclaim::AxisOrder	convertStringToAxisOrder(std::string const& s);
-		static DirectX::XMMATRIX	getRotationFromAxis(DirectX::XMFLOAT3 axis, AxisOrder order, float unit = 1.0f);
+		static DirectX::XMVECTOR	getQuaternionFromAxis(DirectX::XMVECTOR axis, AxisOrder order);
 
 	private:
 		Acclaim() = delete;

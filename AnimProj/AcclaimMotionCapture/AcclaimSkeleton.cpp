@@ -33,10 +33,8 @@ pa::Acclaim::Skeleton::Skeleton(std::wstring const& filePath)
 				DebugBreak();
 
 			if (stream >> buffer && "deg" == buffer)
-			{
-				constexpr float radian = 0.0174533;
-				_unit.angle = radian;
-			}
+				_unit.angle = DirectX::XM_PI / 180.0f;
+			
 			continue;
 		}
 		if (":root" == buffer)
@@ -157,6 +155,55 @@ uint16_t pa::Acclaim::Skeleton::findBoneIDFromName(std::string const& name) cons
 		DebugBreak();
 
 	return std::distance(_boneData.begin(), iter);
+}
+
+uint16_t pa::Acclaim::Skeleton::getParentID(uint16_t boneID) const
+{
+	return _parents[boneID];
+}
+
+DirectX::XMVECTOR pa::Acclaim::Skeleton::getBoneTranslation(uint16_t boneID) const
+{
+	using namespace DirectX;
+	if (0 == boneID)
+	{
+		XMVECTOR V = XMLoadFloat3(&_root.position);
+		V = V * _unit.length;
+
+		return V;
+	}
+
+	const Bone& bone = _boneData[boneID];
+
+	XMVECTOR V = XMLoadFloat3(&bone.direction);
+	V = V * _unit.length;
+
+	XMVECTOR axis = XMLoadFloat3(&bone.axis);
+	axis = axis * _unit.angle;
+
+	const XMVECTOR Q = Acclaim::getQuaternionFromAxis(axis, bone.axisOrder);
+	const XMVECTOR Qinversed = XMQuaternionConjugate(Q);
+	V = XMVector3Rotate(V, Qinversed);
+
+	return V;
+}
+
+DirectX::XMVECTOR pa::Acclaim::Skeleton::getBoneRotation(uint16_t boneID) const
+{
+	using namespace DirectX;
+	Skeleton::Bone const& bone = _boneData[boneID];
+	Skeleton::Bone const& parent = _boneData[this->getParentID(boneID)];
+
+	XMVECTOR axis = XMLoadFloat3(&bone.axis);
+	XMVECTOR parentAxis = XMLoadFloat3(&parent.axis);
+
+	axis		= axis * _unit.angle;
+	parentAxis	= parentAxis * _unit.angle;
+
+	XMVECTOR		Q		= Acclaim::getQuaternionFromAxis(axis, bone.axisOrder);
+	const XMVECTOR	Qparent	= Acclaim::getQuaternionFromAxis(parentAxis, parent.axisOrder);
+		
+	return XMQuaternionMultiply(Q, Qparent);;
 }
 
 pa::Acclaim::Skeleton::Bone pa::Acclaim::Skeleton::convertRootToBone(const Root& root)

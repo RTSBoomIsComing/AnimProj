@@ -51,35 +51,47 @@ pa::Acclaim::AxisOrder pa::Acclaim::convertStringToAxisOrder(std::string const& 
     return Acclaim::AxisOrder();
 }
 
-DirectX::XMMATRIX pa::Acclaim::getRotationFromAxis(DirectX::XMFLOAT3 axis, AxisOrder order, float unit)
+DirectX::XMVECTOR pa::Acclaim::getQuaternionFromAxis(DirectX::XMVECTOR axis, AxisOrder order)
 {
     using namespace DirectX;
-    // Use row major matrix
-    const XMMATRIX rotationX = XMMatrixRotationX(axis.x);
-    const XMMATRIX rotationY = XMMatrixRotationY(axis.y);
-    const XMMATRIX rotationZ = XMMatrixRotationZ(axis.z);
+
+    const XMMATRIX rotationX = XMMatrixRotationX(XMVectorGetX(axis));
+    const XMMATRIX rotationY = XMMatrixRotationY(XMVectorGetY(axis));
+    const XMMATRIX rotationZ = XMMatrixRotationZ(XMVectorGetZ(axis));
+
+    XMMATRIX M = {};
 
     switch (order)
     {
     case AxisOrder::XYZ:
-        return rotationX * rotationY * rotationZ;
+        M = rotationX * rotationY * rotationZ;
+        break;
 
     case AxisOrder::XZY:
-        return rotationX * rotationZ * rotationY;
+        M = rotationX * rotationZ * rotationY;
+        break;
 
     case AxisOrder::YZX:
-        return rotationY * rotationZ * rotationX;
+        M = rotationY * rotationZ * rotationX;
+        break;
 
     case AxisOrder::YXZ:
-        return rotationY * rotationX * rotationZ;
+        M = rotationY * rotationX * rotationZ;
+        break;
 
     case AxisOrder::ZXY:
-        return rotationZ * rotationX * rotationY;
+        M = rotationZ * rotationX * rotationY;
+        break;
 
     case AxisOrder::ZYX:
-        return rotationZ * rotationY * rotationX;
+        M = rotationZ * rotationY * rotationX;
+        break;
+    default:
+        DebugBreak();
     }
 
-    DebugBreak();
-    return DirectX::XMMATRIX();
+    XMVECTOR Q = XMQuaternionRotationMatrix(M);
+    Q = XMQuaternionNormalizeEst(Q);
+
+    return Q;
 }

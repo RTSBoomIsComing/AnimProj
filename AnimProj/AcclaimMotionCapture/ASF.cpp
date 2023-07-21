@@ -66,7 +66,7 @@ pa::Skeleton* pa::ASF::createSkeleton()
 
 	Skeleton* skeleton = new Skeleton();
 	skeleton->_hierarchy	= _hierarchy;
-	skeleton->_parentList		= _parentList;
+	skeleton->_parents		= _parentList;
 	
 	for (size_t boneIndex = 0; boneIndex < getBoneCount(); boneIndex++)
 	{
