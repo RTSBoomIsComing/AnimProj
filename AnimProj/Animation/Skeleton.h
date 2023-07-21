@@ -9,6 +9,7 @@ namespace pa
 		friend class AcclaimImporter;
 
 	public:
+		Skeleton() = default;
 		~Skeleton() = default;
 
 	public:
@@ -20,9 +21,6 @@ namespace pa
 		inline size_t						getBoneCount()					const { return _boneMatrices.size(); }
 		inline size_t						getParentBoneID(size_t index)	const { return _parents[index]; }
 		inline std::vector<uint16_t> const&	getHierarchy()					const { return _hierarchy; }
-
-	private:
-		Skeleton() = default;
 
 	private:
 		std::vector<DirectX::XMFLOAT4X4>	_boneMatrices;

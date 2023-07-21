@@ -32,6 +32,7 @@ namespace pa
 	public:
 		uint16_t			findBoneIDFromName(std::string const& name) const;
 		uint16_t			getParentID(uint16_t boneID) const;
+		std::vector<uint16_t> getChildrenID(uint16_t boneID) const;
 		DirectX::XMVECTOR	getBoneTranslation(uint16_t boneID) const;
 		DirectX::XMVECTOR	getBoneRotation(uint16_t boneID) const;
 	private:

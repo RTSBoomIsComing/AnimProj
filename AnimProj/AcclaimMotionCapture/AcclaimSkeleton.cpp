@@ -162,6 +162,23 @@ uint16_t pa::Acclaim::Skeleton::getParentID(uint16_t boneID) const
 	return _parents[boneID];
 }
 
+std::vector<uint16_t> pa::Acclaim::Skeleton::getChildrenID(uint16_t boneID) const
+{
+	std::vector<uint16_t> children;
+	for (uint16_t i = 0; i < _parents.size(); i++)
+	{
+		// parent of root bone is root bone itself
+		// so we should skip it 
+		if (_parents[i] == i)
+			continue;
+
+		if (_parents[i] == boneID)
+			children.push_back(i);
+	}
+
+	return children;
+}
+
 DirectX::XMVECTOR pa::Acclaim::Skeleton::getBoneTranslation(uint16_t boneID) const
 {
 	using namespace DirectX;
@@ -176,14 +193,18 @@ DirectX::XMVECTOR pa::Acclaim::Skeleton::getBoneTranslation(uint16_t boneID) con
 	const Bone& bone = _boneData[boneID];
 
 	XMVECTOR V = XMLoadFloat3(&bone.direction);
-	V = V * _unit.length;
+	V = V * bone.length * _unit.length;
 
 	XMVECTOR axis = XMLoadFloat3(&bone.axis);
 	axis = axis * _unit.angle;
 
+	// convert right-handed to left-handed
+	V = XMVectorSetZ(V, -XMVectorGetZ(V));
+	axis = axis * XMVectorSet(-1.0f, -1.0f, 1.0f, 0.0f);
+
+
 	const XMVECTOR Q = Acclaim::getQuaternionFromAxis(axis, bone.axisOrder);
-	const XMVECTOR Qinversed = XMQuaternionConjugate(Q);
-	V = XMVector3Rotate(V, Qinversed);
+	V = XMVector3InverseRotate(V, Q);
 
 	return V;
 }
@@ -200,10 +221,14 @@ DirectX::XMVECTOR pa::Acclaim::Skeleton::getBoneRotation(uint16_t boneID) const
 	axis		= axis * _unit.angle;
 	parentAxis	= parentAxis * _unit.angle;
 
-	XMVECTOR		Q		= Acclaim::getQuaternionFromAxis(axis, bone.axisOrder);
-	const XMVECTOR	Qparent	= Acclaim::getQuaternionFromAxis(parentAxis, parent.axisOrder);
-		
-	return XMQuaternionMultiply(Q, Qparent);;
+	// convert right-handed to left-handed
+	axis = axis * XMVectorSet(-1.0f, -1.0f, 1.0f, 0.0f);
+	parentAxis	= parentAxis * XMVectorSet(-1.0f, -1.0f, 1.0f, 0.0f);
+
+	XMVECTOR		Q			= Acclaim::getQuaternionFromAxis(axis, bone.axisOrder);
+	const XMVECTOR	Qparent		= Acclaim::getQuaternionFromAxis(parentAxis, parent.axisOrder);
+	const XMVECTOR	QparentInv	= XMQuaternionInverse(Qparent);
+	return XMQuaternionMultiply(Q, QparentInv);
 }
 
 pa::Acclaim::Skeleton::Bone pa::Acclaim::Skeleton::convertRootToBone(const Root& root)

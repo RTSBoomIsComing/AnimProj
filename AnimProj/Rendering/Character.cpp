@@ -5,6 +5,7 @@
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 #include "../Animation/Animation.h"
+#include "../Animation/AcclaimImporter.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
 #include "../Rendering/Mesh.h"
@@ -19,8 +20,10 @@ pa::Character::Character(ID3D11Device* device)
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 	Acclaim::Skeleton acclaimSkeleton(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
+	_skeleton = new Skeleton();
+	AcclaimImporter::createSkeleton(acclaimSkeleton, _skeleton);
 
-	_skeleton = asf.createSkeleton();
+	//_skeleton = asf.createSkeleton();
 	_skeleton->generateBoneMasks();
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
@@ -39,16 +42,17 @@ pa::Character::Character(ID3D11Device* device)
 	//_animations.push_back(Animation(&asf, &amcJump));
 	//_animations.push_back(Animation(&asf, &amcPunch));
 
+	for (auto& animation : _animations)
+	{
+		animation.compressAnimation();
+	}
+
 	_animationControllers.push_back(AnimationController(&_animations[0]));
 	//_animationControllers.push_back(AnimationController(&_animations[1]));
 	//_animationControllers.push_back(AnimationController(&_animations[2]));
 	//_animationControllers.push_back(AnimationController(&_animations[3]));
 	//_animationControllers.push_back(AnimationController(&_animations[4]));
 
-	for (auto& animation : _animations)
-	{
-		animation.compressAnimation();
-	}
 	//_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
 	//_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
 
@@ -125,7 +129,7 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);
-		const XMMATRIX& parentWorldTransform	= (parentBoneIndex < _skeleton->getBoneCount()) ? 
+		const XMMATRIX& parentWorldTransform	= (boneIndex != 0) ?
 			_jointTransforms[parentBoneIndex] : XMMatrixIdentity();
 
 		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneIndex);
