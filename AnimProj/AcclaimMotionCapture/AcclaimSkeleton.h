@@ -5,6 +5,8 @@ namespace pa
 {
 	class Acclaim::Skeleton
 	{
+		friend class Acclaim::Motion;
+
 		using BoneID = uint16_t;
 		enum class AxisOrder
 		{

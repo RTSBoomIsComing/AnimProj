@@ -93,7 +93,10 @@
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationBuilder.h">
+    <ClInclude Include="Animation\AnimationBuilder.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation\PrimitiveAnimation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -179,7 +182,10 @@
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AnimationBuilder.cpp">
+    <ClCompile Include="Animation\AnimationBuilder.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation\PrimitiveAnimation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

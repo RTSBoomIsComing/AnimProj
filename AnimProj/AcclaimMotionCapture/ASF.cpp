@@ -7,7 +7,6 @@ static std::istream& ignoreEmptyChar(std::istream& stream)
 {
 	while (stream)
 	{
-
 		if (stream.peek() == ' ' || stream.peek() == '\n' || stream.peek() == '\t')
 			stream.ignore();
 		else
@@ -66,7 +65,7 @@ pa::Skeleton* pa::ASF::createSkeleton()
 	using namespace DirectX;
 
 	Skeleton* skeleton = new Skeleton();
-	skeleton->_boneHierarchy	= _hierarchy;
+	skeleton->_hierarchy	= _hierarchy;
 	skeleton->_parentList		= _parentList;
 	
 	for (size_t boneIndex = 0; boneIndex < getBoneCount(); boneIndex++)
@@ -193,7 +192,7 @@ void pa::ASF::parseBoneData(std::istream& stream)
 		DOF		dof = {};
 		while (ignoreEmptyChar(stream))
 		{
-			getline(stream, buffer);
+			std::getline(stream, buffer);
 			std::istringstream line{ buffer };
 
 			line >> buffer;

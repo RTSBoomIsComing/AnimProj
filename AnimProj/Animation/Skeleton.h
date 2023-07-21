@@ -17,7 +17,7 @@ namespace pa
 
 		inline size_t						getBoneCount()					const { return _boneMatrices.size(); }
 		inline size_t						getParentBoneID(size_t index)	const { return _parentList[index]; }
-		inline std::vector<uint16_t> const&	getHierarchy()					const { return _boneHierarchy; }
+		inline std::vector<uint16_t> const&	getHierarchy()					const { return _hierarchy; }
 
 	private:
 		Skeleton() = default;
@@ -25,7 +25,7 @@ namespace pa
 	private:
 		std::vector<DirectX::XMFLOAT4X4>	_boneMatrices;
 		std::vector<std::uint16_t>			_parentList;
-		std::vector<std::uint16_t>			_boneHierarchy;
+		std::vector<std::uint16_t>			_hierarchy;
 
 		std::vector<bool>					_upperBodyMask;
 		std::vector<bool>					_lowerBodyMask;

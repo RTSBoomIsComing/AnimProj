@@ -6,12 +6,16 @@ namespace pa
 	class Acclaim::Motion
 	{
 	public:
-		Motion(std::wstring const& filePath);
+		Motion(const Acclaim::Skeleton* skeleton, std::wstring const& filePath);
 		~Motion() = default;
 
 	private:
-		std::vector<std::string>	_boneNames;
-		std::vector<float>			_data;
+		void parseBoneNames(std::istream& stream);
+
+	private:
+		const Acclaim::Skeleton* const	_skeleton;
+		std::vector<std::string>		_boneNames;
+		std::vector<std::vector<float>>	_data;
 	};
 
 }

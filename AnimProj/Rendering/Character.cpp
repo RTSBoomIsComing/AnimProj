@@ -2,6 +2,8 @@
 #include "Character.h"
 #include "../AcclaimMotionCapture/ASF.h"
 #include "../AcclaimMotionCapture/AMC.h"
+#include "../AcclaimMotionCapture/AcclaimMotion.h"
+#include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 #include "../Animation/Animation.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
@@ -16,12 +18,14 @@ pa::Character::Character(ID3D11Device* device)
 	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
+
 	_skeleton = asf.createSkeleton();
 	_skeleton->generateBoneMasks();
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 
+	Acclaim::Motion acclaimMotion(nullptr, amcDirectory + L"131_04-dance.amc");
 	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
 	//AMC amcIdle(amcDirectory	+ L"idle.amc");
 	//AMC amcWalk(amcDirectory	+ L"walk.amc");

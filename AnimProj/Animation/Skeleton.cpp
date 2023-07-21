@@ -11,7 +11,7 @@ void pa::Skeleton::generateBoneMasks()
     _lowerBodyMask[31 /*lhipjoint dummy bone*/] = true;
     _lowerBodyMask[32 /*rhipjoint dummy bone*/] = true;
 
-    for (uint16_t boneID : _boneHierarchy)
+    for (uint16_t boneID : _hierarchy)
     {
         if (0 == boneID)
             continue;
