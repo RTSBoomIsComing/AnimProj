@@ -7,34 +7,39 @@ namespace pa
 	{
 		friend class Acclaim::Motion;
 
-		using BoneID = uint16_t;
-		enum class AxisOrder
-		{
-			XYZ, XZY, YZX, YXZ, ZXY, ZYX
-		};
 		struct Root
 		{
-			std::array<Acclaim::DOF, 6> order		= {};
 			DirectX::XMFLOAT3			position	= {};
 			DirectX::XMFLOAT3			orientation = {};
+			std::vector<Acclaim::DOF>	order		= {};
+			Acclaim::AxisOrder			axis		= {};
 		};
 
 		struct Bone
 		{
-			DirectX::XMFLOAT3	direction	= {};
-			DirectX::XMFLOAT3	axis		= {};
-			std::string			name;
-			float				length		= 0.0f;
+			std::string					name;
+			std::vector<Acclaim::DOF>	dof;
+			DirectX::XMFLOAT3			direction	= {};
+			DirectX::XMFLOAT3			axis		= {};
+			float						length		= 0.0f;
+			Acclaim::AxisOrder			axisOrder	= {};
 		};
 	public:
 		Skeleton(std::wstring const& filePath);
 		~Skeleton() = default;
 
 	private:
-		Acclaim::Unit			_unit = {};
-		Root					_root = {};
-		std::vector<Bone>		_boneData;
-		std::vector<BoneID>		_hierarchy;
+		void			parseUnits(std::istream& stream);
+		void			parseRoot(std::istream& stream);
+		void			parseBoneData(std::istream& stream);
+		void			parseHierarchy(std::istream& stream);
+
+	private:
+		Acclaim::Unit				_unit = {};
+		Root						_root = {};
+		std::vector<Bone>			_boneData;
+		std::vector<uint16_t>		_parents;
+		std::vector<uint16_t>		_hierarchy;
 	};
 }
 

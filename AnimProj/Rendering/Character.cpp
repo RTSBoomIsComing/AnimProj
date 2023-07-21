@@ -17,6 +17,7 @@ pa::Character::Character(ID3D11Device* device)
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
 	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
+	Acclaim::Skeleton acclaimSkeleton(asfFilePath + L"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 
 	_skeleton = asf.createSkeleton();
@@ -24,8 +25,7 @@ pa::Character::Character(ID3D11Device* device)
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
-
-	Acclaim::Motion acclaimMotion(nullptr, amcDirectory + L"131_04-dance.amc");
+	Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + L"131_04-dance.amc");
 	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
 	//AMC amcIdle(amcDirectory	+ L"idle.amc");
 	//AMC amcWalk(amcDirectory	+ L"walk.amc");
