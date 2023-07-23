@@ -1,27 +1,29 @@
 // author: Changwan Yu
 #pragma once
-class RawAnimation
+
+namespace pa
 {
-	friend class Acclaim;
-public:
-	struct Keyframe
+	class RawAnimation
 	{
-		// scale, position or rotation(quaternion)
-		DirectX::XMFLOAT4	v = {};
+		friend class Acclaim;
+	public:
+		struct Keyframe
+		{
+			// scale, position or rotation(quaternion)
+			DirectX::XMFLOAT4	v = {};
+		};
+			uint16_t			id : 14;
 
-		uint16_t			keytime;
-		uint16_t			id		: 14;
+			// scale: 0, rotation: 1, translation: 2
+			uint16_t			channel : 2;
 
-		// scale: 0, rotation: 1, translation: 2
-		uint16_t			channel	: 2;
+		using AnimationTrack = std::vector<Keyframe>;
+	public:
+		RawAnimation() = default;
+		~RawAnimation() = default;
+
+	private:
+		std::vector<AnimationTrack> _tracks;
 	};
-
-	using AnimationTrack = std::vector<Keyframe>;
-public:
-	RawAnimation() = default;
-	~RawAnimation() = default;
-
-private:
-	std::vector<AnimationTrack> _tracks;
-};
+}
 

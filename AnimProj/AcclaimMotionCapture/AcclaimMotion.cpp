@@ -12,6 +12,7 @@ pa::Acclaim::Motion::Motion(const Acclaim::Skeleton* skeleton, std::wstring cons
 		DebugBreak();
 
 	parseBoneNames(stream);
+	convertBoneNameToID();
 	parseMotionData(stream);
 }
 
@@ -39,12 +40,6 @@ void pa::Acclaim::Motion::parseBoneNames(std::istream& stream)
 
 void pa::Acclaim::Motion::parseMotionData(std::istream& stream)
 {
-	_boneIDs.resize(_boneNames.size());
-	for (std::string const& name : _boneNames)
-	{
-		_boneIDs.push_back(_skeleton->findBoneIDFromName(name));
-	}
-
 	std::vector<Skeleton::Bone> const& boneData = _skeleton->_boneData;
 	_data.resize(_boneNames.size());
 
@@ -54,6 +49,7 @@ void pa::Acclaim::Motion::parseMotionData(std::istream& stream)
 		if ("root" != buffer)
 			continue;
 
+		_frameCount++;
 		for (int i{}; i < boneData[0].dof.size(); i++)
 		{
 			float floatBuffer;
@@ -76,4 +72,15 @@ void pa::Acclaim::Motion::parseMotionData(std::istream& stream)
 			}
 		}
 	}
+}
+
+void pa::Acclaim::Motion::convertBoneNameToID()
+{
+	std::vector<uint16_t> boneIDs;
+	boneIDs.reserve(_boneNames.size());
+	for (std::string const& name : _boneNames)
+	{
+		boneIDs.push_back(_skeleton->findBoneIDFromName(name));
+	}
+	_boneIDs = std::move(boneIDs);
 }

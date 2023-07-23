@@ -48,14 +48,14 @@ pa::Acclaim::Skeleton::Skeleton(std::wstring const& filePath)
 		for (int i = 0; i < 6; i++)
 		{
 			stream >> buffer;
-			_root.order.push_back(Acclaim::convertStringToDOF(buffer));
+			_root.order.push_back(Acclaim::convertToDOF(buffer));
 		}
 
 		if (stream >> buffer && "axis" != buffer)
 			DebugBreak();
 
 		stream >> buffer;
-		_root.axis = Acclaim::convertStringToAxisOrder(buffer);
+		_root.axis = Acclaim::convertToAxisOrder(buffer);
 
 		if (stream >> buffer && "position" != buffer)
 			DebugBreak();
@@ -93,14 +93,14 @@ pa::Acclaim::Skeleton::Skeleton(std::wstring const& filePath)
 			DebugBreak();
 
 		stream >> bone.axis.x >> bone.axis.y >> bone.axis.z >> buffer;
-		_root.axis = Acclaim::convertStringToAxisOrder(buffer);
+		_root.axis = Acclaim::convertToAxisOrder(buffer);
 
 		stream >> buffer;
 		if ("dof" == buffer)
 		{
 			while (stream >> buffer && "limits" != buffer)
 			{
-				bone.dof.push_back(Acclaim::convertStringToDOF(buffer));
+				bone.dof.push_back(Acclaim::convertToDOF(buffer));
 			}
 		}
 
@@ -154,7 +154,7 @@ uint16_t pa::Acclaim::Skeleton::findBoneIDFromName(std::string const& name) cons
 	if (iter == _boneData.end())
 		DebugBreak();
 
-	return std::distance(_boneData.begin(), iter);
+	return static_cast<uint16_t>(std::distance(_boneData.begin(), iter));
 }
 
 uint16_t pa::Acclaim::Skeleton::getParentID(uint16_t boneID) const

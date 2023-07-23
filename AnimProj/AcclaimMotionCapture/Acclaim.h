@@ -16,7 +16,7 @@ namespace pa
 
 		enum class DOF : uint16_t
 		{
-			None, TX, TY, TZ, RX, RY, RZ, L
+			TX, TY, TZ, RX, RY, RZ, L
 		};
 
 		enum class AxisOrder : uint16_t
@@ -25,8 +25,8 @@ namespace pa
 		};
 
 	public:
-		static Acclaim::DOF			convertStringToDOF(std::string const& s);
-		static Acclaim::AxisOrder	convertStringToAxisOrder(std::string const& s);
+		static Acclaim::DOF			convertToDOF(std::string const& s);
+		static Acclaim::AxisOrder	convertToAxisOrder(std::string const& s);
 		static DirectX::XMVECTOR	getQuaternionFromAxis(DirectX::XMVECTOR axis, AxisOrder order);
 
 	private:

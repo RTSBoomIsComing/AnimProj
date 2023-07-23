@@ -22,9 +22,8 @@ pa::Character::Character(ID3D11Device* device)
 
 	_skeleton = new Skeleton();
 	AcclaimImporter::createSkeleton(acclaimSkeleton, _skeleton);
-
-	//_skeleton = asf.createSkeleton();
 	_skeleton->generateBoneMasks();
+
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
@@ -80,11 +79,9 @@ pa::Character::Character(ID3D11Device* device)
 
 pa::Character::~Character()
 {
-	if (_skeleton != nullptr)
-	{
-		delete _skeleton;
-		_skeleton = nullptr;
-	}
+	AcclaimImporter::destroySkeleton(_skeleton);
+	_skeleton = nullptr;
+
 	if (nullptr != _boneMesh)
 	{
 		delete _boneMesh;

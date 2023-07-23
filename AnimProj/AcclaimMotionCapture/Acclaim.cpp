@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Acclaim.h"
 
-pa::Acclaim::DOF pa::Acclaim::convertStringToDOF(std::string const& s)
+pa::Acclaim::DOF pa::Acclaim::convertToDOF(std::string const& s)
 {
     if ("TX" == s || "tx" == s)
         return DOF::TX;
@@ -27,7 +27,7 @@ pa::Acclaim::DOF pa::Acclaim::convertStringToDOF(std::string const& s)
     return DOF::None;
 }
 
-pa::Acclaim::AxisOrder pa::Acclaim::convertStringToAxisOrder(std::string const& s)
+pa::Acclaim::AxisOrder pa::Acclaim::convertToAxisOrder(std::string const& s)
 {
     if ("XYZ" == s)
         return AxisOrder::XYZ;
