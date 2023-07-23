@@ -6,6 +6,7 @@
 //#include "../Animation/IAnimationController.h"
 #include "../Animation/Animation.h"
 #include "../Animation/AnimationController.h"
+#include "../Animation/AnimationPlayer.h"
 namespace pa
 {
 	class Mesh;
@@ -46,6 +47,7 @@ namespace pa
 		std::vector<bool>					_skeletonUpperBodyMask;
 		std::vector<Animation>				_animations;
 		std::vector<AnimationController>	_animationControllers;
+		AnimationPlayer*					_animationPlayer;
 		std::vector<DirectX::XMMATRIX>		_jointTransforms;
 		std::vector<DirectX::XMMATRIX>		_boneStickTransforms;
 	};

@@ -5,13 +5,13 @@
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 
+#include "../Animation/AnimationPlayer.h"
 #include "../Animation/AcclaimImporter.h"
 #include "../Animation/Animation.h"
 #include "../Animation/RawAnimation.h"
 #include "../Animation/CompactAnimation.h"
 
 #include "../Animation/AnimationBuilder.h"
-#include "../Animation/AnimationPlayer.h"
 
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
@@ -24,7 +24,7 @@ pa::Character::Character(ID3D11Device* device)
 {
 	std::wstring asfFilePath = _SOLUTIONDIR;
 	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
-	ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
+	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 	Acclaim::Skeleton acclaimSkeleton(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 	_skeleton = new Skeleton();
@@ -41,21 +41,19 @@ pa::Character::Character(ID3D11Device* device)
 
 	AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
 	
-	CompactAnimation compactAnimation;
+	static CompactAnimation compactAnimation; 
 	animationBuilder.createFullBodyAnimation(compactAnimation);
 
-	AnimationPlayer animationPlayer(compactAnimation);
-	animationPlayer.update(0.4f);
-
-
-	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
+	_animationPlayer = new AnimationPlayer(compactAnimation);
+	
+	//AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
 	//AMC amcIdle(amcDirectory	+ L"idle.amc");
 	//AMC amcWalk(amcDirectory	+ L"walk.amc");
 	//AMC amcRun(amcDirectory	+ L"run_cyclic.amc");
 	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
 	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
 
-	_animations.push_back(Animation(&asf, &amcIdle));
+	//_animations.push_back(Animation(&asf, &amcIdle));
 	//_animations.push_back(Animation(&asf, &amcWalk));
 	//_animations.push_back(Animation(&asf, &amcRun));
 	//_animations.push_back(Animation(&asf, &amcJump));
@@ -63,12 +61,12 @@ pa::Character::Character(ID3D11Device* device)
 
 
 
-	for (auto& animation : _animations)
-	{
-		animation.compressAnimation();
-	}
+	//for (auto& animation : _animations)
+	//{
+	//	animation.compressAnimation();
+	//}
 
-	_animationControllers.push_back(AnimationController(&_animations[0]));
+	//_animationControllers.push_back(AnimationController(&_animations[0]));
 	//_animationControllers.push_back(AnimationController(&_animations[1]));
 	//_animationControllers.push_back(AnimationController(&_animations[2]));
 	//_animationControllers.push_back(AnimationController(&_animations[3]));
@@ -127,11 +125,18 @@ pa::Character::~Character()
 		delete _animationIdleWalk;
 		_animationIdleWalk = nullptr;
 	}
+
+	if (nullptr != _animationPlayer)
+	{
+		delete _animationPlayer;
+		_animationPlayer = nullptr;
+	}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
-	_animationControllers[0].update(deltaTime);
+//	_animationControllers[0].update(deltaTime);
+	_animationPlayer->update(deltaTime);
 	//for (auto& animationController : _animationControllers)
 	//{
 	//	animationController.update(deltaTime);
@@ -144,7 +149,8 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
 		//XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
-		XMVECTOR animationRotation = _animationControllers[0].getBoneRotation(boneIndex);
+		//XMVECTOR animationRotation = _animationControllers[0].getBoneRotation(boneIndex);
+		XMVECTOR animationRotation = _animationPlayer->getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);

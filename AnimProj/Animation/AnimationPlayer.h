@@ -1,9 +1,10 @@
 // author: Changwan Yu
 #pragma once
-#include "CompactAnimation.h"
+
 namespace pa
 {
 	class CompactAnimation;
+	struct CompactKeyframe;
 	class AnimationPlayer
 	{
 	public:
@@ -12,6 +13,7 @@ namespace pa
 
 	public:
 		void update(float deltaTime);
+		DirectX::XMVECTOR getBoneRotation(uint32_t boneIndex) const;
 
 	private:
 		void initializeActiveKeys();
@@ -20,6 +22,8 @@ namespace pa
 		const CompactAnimation&	_animation;
 
 		std::vector<std::array<CompactKeyframe, 4>> _activeKeys;
+		std::vector<DirectX::XMVECTOR>				_rotations;		//temp
+
 		uint32_t		_cursor = 0;
 
 		const uint16_t	_duration		= 0;

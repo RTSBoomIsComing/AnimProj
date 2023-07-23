@@ -9,16 +9,18 @@ pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimat
 	: _skeleton(skeleton)
 	, _rawAnimation(rawAnimation)
 {
-	for (const auto& track : rawAnimation._tracks)
-	{
-		_tracks.push_back(this->removeDuplicateFrame(track));
-	}
+	//for (const auto& track : rawAnimation._tracks)
+	//{
+	//	_tracks.push_back(this->removeDuplicateFrame(track));
+	//}
+	_tracks = rawAnimation._tracks;
 
 	std::vector<AnimationTrack> compressed;
 	for (const auto& track : _tracks)
 	{
 		compressed.push_back(this->fitCurveWithCatmullRom(track));
 	}
+
 	_tracks = std::move(compressed);
 }
 
@@ -112,7 +114,13 @@ pa::AnimationTrack pa::AnimationBuilder::fitCurveWithCatmullRom(AnimationTrack c
 
 				const XMVECTOR	difference = XMLoadFloat4(&track.values[between]) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
-				errors.back() += error;
+				//errors.back() += error;
+
+				if (errors.back() < error)
+				{
+					errors.back() = error;
+					midPoints.back() = between;
+				}
 			}
 
 			P0 = P1;
@@ -227,9 +235,9 @@ std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks
 	{
 		const auto& track = tracks[trackID];
 
-		// front
+		// first key
 		ExtendedKey keyframeBuilder = {};
-		keyframeBuilder.prevKeyTime = -1;
+		keyframeBuilder.prevKeyTime = -2;
 		keyframeBuilder.keyTime = track.times.front();
 		keyframeBuilder.trackID = trackID;
 		keyframeBuilder.value = track.values.front();
@@ -238,11 +246,22 @@ std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks
 		keyframeBuilders.push_back(keyframeBuilder);
 		keyframeBuilders.push_back(keyframeBuilder);
 
+		// second key
+		keyframeBuilder = {};
+		keyframeBuilder.prevKeyTime = -1;
+		keyframeBuilder.keyTime = track.times[1];
+		keyframeBuilder.trackID = trackID;
+		keyframeBuilder.value = track.values[1];
+		keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+		keyframeBuilders.push_back(keyframeBuilder);
 
-		for (size_t i = 1; i < track.values.size(); i++)
+		if (track.values.size() == 2)
+			keyframeBuilders.push_back(keyframeBuilder);
+
+		for (size_t i = 2; i < track.values.size(); i++)
 		{
 			ExtendedKey keyframeBuilder = {};
-			keyframeBuilder.prevKeyTime = track.times[i - 1];
+			keyframeBuilder.prevKeyTime = track.times[i - 2];
 			keyframeBuilder.keyTime = track.times[i];
 			keyframeBuilder.trackID = trackID;
 			keyframeBuilder.value = track.values[i];

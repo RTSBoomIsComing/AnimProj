@@ -163,7 +163,7 @@
     </ClInclude>
     <None Include="Animation\AnimationTrack.cpp" />
     <None Include="Animation\AnimationTrack.h" />
-    <None Include="Animation\AnimationPlayer.cpp" />
+    <ClCompile Include="Animation\AnimationPlayer.cpp" />
     <None Include="Animation\AnimationPlayer.h" />
     <None Include="Animation\CompactAnimation.cpp" />
     <None Include="Animation\CompactAnimation.h" />

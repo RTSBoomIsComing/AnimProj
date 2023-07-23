@@ -29,7 +29,7 @@ namespace pa
 	
 	private:
 		static AnimationTrack		removeDuplicateFrame(AnimationTrack const& track);
-		static AnimationTrack		fitCurveWithCatmullRom(AnimationTrack const& track, float threshold = 0.0001f);
+		static AnimationTrack		fitCurveWithCatmullRom(AnimationTrack const& track, float threshold = 0.00005f);
 		static CompactAnimation		buildCompactAnimation(std::vector<AnimationTrack> const& tracks);
 		static bool					SortingKeyframeBuilderLess(const ExtendedKey& a, const ExtendedKey& b);
 		

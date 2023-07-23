@@ -194,6 +194,9 @@
     <ClCompile Include="Animation\AcclaimImporter.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Animation\AnimationPlayer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -205,9 +208,6 @@
     </None>
     <None Include="Animation\AnimationPlayer.h">
       <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="Animation\AnimationPlayer.cpp">
-      <Filter>소스 파일</Filter>
     </None>
     <None Include="Animation\CompactAnimation.h">
       <Filter>헤더 파일</Filter>
