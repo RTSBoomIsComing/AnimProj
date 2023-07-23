@@ -226,16 +226,34 @@ std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks
 	for (size_t trackID = 0; trackID < tracks.size(); trackID++)
 	{
 		const auto& track = tracks[trackID];
-		for (size_t i = 0; i < track.values.size(); i++)
+
+		// front
+		ExtendedKey keyframeBuilder = {};
+		keyframeBuilder.prevKeyTime = -1;
+		keyframeBuilder.keyTime = track.times.front();
+		keyframeBuilder.trackID = trackID;
+		keyframeBuilder.value = track.values.front();
+		keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+
+		keyframeBuilders.push_back(keyframeBuilder);
+		keyframeBuilders.push_back(keyframeBuilder);
+
+
+		for (size_t i = 1; i < track.values.size(); i++)
 		{
 			ExtendedKey keyframeBuilder = {};
-			keyframeBuilder.prevKeyTime = (0 < i) ? track.times[i - 1] : -1;
+			keyframeBuilder.prevKeyTime = track.times[i - 1];
 			keyframeBuilder.keyTime = track.times[i];
 			keyframeBuilder.trackID = trackID;
 			keyframeBuilder.value = track.values[i];
 			keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
 
 			keyframeBuilders.push_back(keyframeBuilder);
+
+			if (i == track.values.size() - 1)
+			{
+				keyframeBuilders.push_back(keyframeBuilder);
+			}
 		}
 	}
 

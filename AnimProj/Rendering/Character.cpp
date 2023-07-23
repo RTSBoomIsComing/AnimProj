@@ -11,6 +11,8 @@
 #include "../Animation/CompactAnimation.h"
 
 #include "../Animation/AnimationBuilder.h"
+#include "../Animation/AnimationPlayer.h"
+
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
 #include "../Rendering/Mesh.h"
@@ -42,7 +44,8 @@ pa::Character::Character(ID3D11Device* device)
 	CompactAnimation compactAnimation;
 	animationBuilder.createFullBodyAnimation(compactAnimation);
 
-
+	AnimationPlayer animationPlayer(compactAnimation);
+	animationPlayer.update(0.4f);
 
 
 	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");

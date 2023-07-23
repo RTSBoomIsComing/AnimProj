@@ -1,11 +1,11 @@
 // author: Changwan Yu
 #pragma once
-#include "RawAnimation.h"
+//#include "RawAnimation.h"
 #include "AnimationTrack.h"
 namespace pa
 {
+	struct RawAnimation;
 	class Skeleton;
-	class RawAnimation;
 	class CompactAnimation;
 	class AnimationBuilder
 	{
