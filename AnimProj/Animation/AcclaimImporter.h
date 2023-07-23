@@ -4,7 +4,7 @@
 
 namespace pa
 {
-	class RawAnimation;
+	struct RawAnimation;
 	class Skeleton;
 	class AcclaimImporter
 	{

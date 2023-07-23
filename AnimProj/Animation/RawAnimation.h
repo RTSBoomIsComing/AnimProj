@@ -3,10 +3,8 @@
 
 namespace pa
 {
-	class RawAnimation
+	struct RawAnimation
 	{
-		friend class AcclaimImporter;
-	public:
 		struct Track
 		{
 			enum class Type : uint16_t
@@ -23,11 +21,6 @@ namespace pa
 			Type				type	: 2;
 		};
 
-	public:
-		RawAnimation() = default;
-		~RawAnimation() = default;
-
-	public:
 		std::vector<Track> _tracks;
 	};
 }
