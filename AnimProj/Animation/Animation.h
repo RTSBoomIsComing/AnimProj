@@ -45,7 +45,7 @@ namespace pa
 		void				fitBoneAnimationCatmullRom(std::vector<Animation::Keyframe>& frames, float threshold = 0.00005f);
 		void				fitBoneAnimationCatmullRomCyclic(std::vector<Animation::Keyframe>& frames, float threshold = 0.00005f);
 		bool				validateDetailedStream();
-	private:
+	public:
 		uint16_t						_duration			= 0;
 		uint16_t						_boneCount			= 0;
 

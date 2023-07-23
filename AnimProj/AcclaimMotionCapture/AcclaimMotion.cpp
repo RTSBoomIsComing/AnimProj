@@ -16,6 +16,49 @@ pa::Acclaim::Motion::Motion(const Acclaim::Skeleton* skeleton, std::wstring cons
 	parseMotionData(stream);
 }
 
+bool pa::Acclaim::Motion::hasTranslation(uint16_t index) const
+{
+	assert(_skeleton);
+
+	uint16_t boneID = _boneIDs[index];
+	std::vector<Acclaim::DOF> const& dofs = _skeleton->_boneData[boneID].dof;
+	for (Acclaim::DOF dof : dofs)
+	{
+		if (Acclaim::DOF::TX == dof || Acclaim::DOF::TY == dof || Acclaim::DOF::TZ == dof)
+			return true;
+	}
+
+	return false;
+}
+
+bool pa::Acclaim::Motion::hasRotation(uint16_t index) const
+{
+	assert(_skeleton);
+
+	uint16_t boneID = _boneIDs[index];
+	std::vector<Acclaim::DOF> const& dofs = _skeleton->_boneData[boneID].dof;
+	for (Acclaim::DOF dof : dofs)
+	{
+		if (Acclaim::DOF::RX == dof || Acclaim::DOF::RY == dof || Acclaim::DOF::RZ == dof) 
+			return true;
+	}
+
+	return false;
+}
+
+DirectX::XMVECTOR pa::Acclaim::Motion::getTranslation(uint16_t index, uint16_t frameID) const
+{
+	if (false == this->hasTranslation(index))
+		return DirectX::XMVECTOR();
+
+	assert(_skeleton);
+	uint16_t boneID = _boneIDs[index];
+	std::vector<Acclaim::DOF> const& dofs = _skeleton->_boneData[boneID].dof;
+
+
+	return DirectX::XMVECTOR();
+}
+
 void pa::Acclaim::Motion::parseBoneNames(std::istream& stream)
 {
 	std::string buffer;

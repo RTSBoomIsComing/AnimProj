@@ -24,7 +24,7 @@ pa::Acclaim::DOF pa::Acclaim::convertToDOF(std::string const& s)
     if ("L" == s || "l" == s)
         return DOF::L;
 
-    return DOF::None;
+    return DOF();
 }
 
 pa::Acclaim::AxisOrder pa::Acclaim::convertToAxisOrder(std::string const& s)
@@ -91,7 +91,7 @@ DirectX::XMVECTOR pa::Acclaim::getQuaternionFromAxis(DirectX::XMVECTOR axis, Axi
     }
 
     XMVECTOR Q = XMQuaternionRotationMatrix(M);
-    Q = XMQuaternionNormalizeEst(Q);
+    Q = XMQuaternionNormalize(Q);
 
     return Q;
 }

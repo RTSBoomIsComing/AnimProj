@@ -8,19 +8,19 @@
 namespace pa
 {
 	class Skeleton;
-	class Animation;
+	class RawAnimation;
 	class AnimationBuilder
 	{
 	public:
-		AnimationBuilder(const Skeleton* skeleton, const Animation* animation);
+		AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation);
 		~AnimationBuilder() = default;
 
 		static Animation* createDetailedAnimation(Animation* animation, std::vector<bool> const& mask);
 		static Animation* createCompactAnimation(Animation* animation, std::vector<bool> const& mask);
 
 	private:
-		const Skeleton* const	_skeleton;
-		const Animation* const	_animation;
+		const Skeleton&		_skeleton;
+		const RawAnimation& _rawAnimation;
 	};
 }
 

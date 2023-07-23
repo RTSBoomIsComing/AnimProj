@@ -8,10 +8,10 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <unordered_map>
 #include <chrono>
 #include <algorithm>
 #include <array>
+#include <numeric>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

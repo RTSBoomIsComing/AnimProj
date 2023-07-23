@@ -6,42 +6,97 @@
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 
-void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotion, RawAnimation* rawAnimation)
+void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotion, const Skeleton& skeleton, RawAnimation* rawAnimation)
 {
 	using namespace DirectX;
+
+	std::vector<uint16_t> times(acclaimMotion._frameCount);
+	for (uint16_t frame = 0; frame < acclaimMotion._frameCount; frame++)
+	{
+		times[frame] = frame;
+	}
+
 	for (int i = 0; i < acclaimMotion._boneIDs.size(); i++)
 	{
 		uint16_t boneID = acclaimMotion._boneIDs[i];
-		std::vector<Acclaim::DOF> const& dofs = acclaimMotion._skeleton->_boneData[boneID].dof;
+		Acclaim::Skeleton::Bone const& bone = acclaimMotion._skeleton->_boneData[boneID];
+
+		bool hasTranslation = false;
+		bool hasRotation = false;
+		for (Acclaim::DOF dof : bone.dof)
+		{
+			if (static_cast<uint16_t>(dof) < 3)
+				hasTranslation = true;
+			else if (static_cast<uint16_t>(dof) < 6)
+				hasRotation = true;
+			else
+				DebugBreak();
+		}
+
+		std::vector<XMFLOAT4> translations;
+		std::vector<XMFLOAT4> rotations;
 
 		std::vector<float> const& motionData = acclaimMotion._data[i];
 		size_t motionDataCursor = 0;
 		for (uint16_t frame = 0; frame < acclaimMotion._frameCount; frame++)
 		{
+			// 0, 1, 2 -> translation, 3, 4, 5 -> rotation, 6 -> length
 			float buffer[7] = {};
-			bool hasTranslation = false;
-			bool hasRotation = false;
-			for (Acclaim::DOF dof : dofs)
+
+			for (Acclaim::DOF dof : bone.dof)
 			{
-				const float value = motionData[motionDataCursor++];
 				uint16_t index = static_cast<uint16_t>(dof);
-				buffer[index] = value;
-				if (index < 3)
-					hasTranslation = true;
-				else if (index < 6)
-					hasRotation = true;
-				else
-					DebugBreak();
+				buffer[index] = motionData[motionDataCursor++];
 			}
 
 			if (hasTranslation)
 			{
-				//TODO
+				XMVECTOR V = XMVectorSet(buffer[0], buffer[1], buffer[2], 0.0f);
+				V = V * acclaimMotion._skeleton->_unit.length;
+
+				// convert right-handed to left-handed
+				V = V * XMVectorSet(1.0f, 1.0f, -1.0f, 0.0f);
+
+				XMFLOAT4 translation = {};
+				translations.push_back(translation);
 			}
+
 			if (hasRotation)
 			{
-				//TODO
+				XMVECTOR Euler = XMVectorSet(buffer[3], buffer[4], buffer[5], 0.0f);
+				Euler = Euler * acclaimMotion._skeleton->_unit.angle;
+
+				// convert right-handed to left-handed
+				Euler = Euler * XMVectorSet(-1.0f, -1.0f, 1.0f, 0.0f);
+
+				const XMVECTOR Q = Acclaim::getQuaternionFromAxis(Euler, bone.axisOrder);
+
+				XMFLOAT4 quaternion = {};
+				XMStoreFloat4(&quaternion, Q);
+				rotations.push_back(quaternion);
 			}
+		}
+
+		if (hasTranslation)
+		{
+			RawAnimation::Track track = {};
+			track.boneID = boneID;
+			track.type = RawAnimation::Track::Type::Translation;
+			track.values = std::move(translations);
+			track.times = times;
+
+			rawAnimation->_tracks.push_back(track);
+		}
+
+		if (hasRotation)
+		{
+			RawAnimation::Track track = {};
+			track.boneID = skeleton.getParentBoneID(boneID);
+			track.type = RawAnimation::Track::Type::Rotation;
+			track.values = std::move(rotations);
+			track.times = times;
+
+			rawAnimation->_tracks.push_back(track);
 		}
 	}
 }

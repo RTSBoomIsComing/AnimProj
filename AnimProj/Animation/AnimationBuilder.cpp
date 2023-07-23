@@ -3,9 +3,9 @@
 #include "AnimationBuilder.h"
 #include "Animation.h"
 
-pa::AnimationBuilder::AnimationBuilder(const Skeleton* skeleton, const Animation* animation)
+pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation)
 	: _skeleton(skeleton)
-	, _animation(animation)
+	, _rawAnimation(rawAnimation)
 {
 
 }

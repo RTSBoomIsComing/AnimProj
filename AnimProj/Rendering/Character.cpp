@@ -5,7 +5,9 @@
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 #include "../Animation/Animation.h"
+#include "../Animation/RawAnimation.h"
 #include "../Animation/AcclaimImporter.h"
+#include "../Animation/AnimationBuilder.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
 #include "../Rendering/Mesh.h"
@@ -28,6 +30,13 @@ pa::Character::Character(ID3D11Device* device)
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 	Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + L"131_04-dance.amc");
+	RawAnimation rawAnimation;
+	AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
+
+	AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
+
+
+
 	AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
 	//AMC amcIdle(amcDirectory	+ L"idle.amc");
 	//AMC amcWalk(amcDirectory	+ L"walk.amc");
@@ -40,6 +49,8 @@ pa::Character::Character(ID3D11Device* device)
 	//_animations.push_back(Animation(&asf, &amcRun));
 	//_animations.push_back(Animation(&asf, &amcJump));
 	//_animations.push_back(Animation(&asf, &amcPunch));
+
+
 
 	for (auto& animation : _animations)
 	{

@@ -9,7 +9,7 @@ namespace pa
 	class AcclaimImporter
 	{
 	public:
-		static void	createRawAnimation(Acclaim::Motion const& acclaimMotion, RawAnimation* rawAnimation);
+		static void	createRawAnimation(Acclaim::Motion const& acclaimMotion, const Skeleton& skeleton, RawAnimation* rawAnimation);
 		static void	destroyRawAnimation(RawAnimation* rawAnimation);
 
 		static void	createSkeleton(Acclaim::Skeleton const& acclaimSkeleton, Skeleton* skeleton);
