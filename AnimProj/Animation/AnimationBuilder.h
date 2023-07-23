@@ -1,9 +1,11 @@
 // author: Changwan Yu
 #pragma once
 #include "RawAnimation.h"
+#include "AnimationTrack.h"
 namespace pa
 {
 	class Skeleton;
+	class RawAnimation;
 	class CompactAnimation;
 	class AnimationBuilder
 	{
@@ -19,8 +21,12 @@ namespace pa
 	public:
 		AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation);
 		~AnimationBuilder() = default;
-
-		void						createCompactAnimation(CompactAnimation* comapactAnimation);
+	
+	public:
+		void	createFullBodyAnimation(CompactAnimation& outAnimation)  const;
+		void	createUpperBodyAnimation(CompactAnimation& outAnimation) const;
+		void	createLowerBodyAnimation(CompactAnimation& outAnimation) const;
+	
 	private:
 		static AnimationTrack		removeDuplicateFrame(AnimationTrack const& track);
 		static AnimationTrack		fitCurveWithCatmullRom(AnimationTrack const& track, float threshold = 0.0001f);

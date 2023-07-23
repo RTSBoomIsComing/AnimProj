@@ -4,9 +4,12 @@
 #include "../AcclaimMotionCapture/AMC.h"
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
+
+#include "../Animation/AcclaimImporter.h"
 #include "../Animation/Animation.h"
 #include "../Animation/RawAnimation.h"
-#include "../Animation/AcclaimImporter.h"
+#include "../Animation/CompactAnimation.h"
+
 #include "../Animation/AnimationBuilder.h"
 #include "../Animation/AnimationController.h"
 #include "../Animation/AnimationBlender.h"
@@ -30,10 +33,15 @@ pa::Character::Character(ID3D11Device* device)
 	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
 	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
 	Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + L"131_04-dance.amc");
+
 	RawAnimation rawAnimation;
 	AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
 
 	AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
+	
+	CompactAnimation compactAnimation;
+	animationBuilder.createFullBodyAnimation(compactAnimation);
+
 
 
 

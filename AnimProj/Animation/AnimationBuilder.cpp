@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "AnimationBuilder.h"
 #include "CompactAnimation.h"
+#include "RawAnimation.h"
+#include "Skeleton.h"
 
 pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation)
 	: _skeleton(skeleton)
@@ -247,4 +249,35 @@ bool pa::AnimationBuilder::SortingKeyframeBuilderLess(const ExtendedKey& a, cons
 	return a.prevKeyTime < b.prevKeyTime
 		|| (a.prevKeyTime == b.prevKeyTime
 			&& a.trackID < b.trackID);
+}
+
+void pa::AnimationBuilder::createFullBodyAnimation(CompactAnimation& outAnimation) const
+{
+	outAnimation = buildCompactAnimation(_tracks);
+}
+
+void pa::AnimationBuilder::createUpperBodyAnimation(CompactAnimation& outAnimation) const
+{
+	std::vector<AnimationTrack> upperBodyTracks;
+	for (const auto& track : _tracks)
+	{
+		uint16_t boneID = track.boneID;
+		if (_skeleton.getUpperBodyMask()[boneID])
+			upperBodyTracks.push_back(track);
+	}
+
+	outAnimation = buildCompactAnimation(upperBodyTracks);
+}
+
+void pa::AnimationBuilder::createLowerBodyAnimation(CompactAnimation& outAnimation) const
+{
+	std::vector<AnimationTrack> lowerBodyTracks;
+	for (const auto& track : _tracks)
+	{
+		uint16_t boneID = track.boneID;
+		if (_skeleton.getLowerBodyMask()[boneID])
+			lowerBodyTracks.push_back(track);
+	}
+
+	outAnimation = buildCompactAnimation(lowerBodyTracks);
 }
