@@ -2,11 +2,6 @@
 #pragma once
 namespace pa
 {
-	struct KeyframeDescriptor
-	{
-
-	};
-
 	struct CompactKeyframe
 	{
 		union

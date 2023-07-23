@@ -163,6 +163,8 @@
     </ClInclude>
     <None Include="Animation\AnimationPlayer.cpp" />
     <None Include="Animation\AnimationPlayer.h" />
+    <None Include="Animation\CompactAnimation.cpp" />
+    <None Include="Animation\CompactAnimation.h" />
     <None Include="cpp.hint" />
     <None Include="Rendering\SkeletonMesh.cpp" />
     <None Include="Rendering\SkeletonMesh.h" />
