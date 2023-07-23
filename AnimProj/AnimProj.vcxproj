@@ -161,6 +161,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <None Include="Animation\AnimationTrack.cpp" />
+    <None Include="Animation\AnimationTrack.h" />
     <None Include="Animation\AnimationPlayer.cpp" />
     <None Include="Animation\AnimationPlayer.h" />
     <None Include="Animation\CompactAnimation.cpp" />

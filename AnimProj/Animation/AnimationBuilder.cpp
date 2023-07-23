@@ -7,26 +7,23 @@ pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimat
 	: _skeleton(skeleton)
 	, _rawAnimation(rawAnimation)
 {
-	std::vector<RawAnimation::Track> compressLv1;
 	for (const auto& track : rawAnimation._tracks)
 	{
-		compressLv1.push_back(this->removeDuplicateFrame(track));
+		_tracks.push_back(this->removeDuplicateFrame(track));
 	}
 
-	std::vector<RawAnimation::Track> compressLv2;
-	for (const auto& track : compressLv1)
+	std::vector<AnimationTrack> compressed;
+	for (const auto& track : _tracks)
 	{
-		compressLv2.push_back(this->fitCurveWithCatmullRom(track));
+		compressed.push_back(this->fitCurveWithCatmullRom(track));
 	}
-
-	auto compactAnimation = this->buildCompactAnimation(compressLv2);
-
+	_tracks = std::move(compressed);
 }
 
-pa::RawAnimation::Track pa::AnimationBuilder::removeDuplicateFrame(RawAnimation::Track const& track)
+pa::AnimationTrack pa::AnimationBuilder::removeDuplicateFrame(AnimationTrack const& track)
 {
 	using namespace DirectX;
-	RawAnimation::Track newTrack;
+	AnimationTrack newTrack;
 	newTrack.boneID = track.boneID;
 	newTrack.type = track.type;
 
@@ -62,7 +59,7 @@ pa::RawAnimation::Track pa::AnimationBuilder::removeDuplicateFrame(RawAnimation:
 	return newTrack;
 }
 
-pa::RawAnimation::Track pa::AnimationBuilder::fitCurveWithCatmullRom(RawAnimation::Track const& track, float threshold)
+pa::AnimationTrack pa::AnimationBuilder::fitCurveWithCatmullRom(AnimationTrack const& track, float threshold)
 {
 	using namespace DirectX;
 
@@ -137,7 +134,7 @@ pa::RawAnimation::Track pa::AnimationBuilder::fitCurveWithCatmullRom(RawAnimatio
 		samples[midPoints[std::distance(errors.begin(), findMaxError)]] = true;
 	}
 
-	RawAnimation::Track newTrack;
+	AnimationTrack newTrack;
 	newTrack.boneID = track.boneID;
 	newTrack.type = track.type;
 
@@ -159,56 +156,31 @@ pa::RawAnimation::Track pa::AnimationBuilder::fitCurveWithCatmullRom(RawAnimatio
 	return newTrack;
 }
 
-pa::CompactAnimation pa::AnimationBuilder::buildCompactAnimation(std::vector<RawAnimation::Track> const& tracks)
+pa::CompactAnimation pa::AnimationBuilder::buildCompactAnimation(std::vector<AnimationTrack> const& tracks)
 {
 	using namespace DirectX;
 
-	size_t keyframeCount = 0;
+	std::vector<AnimationTrackHeader> trackHeaders;
 	for (const auto& track : tracks)
 	{
-		keyframeCount += track.values.size();
-	}
-
-	std::vector<CompactKeyframe> keyframes;
-	keyframes.reserve(keyframeCount);
-
-	std::vector<CompactAnimation::TrackHeader> trackHeaders;
-	for (const auto& track : tracks)
-	{
-		CompactAnimation::TrackHeader trackHeader;
+		AnimationTrackHeader trackHeader;
 		trackHeader.boneID = track.boneID;
 
 		const uint16_t trackType = static_cast<uint16_t>(track.type);
-		trackHeader.type = static_cast<CompactAnimation::TrackHeader::Type>(trackType);
+		trackHeader.type = static_cast<AnimationType>(trackType);
 
 		trackHeaders.push_back(trackHeader);
 	}
 
-	std::vector<KeyframeBuilder> keyframeBuilders;
-	keyframeBuilders.reserve(keyframeCount);
+	std::vector<ExtendedKey> keyframeBuilders = mergeTracks(tracks);
 
-	for (size_t trackID = 0; trackID < tracks.size(); trackID++)
-	{
-		const auto& track = tracks[trackID];
-		for (size_t i = 0; i < track.values.size(); i++)
-		{
-			KeyframeBuilder keyframeBuilder = {};
-			keyframeBuilder.prevKeyTime = (0 < i) ? track.times[i - 1] : -1;
-			keyframeBuilder.keyTime = track.times[i];
-			keyframeBuilder.trackID = trackID;
-			keyframeBuilder.value = track.values[i];
-			keyframeBuilder.isQuaternion = (RawAnimation::Track::Type::Rotation == track.type);
-
-			keyframeBuilders.push_back(keyframeBuilder);
-		}
-	}
-
-	std::sort(keyframeBuilders.begin(), keyframeBuilders.end(), SortingKeyframeBuilderLess);
+	std::vector<CompactKeyframe> keyframes;
+	keyframes.reserve(keyframeBuilders.size());
 
 	std::vector<uint16_t> trackIndices;
 	trackIndices.reserve(keyframeBuilders.size());
 
-	for (const KeyframeBuilder& keyframeBuilder : keyframeBuilders)
+	for (const ExtendedKey& keyframeBuilder : keyframeBuilders)
 	{
 		if (keyframeBuilder.isQuaternion)
 		{
@@ -238,7 +210,39 @@ pa::CompactAnimation pa::AnimationBuilder::buildCompactAnimation(std::vector<Raw
 	return compactAnimation;
 }
 
-bool pa::AnimationBuilder::SortingKeyframeBuilderLess(const KeyframeBuilder& a, const KeyframeBuilder& b)
+std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks(std::vector<AnimationTrack> const& tracks)
+{
+	size_t keyframeCount = 0;
+	for (const auto& track : tracks)
+	{
+		keyframeCount += track.values.size();
+	}
+
+	std::vector<ExtendedKey> keyframeBuilders;
+	keyframeBuilders.reserve(keyframeCount);
+
+	for (size_t trackID = 0; trackID < tracks.size(); trackID++)
+	{
+		const auto& track = tracks[trackID];
+		for (size_t i = 0; i < track.values.size(); i++)
+		{
+			ExtendedKey keyframeBuilder = {};
+			keyframeBuilder.prevKeyTime = (0 < i) ? track.times[i - 1] : -1;
+			keyframeBuilder.keyTime = track.times[i];
+			keyframeBuilder.trackID = trackID;
+			keyframeBuilder.value = track.values[i];
+			keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+
+			keyframeBuilders.push_back(keyframeBuilder);
+		}
+	}
+
+	std::sort(keyframeBuilders.begin(), keyframeBuilders.end(), SortingKeyframeBuilderLess);
+
+	return keyframeBuilders;
+}
+
+bool pa::AnimationBuilder::SortingKeyframeBuilderLess(const ExtendedKey& a, const ExtendedKey& b)
 {
 	return a.prevKeyTime < b.prevKeyTime
 		|| (a.prevKeyTime == b.prevKeyTime

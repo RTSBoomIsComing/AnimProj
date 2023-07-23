@@ -79,9 +79,9 @@ void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotio
 
 		if (hasTranslation)
 		{
-			RawAnimation::Track track = {};
+			AnimationTrack track = {};
 			track.boneID = boneID;
-			track.type = RawAnimation::Track::Type::Translation;
+			track.type = AnimationTrack::Type::Translation;
 			track.values = std::move(translations);
 			track.times = times;
 
@@ -90,9 +90,9 @@ void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotio
 
 		if (hasRotation)
 		{
-			RawAnimation::Track track = {};
+			AnimationTrack track = {};
 			track.boneID = skeleton.getParentBoneID(boneID);
-			track.type = RawAnimation::Track::Type::Rotation;
+			track.type = AnimationTrack::Type::Rotation;
 			track.values = std::move(rotations);
 			track.times = times;
 
