@@ -8,9 +8,10 @@ pa::AnimationPlayer::AnimationPlayer(const CompactAnimation& animation)
 	, _duration(_animation.getKeyframes().back().keytime)
 {
 	_activeKeys.resize(_animation.getTrackHeaders().size());
-	initializeActiveKeys();
+	initializeActiveKeysWithMemCopy();
 
 	_rotations.resize(41);
+	_isRunning = false;
 }
 
 void pa::AnimationPlayer::update(float deltaTime)
@@ -19,7 +20,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 	constexpr int fps = 120;
 
 	if (_isRunning)
-		_runningTime += deltaTime;
+		_runningTime += deltaTime * 0.5f;
 	
 	
 	float elipsedFrame = _runningTime * fps;
@@ -27,41 +28,58 @@ void pa::AnimationPlayer::update(float deltaTime)
 	{
 		elipsedFrame = 0;
 		_runningTime = 0;
-		initializeActiveKeys();
+		initializeActiveKeysWithMemCopy();
 	}
 
 	while (_cursor < _animation.getKeyframes().size())
 	{
 		uint16_t trackID = _animation.getTrackIndices()[_cursor];
-		if (_activeKeys[trackID][2].keytime < elipsedFrame)
+		auto& controlPoints = _activeKeys[trackID];
+		if (controlPoints[2].keytime < elipsedFrame)
 		{
-			_activeKeys[trackID][0] = _activeKeys[trackID][1];
-			_activeKeys[trackID][1] = _activeKeys[trackID][2];
-			_activeKeys[trackID][2] = _activeKeys[trackID][3];
-			_activeKeys[trackID][3] = _animation.getKeyframes()[_cursor];
+			controlPoints[0] = controlPoints[1];
+			controlPoints[1] = controlPoints[2];
+			controlPoints[2] = controlPoints[3];
+			controlPoints[3] = _animation.getKeyframes()[_cursor];
 		
 			_cursor++;
-
-			//save rotation
-			
-			// bone id 
-			uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
-
-
-			float weight = (elipsedFrame - _activeKeys[trackID][1].keytime) 
-				/ (_activeKeys[trackID][2].keytime - _activeKeys[trackID][1].keytime);
-
-			_rotations[boneID] = XMQuaternionSlerp(_activeKeys[trackID][1].decompressAsQuaternion()
-				, _activeKeys[trackID][2].decompressAsQuaternion(), weight);
 		}
 		else
 			break;
+	}
+
+	//cache rotation
+	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
+	{
+		uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
+		auto& controlPoints = _activeKeys[trackID];
+
+
+		if (!(controlPoints[1].keytime < controlPoints[2].keytime))
+			DebugBreak();
+		if (!(controlPoints[1].keytime <= elipsedFrame && elipsedFrame <= controlPoints[2].keytime))
+			DebugBreak();
+
+		float weight = (elipsedFrame - controlPoints[1].keytime)
+			/ (controlPoints[2].keytime - controlPoints[1].keytime);
+
+		if (AnimationType::Rotation == _animation.getTrackHeaders()[trackID].type)
+		{
+			_rotations[boneID] = XMQuaternionSlerp(
+				controlPoints[1].decompressAsQuaternion(),
+				controlPoints[2].decompressAsQuaternion(), weight);
+		}
 	}
 }
 
 DirectX::XMVECTOR pa::AnimationPlayer::getBoneRotation(uint32_t boneIndex) const
 {
 	return _rotations[boneIndex];
+}
+
+void pa::AnimationPlayer::play()
+{
+	_isRunning = true;
 }
 
 void pa::AnimationPlayer::initializeActiveKeys()
@@ -77,4 +95,12 @@ void pa::AnimationPlayer::initializeActiveKeys()
 		_activeKeys[trackID][2] = _activeKeys[trackID][3];
 		_activeKeys[trackID][3] = _animation.getKeyframes()[i];	
 	}
+}
+
+void pa::AnimationPlayer::initializeActiveKeysWithMemCopy()
+{
+	const size_t trackCount = _animation.getTrackHeaders().size();
+	_cursor = trackCount * 4;
+	std::memcpy(_activeKeys.data(), _animation.getKeyframes().data(), sizeof(CompactKeyframe) * _cursor);
+
 }

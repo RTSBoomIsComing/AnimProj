@@ -114,13 +114,13 @@ pa::AnimationTrack pa::AnimationBuilder::fitCurveWithCatmullRom(AnimationTrack c
 
 				const XMVECTOR	difference = XMLoadFloat4(&track.values[between]) - catmullRom;
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
-				//errors.back() += error;
+				errors.back() += error;
 
-				if (errors.back() < error)
-				{
-					errors.back() = error;
-					midPoints.back() = between;
-				}
+				//if (errors.back() < error)
+				//{
+				//	errors.back() = error;
+				//	midPoints.back() = between;
+				//}
 			}
 
 			P0 = P1;
@@ -182,7 +182,7 @@ pa::CompactAnimation pa::AnimationBuilder::buildCompactAnimation(std::vector<Ani
 		trackHeaders.push_back(trackHeader);
 	}
 
-	std::vector<ExtendedKey> keyframeBuilders = mergeTracks(tracks);
+	std::vector<ExtendedKey> keyframeBuilders = mergeTracks2(tracks);
 
 	std::vector<CompactKeyframe> keyframes;
 	keyframes.reserve(keyframeBuilders.size());
@@ -281,6 +281,91 @@ std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks
 	return keyframeBuilders;
 }
 
+std::vector<pa::AnimationBuilder::ExtendedKey> pa::AnimationBuilder::mergeTracks2(std::vector<AnimationTrack> const& tracks)
+{
+	size_t keyframeCount = 0;
+	for (const auto& track : tracks)
+	{
+		keyframeCount += track.values.size();
+	}
+
+	std::vector<ExtendedKey> keyframeBuilders;
+	keyframeBuilders.reserve(keyframeCount);
+
+	std::vector<uint16_t> cursors(tracks.size(), 0ui16);
+	for (uint16_t trackID = 0; trackID < tracks.size(); trackID++)
+	{
+		const auto& track = tracks[trackID];
+
+		ExtendedKey keyframeBuilder = {};
+		keyframeBuilder.prevKeyTime = -2;
+		keyframeBuilder.trackID = trackID;
+		keyframeBuilder.keyTime = track.times.front();
+		keyframeBuilder.value = track.values.front();
+		keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+
+
+		keyframeBuilders.push_back(keyframeBuilder);
+		keyframeBuilders.push_back(keyframeBuilder);
+
+		keyframeBuilder.keyTime = track.times[1];
+		keyframeBuilder.value   = track.values[1];
+		keyframeBuilders.push_back(keyframeBuilder);
+
+		if (2 < track.times.size())
+		{
+			keyframeBuilder.keyTime = track.times[2];
+			keyframeBuilder.value	= track.values[2];
+		}
+
+		keyframeBuilders.push_back(keyframeBuilder);
+		cursors[trackID] = 2;
+
+	}
+
+	uint16_t _duration = tracks.front().times.back();
+	for (uint16_t currentKeytime = 0; currentKeytime < _duration; currentKeytime++)
+	{
+		for (uint16_t trackID = 0; trackID < tracks.size(); trackID++)
+		{
+			const auto& track = tracks[trackID];
+			uint16_t& cursor = cursors[trackID];
+			if (track.times.size() == cursor)
+				continue;
+
+			if (track.times[cursor - 1] == currentKeytime)
+			{
+				cursor += 1;
+				//assert(cursor < currentTrack.size());
+				if (cursor == track.times.size())
+				{
+					ExtendedKey keyframeBuilder = {};
+					keyframeBuilder.prevKeyTime = 0;
+					keyframeBuilder.trackID = trackID;
+					keyframeBuilder.keyTime = track.times.back();
+					keyframeBuilder.value = track.values.back();
+					keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+
+					keyframeBuilders.push_back(keyframeBuilder);
+				}
+				else
+				{
+					ExtendedKey keyframeBuilder = {};
+					keyframeBuilder.prevKeyTime = 0;
+					keyframeBuilder.trackID = trackID;
+					keyframeBuilder.keyTime = track.times[cursor];
+					keyframeBuilder.value = track.values[cursor];
+					keyframeBuilder.isQuaternion = (AnimationTrack::Type::Rotation == track.type);
+
+					keyframeBuilders.push_back(keyframeBuilder);
+				}
+			}
+		}
+	}
+
+	return keyframeBuilders;
+}
+
 bool pa::AnimationBuilder::SortingKeyframeBuilderLess(const ExtendedKey& a, const ExtendedKey& b)
 {
 	return a.prevKeyTime < b.prevKeyTime
@@ -288,12 +373,12 @@ bool pa::AnimationBuilder::SortingKeyframeBuilderLess(const ExtendedKey& a, cons
 			&& a.trackID < b.trackID);
 }
 
-void pa::AnimationBuilder::createFullBodyAnimation(CompactAnimation& outAnimation) const
+pa::CompactAnimation pa::AnimationBuilder::createFullBodyAnimation() const
 {
-	outAnimation = buildCompactAnimation(_tracks);
+	return buildCompactAnimation(_tracks);
 }
 
-void pa::AnimationBuilder::createUpperBodyAnimation(CompactAnimation& outAnimation) const
+pa::CompactAnimation pa::AnimationBuilder::createUpperBodyAnimation() const
 {
 	std::vector<AnimationTrack> upperBodyTracks;
 	for (const auto& track : _tracks)
@@ -303,10 +388,10 @@ void pa::AnimationBuilder::createUpperBodyAnimation(CompactAnimation& outAnimati
 			upperBodyTracks.push_back(track);
 	}
 
-	outAnimation = buildCompactAnimation(upperBodyTracks);
+	return buildCompactAnimation(upperBodyTracks);
 }
 
-void pa::AnimationBuilder::createLowerBodyAnimation(CompactAnimation& outAnimation) const
+pa::CompactAnimation pa::AnimationBuilder::createLowerBodyAnimation() const
 {
 	std::vector<AnimationTrack> lowerBodyTracks;
 	for (const auto& track : _tracks)
@@ -316,5 +401,5 @@ void pa::AnimationBuilder::createLowerBodyAnimation(CompactAnimation& outAnimati
 			lowerBodyTracks.push_back(track);
 	}
 
-	outAnimation = buildCompactAnimation(lowerBodyTracks);
+	return buildCompactAnimation(lowerBodyTracks);
 }

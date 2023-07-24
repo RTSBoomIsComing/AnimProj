@@ -23,9 +23,9 @@ namespace pa
 		~AnimationBuilder() = default;
 	
 	public:
-		void	createFullBodyAnimation(CompactAnimation& outAnimation)  const;
-		void	createUpperBodyAnimation(CompactAnimation& outAnimation) const;
-		void	createLowerBodyAnimation(CompactAnimation& outAnimation) const;
+		CompactAnimation	createFullBodyAnimation()  const;
+		CompactAnimation	createUpperBodyAnimation() const;
+		CompactAnimation	createLowerBodyAnimation() const;
 	
 	private:
 		static AnimationTrack		removeDuplicateFrame(AnimationTrack const& track);
@@ -34,6 +34,7 @@ namespace pa
 		static bool					SortingKeyframeBuilderLess(const ExtendedKey& a, const ExtendedKey& b);
 		
 		static std::vector<ExtendedKey>	mergeTracks(std::vector<AnimationTrack> const& tracks);
+		static std::vector<ExtendedKey>	mergeTracks2(std::vector<AnimationTrack> const& tracks);
 
 	private:
 		const Skeleton&		_skeleton;

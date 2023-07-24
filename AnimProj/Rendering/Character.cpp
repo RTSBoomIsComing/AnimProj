@@ -1,20 +1,15 @@
 #include "pch.h"
 #include "Character.h"
-#include "../AcclaimMotionCapture/ASF.h"
-#include "../AcclaimMotionCapture/AMC.h"
 #include "../AcclaimMotionCapture/AcclaimMotion.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 
 #include "../Animation/AnimationPlayer.h"
 #include "../Animation/AcclaimImporter.h"
-#include "../Animation/Animation.h"
 #include "../Animation/RawAnimation.h"
 #include "../Animation/CompactAnimation.h"
-
 #include "../Animation/AnimationBuilder.h"
 
-#include "../Animation/AnimationController.h"
-#include "../Animation/AnimationBlender.h"
+
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"
@@ -41,10 +36,12 @@ pa::Character::Character(ID3D11Device* device)
 
 	AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
 	
-	static CompactAnimation compactAnimation; 
-	animationBuilder.createFullBodyAnimation(compactAnimation);
+	static CompactAnimation danceLowerBody = animationBuilder.createLowerBodyAnimation();
+	_animationPlayers.push_back(AnimationPlayer(danceLowerBody));
 
-	_animationPlayer = new AnimationPlayer(compactAnimation);
+	static CompactAnimation danceUpperBody = animationBuilder.createLowerBodyAnimation();
+	_animationPlayers.push_back(AnimationPlayer(danceUpperBody));
+
 	
 	//AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
 	//AMC amcIdle(amcDirectory	+ L"idle.amc");
@@ -77,22 +74,12 @@ pa::Character::Character(ID3D11Device* device)
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
+	
+	//_poseScales.resize(_skeleton->getBoneCount());
+	_poseRotations.resize(_skeleton->getBoneCount());
+	_poseTranslations.resize(_skeleton->getBoneCount());
 
-
-	//std::vector<bool> _skeletonUpperBodyMask(_skeleton->getBoneCount());
-
-	//// bone index 11 is the lower back
-	//_skeletonUpperBodyMask[11] = true;
-	//for (uint8_t boneIndex : _skeleton->getHierarchy())
-	//{
-	//	uint8_t parentIndex = _skeleton->getParentBoneID(boneIndex);
-	//	if (parentIndex >= _skeleton->getBoneCount())
-	//		continue;
-
-	//	if (_skeletonUpperBodyMask[parentIndex])
-	//		_skeletonUpperBodyMask[boneIndex] = true;
-	//}
-
+	
 	_boneMesh = new StickMesh(device);
 	_jointMesh = new CubeMesh(device, 0.25f);
 }
@@ -114,43 +101,36 @@ pa::Character::~Character()
 		_jointMesh = nullptr;
 	}
 
-	if (nullptr != _animationWalkRun)
-	{
-		delete _animationWalkRun;
-		_animationWalkRun = nullptr;
-	}
+	//if (nullptr != _animationWalkRun)
+	//{
+	//	delete _animationWalkRun;
+	//	_animationWalkRun = nullptr;
+	//}
 
-	if (nullptr != _animationIdleWalk)
-	{
-		delete _animationIdleWalk;
-		_animationIdleWalk = nullptr;
-	}
+	//if (nullptr != _animationIdleWalk)
+	//{
+	//	delete _animationIdleWalk;
+	//	_animationIdleWalk = nullptr;
+	//}
 
-	if (nullptr != _animationPlayer)
-	{
-		delete _animationPlayer;
-		_animationPlayer = nullptr;
-	}
+	//if (nullptr != _animationPlayer)
+	//{
+	//	delete _animationPlayer;
+	//	_animationPlayer = nullptr;
+	//}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
-//	_animationControllers[0].update(deltaTime);
-	_animationPlayer->update(deltaTime);
-	//for (auto& animationController : _animationControllers)
-	//{
-	//	animationController.update(deltaTime);
-	//}
-
-	//_animationIdleWalk->update(deltaTime);
-	//_animationWalkRun->update(deltaTime);
+	for (auto& animationPlayer : _animationPlayers)
+	{
+		animationPlayer.update(deltaTime);
+	}
 
 	using namespace DirectX;
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		//XMVECTOR animationRotation	= _animationIdleWalk->getBoneRotation(boneIndex);
-		//XMVECTOR animationRotation = _animationControllers[0].getBoneRotation(boneIndex);
-		XMVECTOR animationRotation = _animationPlayer->getBoneRotation(boneIndex);
+		XMVECTOR animationRotation = _animationPlayers[0].getBoneRotation(boneIndex);
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);
@@ -210,6 +190,11 @@ void pa::Character::processInput(float deltaTime)
 	//	_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
 	//}
 
+	if (Keyboard::get()->getKeyState(32))
+	{
+		for (auto& animationPlayer : _animationPlayers)
+			animationPlayer.play();
+	}
 
 
 }

@@ -14,9 +14,11 @@ namespace pa
 	public:
 		void update(float deltaTime);
 		DirectX::XMVECTOR getBoneRotation(uint32_t boneIndex) const;
+		void play();
 
 	private:
 		void initializeActiveKeys();
+		void initializeActiveKeysWithMemCopy();
 
 	private:
 		const CompactAnimation&	_animation;
@@ -28,7 +30,7 @@ namespace pa
 
 		const uint16_t	_duration		= 0;
 		float			_runningTime	= 0.0f;
-		bool			_isRunning		= true;
+		bool			_isRunning		= false;
 		bool			_isLooping		= true;
 	};
 }

@@ -4,14 +4,12 @@
 #pragma once
 #include "../Animation/Skeleton.h"
 //#include "../Animation/IAnimationController.h"
-#include "../Animation/Animation.h"
-#include "../Animation/AnimationController.h"
+//#include "../Animation/Animation.h"
+//#include "../Animation/AnimationController.h"
 #include "../Animation/AnimationPlayer.h"
 namespace pa
 {
 	class Mesh;
-	class IAnimationController;
-	class AnimationBlender;
 	class Character
 	{
 	public:
@@ -38,18 +36,21 @@ namespace pa
 
 	private:
 		Skeleton*							_skeleton				= nullptr;
-		IAnimationController*				_animationWalkRun		= nullptr;
-		IAnimationController*				_animationIdleWalk		= nullptr;
+		//IAnimationController*				_animationWalkRun		= nullptr;
+		//IAnimationController*				_animationIdleWalk		= nullptr;
 
 		// will be removed
 		Mesh*								_jointMesh				= nullptr;
 		Mesh*								_boneMesh				= nullptr;
-		std::vector<bool>					_skeletonUpperBodyMask;
-		std::vector<Animation>				_animations;
-		std::vector<AnimationController>	_animationControllers;
-		AnimationPlayer*					_animationPlayer;
+		//std::vector<Animation>			_animations;
+		//std::vector<AnimationController>	_animationControllers;
+		std::vector<AnimationPlayer>		_animationPlayers;
 		std::vector<DirectX::XMMATRIX>		_jointTransforms;
 		std::vector<DirectX::XMMATRIX>		_boneStickTransforms;
+
+		std::vector<DirectX::XMVECTOR>		_poseScales;
+		std::vector<DirectX::XMVECTOR>		_poseRotations;
+		std::vector<DirectX::XMVECTOR>		_poseTranslations;
 	};
 }
 
