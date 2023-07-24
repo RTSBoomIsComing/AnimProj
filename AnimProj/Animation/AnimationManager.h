@@ -1,13 +1,10 @@
 // author: Changwan Yu
 #pragma once
-#include "Animation.h"
-#include "IAnimationController.h"
-#include "AnimationBlender.h"
 
 namespace pa
 {
 	class Skeleton;
-	class Animation;
+	class CompactAnimation;
 	class AnimationManager
 	{
 	public:
@@ -27,9 +24,7 @@ namespace pa
 
 	private:
 		Skeleton*							_skeleton					= nullptr;
-		std::vector<Animation>				_animationList;
-		std::vector<IAnimationController*>	_animationControllerList;
-
+		//std::vector<CompactAnimation>		_animationList;
 	};
 }
 

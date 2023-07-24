@@ -5,10 +5,8 @@
 
 #include "../Animation/AnimationPlayer.h"
 #include "../Animation/AcclaimImporter.h"
-#include "../Animation/RawAnimation.h"
 #include "../Animation/CompactAnimation.h"
 #include "../Animation/AnimationBuilder.h"
-
 
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
@@ -28,8 +26,8 @@ pa::Character::Character(ID3D11Device* device)
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\)";
 	{
-		//Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(131-dance\131_04-dance.amc)");
-		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(135-martialArts\135_06-martialArts.amc)");
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(131-dance\131_04-dance.amc)");
+		//Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(135-martialArts\135_06-martialArts.amc)");
 		RawAnimation rawAnimation = {};
 		AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
 		AnimationBuilder animationBuilder(*_skeleton, rawAnimation);

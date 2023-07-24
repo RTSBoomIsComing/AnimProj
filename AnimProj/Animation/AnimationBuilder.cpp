@@ -2,26 +2,29 @@
 #include "pch.h"
 #include "AnimationBuilder.h"
 #include "CompactAnimation.h"
-#include "RawAnimation.h"
 #include "Skeleton.h"
 
 pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation)
 	: _skeleton(skeleton)
 	, _rawAnimation(rawAnimation)
 {
-	//for (const auto& track : rawAnimation._tracks)
-	//{
-	//	_tracks.push_back(this->removeDuplicateFrame(track));
-	//}
 	_tracks = rawAnimation._tracks;
+	std::vector<AnimationTrack> compressed;
 
-	//std::vector<AnimationTrack> compressed;
 	//for (const auto& track : _tracks)
 	//{
 	//	compressed.push_back(this->fitCurveWithCatmullRom(track));
 	//}
 
 	//_tracks = std::move(compressed);
+	//compressed = {};
+
+	for (const auto& track : rawAnimation._tracks)
+	{
+		compressed.push_back(this->removeDuplicateFrame(track));
+	}
+	_tracks = std::move(compressed);
+	compressed = {};
 }
 
 pa::AnimationTrack pa::AnimationBuilder::removeDuplicateFrame(AnimationTrack const& track)
@@ -116,11 +119,11 @@ pa::AnimationTrack pa::AnimationBuilder::fitCurveWithCatmullRom(AnimationTrack c
 				const float error = XMVectorGetX(XMVector4LengthSq(difference));
 				errors.back() += error;
 
-				//if (errors.back() < error)
-				//{
-				//	errors.back() = error;
-				//	midPoints.back() = between;
-				//}
+				if (errors.back() < error)
+				{
+					errors.back() = error;
+					midPoints.back() = between;
+				}
 			}
 
 			P0 = P1;

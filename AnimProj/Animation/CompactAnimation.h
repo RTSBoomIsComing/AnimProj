@@ -1,7 +1,7 @@
 // author: Chanwan Yu
 #pragma once
 #include "CompactKeyframe.h"
-#include "AnimationTrack.h"
+
 namespace pa
 {
 	class CompactAnimation
@@ -14,7 +14,7 @@ namespace pa
 
 	public:
 		inline const std::vector<CompactKeyframe>&		getKeyframes()		const { return _keyframes; }
-		inline const std::vector<uint16_t>&				getTrackIDs()	const { return _trackIDs; }
+		inline const std::vector<uint16_t>&				getTrackIDs()		const { return _trackIDs; }
 		inline const std::vector<AnimationTrackHeader>&	getTrackHeaders()	const { return _trackHeaders; }
 	
 	private:

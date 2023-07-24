@@ -1,7 +1,6 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "AcclaimImporter.h"
-#include "RawAnimation.h"
 #include "Skeleton.h"
 #include "../AcclaimMotionCapture/AcclaimSkeleton.h"
 #include "../AcclaimMotionCapture/AcclaimMotion.h"

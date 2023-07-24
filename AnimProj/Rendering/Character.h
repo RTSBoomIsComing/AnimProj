@@ -36,15 +36,13 @@ namespace pa
 
 	private:
 		Skeleton*							_skeleton				= nullptr;
-		//IAnimationController*				_animationWalkRun		= nullptr;
-		//IAnimationController*				_animationIdleWalk		= nullptr;
 
 		// will be removed
 		Mesh*								_jointMesh				= nullptr;
 		Mesh*								_boneMesh				= nullptr;
-		//std::vector<Animation>			_animations;
-		//std::vector<AnimationController>	_animationControllers;
+
 		std::vector<AnimationPlayer>		_animationPlayers;
+
 		std::vector<DirectX::XMMATRIX>		_jointTransforms;
 		std::vector<DirectX::XMMATRIX>		_boneStickTransforms;
 

@@ -36,12 +36,6 @@
     <ClInclude Include="Common\DirectX11Helper.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="AcclaimMotionCapture\ASF.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="AcclaimMotionCapture\AMC.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\Skeleton.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -57,31 +51,16 @@
     <ClInclude Include="Rendering\CubeMesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\Animation.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\Character.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\AnimationBlender.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation\IAnimationController.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation\AnimationController.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Keyboard.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\AnimationManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation\AnimationPose.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Animation\CompactKeyframe.h">
@@ -96,10 +75,10 @@
     <ClInclude Include="Animation\AnimationBuilder.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\RawAnimation.h">
+    <ClInclude Include="Animation\AcclaimImporter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Animation\AcclaimImporter.h">
+    <ClInclude Include="Animation\AnimationPch.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -128,12 +107,6 @@
     <ClCompile Include="Common\DirectX11Helper.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="AcclaimMotionCapture\ASF.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="AcclaimMotionCapture\AMC.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Animation\Skeleton.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -152,28 +125,13 @@
     <ClCompile Include="Rendering\CubeMesh.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\Animation.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Rendering\Character.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Animation\AnimationBlender.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\AnimationController.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\IAnimationController.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Animation\AnimationManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\AnimationPose.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\CompactKeyframe.cpp">
@@ -186,9 +144,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AnimationBuilder.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation\RawAnimation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Animation\AcclaimImporter.cpp">
@@ -213,12 +168,6 @@
       <Filter>헤더 파일</Filter>
     </None>
     <None Include="Animation\CompactAnimation.cpp">
-      <Filter>소스 파일</Filter>
-    </None>
-    <None Include="Animation\AnimationTrack.h">
-      <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="Animation\AnimationTrack.cpp">
       <Filter>소스 파일</Filter>
     </None>
   </ItemGroup>

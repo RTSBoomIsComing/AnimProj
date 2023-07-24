@@ -93,22 +93,15 @@
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
     <ClInclude Include="Animation\AnimationBuilder.h" />
-    <ClInclude Include="Animation\AnimationPose.h" />
-    <ClInclude Include="Animation\IAnimationController.h" />
-    <ClInclude Include="Animation\AnimationBlender.h" />
+    <ClInclude Include="Animation\AnimationPch.h" />
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
-    <ClInclude Include="Animation\Animation.h" />
-    <ClInclude Include="Animation\AnimationController.h" />
     <ClInclude Include="Animation\CompactKeyframe.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Animation\RawAnimation.h" />
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
-    <ClInclude Include="AcclaimMotionCapture\AMC.h" />
     <ClInclude Include="App\Win32Application.h" />
     <ClInclude Include="App\Win32Framework.h" />
-    <ClInclude Include="AcclaimMotionCapture\ASF.h" />
     <ClInclude Include="Rendering\Camera.h" />
     <ClInclude Include="Common\DirectX11Helper.h" />
     <ClInclude Include="Rendering\Mesh.h" />
@@ -123,21 +116,13 @@
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
     <ClCompile Include="Animation\AnimationBuilder.cpp" />
-    <ClCompile Include="Animation\AnimationPose.cpp" />
-    <ClCompile Include="Animation\AnimationBlender.cpp" />
-    <ClCompile Include="Animation\IAnimationController.cpp" />
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
-    <ClCompile Include="Animation\Animation.cpp" />
-    <ClCompile Include="Animation\AnimationController.cpp" />
     <ClCompile Include="Animation\CompactKeyframe.cpp" />
-    <ClCompile Include="Animation\RawAnimation.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
-    <ClCompile Include="AcclaimMotionCapture\AMC.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />
     <ClCompile Include="App\Win32Framework.cpp" />
-    <ClCompile Include="AcclaimMotionCapture\ASF.cpp" />
     <ClCompile Include="Rendering\Camera.cpp" />
     <ClCompile Include="Common\DirectX11Helper.cpp" />
     <ClCompile Include="main.cpp" />
@@ -161,8 +146,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <None Include="Animation\AnimationTrack.cpp" />
-    <None Include="Animation\AnimationTrack.h" />
     <ClCompile Include="Animation\AnimationPlayer.cpp" />
     <None Include="Animation\AnimationPlayer.h" />
     <None Include="Animation\CompactAnimation.cpp" />

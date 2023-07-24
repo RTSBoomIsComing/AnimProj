@@ -24,6 +24,7 @@ pa::Acclaim::DOF pa::Acclaim::convertToDOF(std::string const& s)
     if ("L" == s || "l" == s)
         return DOF::L;
 
+    DebugBreak();
     return DOF();
 }
 

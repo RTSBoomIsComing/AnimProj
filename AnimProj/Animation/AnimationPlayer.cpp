@@ -69,6 +69,17 @@ void pa::AnimationPlayer::update(float deltaTime)
 			_rotations[boneID] = XMQuaternionSlerp(
 				controlPoints[1].decompressAsQuaternion(),
 				controlPoints[2].decompressAsQuaternion(), weight);
+
+			//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
+
+			//_rotations[_animation->_trackDescriptors[i]] = 
+			//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
+
+			//_rotations[boneID] = XMQuaternionNormalize(XMVectorCatmullRom(
+			//	controlPoints[0].decompressAsQuaternion(),
+			//	controlPoints[1].decompressAsQuaternion(),
+			//	controlPoints[2].decompressAsQuaternion(),
+			//	controlPoints[3].decompressAsQuaternion(), weight));
 		}
 	}
 }

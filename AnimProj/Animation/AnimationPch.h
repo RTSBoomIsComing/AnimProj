@@ -1,5 +1,7 @@
 // author: Changwan Yu
 #pragma once
+#include <DirectXMath.h>
+#include <vector>
 
 namespace pa
 {
@@ -28,8 +30,13 @@ namespace pa
 		std::vector<uint16_t>			times;
 		std::vector<DirectX::XMFLOAT4>	values;
 
-		uint16_t			boneID	: 14;
-		Type				type	: 2;
+		uint16_t			boneID : 14;
+		Type				type : 2;
 	};
-}
 
+	struct RawAnimation
+	{
+		std::vector<AnimationTrack> _tracks;
+	};
+
+}
