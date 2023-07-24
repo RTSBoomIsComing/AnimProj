@@ -7,7 +7,8 @@ void pa::Skeleton::generateBoneMasks()
     _upperBodyMask.resize(this->getBoneCount());
     _lowerBodyMask.resize(this->getBoneCount());
 
-    _upperBodyMask[33 /*lower back dummy bone*/] = true;
+    _upperBodyMask[11 /*lower back dummy bone*/] = true;
+    
     _lowerBodyMask[31 /*lhipjoint dummy bone*/] = true;
     _lowerBodyMask[32 /*rhipjoint dummy bone*/] = true;
 
@@ -24,6 +25,7 @@ void pa::Skeleton::generateBoneMasks()
     }
 
     _lowerBodyMask[0 /*root*/] = true;
+    _lowerBodyMask[33 /*lower back dummy bone*/] = true;
 
 }
 

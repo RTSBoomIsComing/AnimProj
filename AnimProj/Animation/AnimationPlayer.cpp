@@ -22,7 +22,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 	if (!_isRunning)
 		return;
 		
-	_runningTime += deltaTime * 0.5f;
+	_runningTime += deltaTime;
 	
 	float elipsedFrame = _runningTime * fps;
 	if (_isLooping && _duration < elipsedFrame)

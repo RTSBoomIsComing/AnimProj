@@ -15,13 +15,13 @@ pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimat
 	//}
 	_tracks = rawAnimation._tracks;
 
-	std::vector<AnimationTrack> compressed;
-	for (const auto& track : _tracks)
-	{
-		compressed.push_back(this->fitCurveWithCatmullRom(track));
-	}
+	//std::vector<AnimationTrack> compressed;
+	//for (const auto& track : _tracks)
+	//{
+	//	compressed.push_back(this->fitCurveWithCatmullRom(track));
+	//}
 
-	_tracks = std::move(compressed);
+	//_tracks = std::move(compressed);
 }
 
 pa::AnimationTrack pa::AnimationBuilder::removeDuplicateFrame(AnimationTrack const& track)
