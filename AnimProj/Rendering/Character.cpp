@@ -18,59 +18,41 @@
 pa::Character::Character(ID3D11Device* device)
 {
 	std::wstring asfFilePath = _SOLUTIONDIR;
-	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\subject02\02.asf)");
-	//ASF asf(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
+
 	Acclaim::Skeleton acclaimSkeleton(asfFilePath + LR"(Assets\ASFAMC\131-dance\131-dance.asf)");
 
 	_skeleton = new Skeleton();
 	AcclaimImporter::createSkeleton(acclaimSkeleton, _skeleton);
 	_skeleton->generateBoneMasks();
-
+	
 	std::wstring amcDirectory = _SOLUTIONDIR;
-	amcDirectory += LR"(Assets\ASFAMC\131-dance\)";
-	//amcDirectory += LR"(Assets\ASFAMC\subject02\)";
-	Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + L"131_04-dance.amc");
+	amcDirectory += LR"(Assets\ASFAMC\)";
+	{
+		//Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(131-dance\131_04-dance.amc)");
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(135-martialArts\135_06-martialArts.amc)");
+		RawAnimation rawAnimation = {};
+		AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
+		AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
 
-	RawAnimation rawAnimation;
-	AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
+		static CompactAnimation animationUpperBody = animationBuilder.createUpperBodyAnimation();
+		_animationPlayers.push_back(AnimationPlayer(animationUpperBody));
 
-	AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
-	
-	static CompactAnimation danceLowerBody = animationBuilder.createLowerBodyAnimation();
-	_animationPlayers.push_back(AnimationPlayer(danceLowerBody));
+		static CompactAnimation animationLowerBody = animationBuilder.createLowerBodyAnimation();
+		_animationPlayers.push_back(AnimationPlayer(animationLowerBody));
+	}
 
-	static CompactAnimation danceUpperBody = animationBuilder.createLowerBodyAnimation();
-	_animationPlayers.push_back(AnimationPlayer(danceUpperBody));
+	{
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(07-walk\07_05-walk.amc)");
+		RawAnimation rawAnimation = {};
+		AcclaimImporter::createRawAnimation(acclaimMotion, *_skeleton, &rawAnimation);
+		AnimationBuilder animationBuilder(*_skeleton, rawAnimation);
 
-	
-	//AMC amcIdle(amcDirectory	+ L"131_04-dance.amc");
-	//AMC amcIdle(amcDirectory	+ L"idle.amc");
-	//AMC amcWalk(amcDirectory	+ L"walk.amc");
-	//AMC amcRun(amcDirectory	+ L"run_cyclic.amc");
-	//AMC amcJump(amcDirectory	+ L"jumpbalance.amc");
-	//AMC amcPunch(amcDirectory	+ L"punchstrike.amc");
+		static CompactAnimation animationUpperBody = animationBuilder.createUpperBodyAnimation();
+		_animationPlayers.push_back(AnimationPlayer(animationUpperBody));
 
-	//_animations.push_back(Animation(&asf, &amcIdle));
-	//_animations.push_back(Animation(&asf, &amcWalk));
-	//_animations.push_back(Animation(&asf, &amcRun));
-	//_animations.push_back(Animation(&asf, &amcJump));
-	//_animations.push_back(Animation(&asf, &amcPunch));
-
-
-
-	//for (auto& animation : _animations)
-	//{
-	//	animation.compressAnimation();
-	//}
-
-	//_animationControllers.push_back(AnimationController(&_animations[0]));
-	//_animationControllers.push_back(AnimationController(&_animations[1]));
-	//_animationControllers.push_back(AnimationController(&_animations[2]));
-	//_animationControllers.push_back(AnimationController(&_animations[3]));
-	//_animationControllers.push_back(AnimationController(&_animations[4]));
-
-	//_animationIdleWalk	= new AnimationBlender(&_animationControllers[1], &_animationControllers[0]);
-	//_animationWalkRun	= new AnimationBlender(&_animationControllers[1], &_animationControllers[2]);
+		static CompactAnimation animationLowerBody = animationBuilder.createLowerBodyAnimation();
+		_animationPlayers.push_back(AnimationPlayer(animationLowerBody));
+	}
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -100,24 +82,6 @@ pa::Character::~Character()
 		delete _jointMesh;
 		_jointMesh = nullptr;
 	}
-
-	//if (nullptr != _animationWalkRun)
-	//{
-	//	delete _animationWalkRun;
-	//	_animationWalkRun = nullptr;
-	//}
-
-	//if (nullptr != _animationIdleWalk)
-	//{
-	//	delete _animationIdleWalk;
-	//	_animationIdleWalk = nullptr;
-	//}
-
-	//if (nullptr != _animationPlayer)
-	//{
-	//	delete _animationPlayer;
-	//	_animationPlayer = nullptr;
-	//}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
@@ -130,7 +94,13 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 	using namespace DirectX;
 	for (const size_t boneIndex : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation = _animationPlayers[0].getBoneRotation(boneIndex);
+		XMVECTOR animationRotation;
+		if (_skeleton->getUpperBodyMask()[boneIndex])
+			animationRotation = _animationPlayers[0].getBoneRotation(boneIndex);
+		else
+			animationRotation = _animationPlayers[3].getBoneRotation(boneIndex);
+
+
 		XMMATRIX animationMatrix	= XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
 
 		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);
@@ -179,21 +149,13 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
-	//if (Keyboard::get()->getKeyState('W'))
-	//{
-	//	_animationIdleWalk->addBlendWeight(-deltaTime * 0.5f);
-	//	_animationWalkRun->addBlendWeight(deltaTime * 0.5f);
-	//}
-	//if (!Keyboard::get()->getKeyState('W'))
-	//{
-	//	_animationIdleWalk->addBlendWeight(deltaTime * 0.5f);
-	//	_animationWalkRun->addBlendWeight(-deltaTime * 0.5f);
-	//}
 
-	if (Keyboard::get()->getKeyState(32))
+	if (Keyboard::get()->getKeyState(32 /* space bar */))
 	{
 		for (auto& animationPlayer : _animationPlayers)
+		{
 			animationPlayer.play();
+		}
 	}
 
 

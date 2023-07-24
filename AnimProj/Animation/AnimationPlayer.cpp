@@ -19,9 +19,10 @@ void pa::AnimationPlayer::update(float deltaTime)
 	using namespace DirectX;
 	constexpr int fps = 120;
 
-	if (_isRunning)
-		_runningTime += deltaTime * 0.5f;
-	
+	if (!_isRunning)
+		return;
+		
+	_runningTime += deltaTime * 0.5f;
 	
 	float elipsedFrame = _runningTime * fps;
 	if (_isLooping && _duration < elipsedFrame)
@@ -102,5 +103,4 @@ void pa::AnimationPlayer::initializeActiveKeysWithMemCopy()
 	const size_t trackCount = _animation.getTrackHeaders().size();
 	_cursor = trackCount * 4;
 	std::memcpy(_activeKeys.data(), _animation.getKeyframes().data(), sizeof(CompactKeyframe) * _cursor);
-
 }
