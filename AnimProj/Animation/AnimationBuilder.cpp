@@ -214,7 +214,7 @@ pa::CompactAnimation pa::AnimationBuilder::buildCompactAnimation(std::vector<Ani
 
 	CompactAnimation compactAnimation;
 	compactAnimation._keyframes = std::move(keyframes);
-	compactAnimation._trackIndices = std::move(trackIndices);
+	compactAnimation._trackIDs = std::move(trackIndices);
 	compactAnimation._trackHeaders = std::move(trackHeaders);
 
 	return compactAnimation;

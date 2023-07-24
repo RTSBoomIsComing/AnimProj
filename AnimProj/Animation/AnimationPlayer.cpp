@@ -34,7 +34,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 
 	while (_cursor < _animation.getKeyframes().size())
 	{
-		uint16_t trackID = _animation.getTrackIndices()[_cursor];
+		uint16_t trackID = _animation.getTrackIDs()[_cursor];
 		auto& controlPoints = _activeKeys[trackID];
 		if (controlPoints[2].keytime < elipsedFrame)
 		{
@@ -89,7 +89,7 @@ void pa::AnimationPlayer::initializeActiveKeys()
 	_cursor = trackCount * 4;
 	for (size_t i = 0; i < _cursor; i++)
 	{
-		const uint16_t trackID = _animation.getTrackIndices()[i];
+		const uint16_t trackID = _animation.getTrackIDs()[i];
 		
 		_activeKeys[trackID][0] = _activeKeys[trackID][1];
 		_activeKeys[trackID][1] = _activeKeys[trackID][2];

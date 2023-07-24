@@ -55,10 +55,12 @@ void pa::AnimationController::update(float deltaTime)
 
 		float weight = (elipsedFrame - cp[1].keytime) / (cp[2].keytime - cp[1].keytime);
 
-		//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
 		_rotations[_animation->_rotationTrackDescriptors[i].id] =
 			XMQuaternionSlerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
+		
+		
+		//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 		
 		//_rotations[_animation->_trackDescriptors[i]] = 
 		//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
@@ -69,14 +71,6 @@ void pa::AnimationController::update(float deltaTime)
 		//	cp[2].decompressAsQuaternion(),
 		//	cp[3].decompressAsQuaternion(), weight));
 	}
-
-	// regacy, catmullrom with binary search
-	//for (size_t boneIndex = 0; boneIndex < _animation->getBoneCount(); boneIndex++)
-	//{
-	//	XMVECTOR rotation = playBoneAnimationCatmullRomCyclic(
-	//		_animation->_boneAnimation[boneIndex].rotation, elipsedFrame);
-	//	_rotations[boneIndex] = rotation;
-	//}
 }
 
 DirectX::XMVECTOR pa::AnimationController::getBoneRotation(size_t boneIndex, uint32_t offset) const
