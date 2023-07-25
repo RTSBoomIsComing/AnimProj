@@ -13,7 +13,8 @@ namespace pa
 
 	public:
 		void update(float deltaTime);
-		DirectX::XMVECTOR getBoneRotation(uint32_t boneIndex) const;
+		//DirectX::XMVECTOR getBoneRotation(uint32_t boneIndex) const;
+		void storePoses(std::vector<Transform>& outPoses) const;
 		void play();
 		void stop();
 		void reset();
@@ -32,7 +33,7 @@ namespace pa
 		const Animation&	_animation;
 
 		std::vector<std::array<CompactKey, 4>>	_activeKeys;
-		std::vector<DirectX::XMVECTOR>			_rotations;
+		//std::vector<DirectX::XMVECTOR>			_rotations;
 
 		uint32_t		_cursor = 0;
 

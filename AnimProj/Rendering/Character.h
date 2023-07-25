@@ -23,12 +23,25 @@ namespace pa
 		inline DirectX::XMFLOAT3& getQrientation()	{ return _orientation; }
 
 	private:
-		void controlAnimationPlayers();
+		enum class AnimPlayerIndex
+		{
+			Walk_up, Walk_lo, Run_up, Run_lo, Punch_up, Punch_lo, Jump_up, Jump_lo, Dance_up, Dance_lo
+		};
+
+		inline AnimationPlayer& getAnimationPlayer(AnimPlayerIndex index)
+		{
+			return _animationPlayers[static_cast<size_t>(index)];
+		}
+
+		void updatePoses();
 
 	private:
 		DirectX::XMFLOAT3					_position				= {};
 		DirectX::XMFLOAT3					_orientation			= {};
 		float								_moveSpeed				= 0.0f;
+		float								_moveTime				= 0.0f;
+		float								_jumpTime				= 0.0f;
+		float								_attackTime				= 0.0f;
 		bool								_isMoving				= false;
 		bool								_isJumping				= false;
 		bool								_isAttacking			= false;
@@ -40,18 +53,15 @@ namespace pa
 		Mesh*								_jointMesh				= nullptr;
 		Mesh*								_boneMesh				= nullptr;
 
-		enum class AnimationPlayerIndex
-		{
-			WALK_UPBODY, WALK_LOBODY, PUNCH_UPBODY, PUNCH_LOBODY, DANCE_UPBODY, DANCE_LOBODY
-		};
 		std::vector<AnimationPlayer>		_animationPlayers;
 
 		std::vector<DirectX::XMFLOAT4X4>	_jointTransforms;
 		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
 
-		std::vector<DirectX::XMVECTOR>		_poseScales;
-		std::vector<DirectX::XMVECTOR>		_poseRotations;
-		std::vector<DirectX::XMVECTOR>		_poseTranslations;
+		std::vector<Transform>				_basePoses;
+		std::vector<Transform>				_blendPoses;
+		std::vector<Transform>				_resultPoses;
+
 	};
 }
 

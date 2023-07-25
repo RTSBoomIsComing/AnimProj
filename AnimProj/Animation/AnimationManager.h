@@ -21,7 +21,7 @@ namespace pa
 	public:
 		enum class AnimationIndex
 		{
-			WALK_UPBODY, WALK_LOBODY, PUNCH_UPBODY, PUNCH_LOBODY, DANCE_UPBODY, DANCE_LOBODY
+			Walk_up, Walk_lo, Run_up, Run_lo, Punch_up, Punch_lo, Jump_up, Jump_lo, Dance_up, Dance_lo
 		};
 
 	public:

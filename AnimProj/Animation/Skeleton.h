@@ -21,8 +21,8 @@ namespace pa
 		inline size_t						getBoneCount()					const { return _boneMatrices.size(); }
 		inline size_t						getParentBoneID(size_t index)	const { return _parents[index]; }
 		inline std::vector<uint16_t> const&	getHierarchy()					const { return _hierarchy; }
-		inline std::vector<bool> const&		getUpperBodyMask()				const { return _upperBodyMask; }
-		inline std::vector<bool> const&		getLowerBodyMask()				const { return _lowerBodyMask; }
+		inline bool							isInUpperBody(size_t boneID)	const { return _upperBodyMask[boneID]; }
+		inline bool							isInLowerBody(size_t boneID)	const { return _lowerBodyMask[boneID]; }
 
 	private:
 		std::vector<DirectX::XMFLOAT4X4>	_boneMatrices;

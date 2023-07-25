@@ -5,6 +5,13 @@
 
 namespace pa
 {
+	struct Transform
+	{
+		DirectX::XMFLOAT4 scale			= { 1.0f, 1.0f, 1.0f, 0.0f };
+		DirectX::XMFLOAT4 rotation		= { 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT4 translation	= {};
+	};
+
 	enum class AnimationTrackType : uint16_t
 	{
 		Scale,

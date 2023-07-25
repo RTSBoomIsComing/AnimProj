@@ -14,14 +14,13 @@ pa::Character::Character(ID3D11Device* device)
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
 	
-	//_poseScales.resize(_skeleton->getBoneCount());
-	_poseRotations.resize(_skeleton->getBoneCount());
-	_poseTranslations.resize(_skeleton->getBoneCount());
+	_basePoses.resize(_skeleton->getBoneCount());
+	_blendPoses.resize(_skeleton->getBoneCount());
+	_resultPoses.resize(_skeleton->getBoneCount());
 
-	
+
 	_boneMesh = new StickMesh(device);
 	_jointMesh = new CubeMesh(device, 0.25f);
-
 
 	for (const auto& anim : AnimationManager::get().getAnimationList())
 	{
@@ -47,41 +46,39 @@ pa::Character::~Character()
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
+	using namespace DirectX;
+
 	for (auto& animationPlayer : _animationPlayers)
 	{
 		animationPlayer.update(deltaTime);
 	}
 
-	this->controlAnimationPlayers();
+	this->updatePoses();
 
-	using namespace DirectX;
-	for (const size_t boneIndex : _skeleton->getHierarchy())
+	for (const size_t boneID : _skeleton->getHierarchy())
 	{
-		XMVECTOR animationRotation;
-		if (_skeleton->getUpperBodyMask()[boneIndex])
-			animationRotation = _animationPlayers[2].getBoneRotation(boneIndex);
-		else
-			animationRotation = _animationPlayers[1].getBoneRotation(boneIndex);
+		XMVECTOR S = XMLoadFloat4(&_resultPoses[boneID].scale);
+		XMVECTOR R = XMLoadFloat4(&_resultPoses[boneID].rotation);
+		XMVECTOR T = XMLoadFloat4(&_resultPoses[boneID].translation);
 
+		XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
-		XMMATRIX animationMatrix = XMMatrixRotationQuaternion(XMQuaternionNormalize(animationRotation));
+		const size_t	parentID				= _skeleton->getParentBoneID(boneID);
+		const XMMATRIX& parentWorldTransform	= (boneID != 0) ?
+			XMLoadFloat4x4(&_jointTransforms[parentID]) : XMMatrixIdentity();
 
-		const size_t parentBoneIndex			= _skeleton->getParentBoneID(boneIndex);
-		const XMMATRIX& parentWorldTransform	= (boneIndex != 0) ?
-			XMLoadFloat4x4(&_jointTransforms[parentBoneIndex]) : XMMatrixIdentity();
-
-		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneIndex);
+		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
 
 		XMVECTOR boneTranslation		= {};
 		XMVECTOR dummyVector			= {};
 		XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
 
-		XMStoreFloat4x4(&_jointTransforms[boneIndex], animationMatrix * boneMatrix * parentWorldTransform);
+		XMStoreFloat4x4(&_jointTransforms[boneID], animationMatrix * boneMatrix * parentWorldTransform);
 
 		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0)
 		{
-			_boneStickTransforms[boneIndex] = XMFLOAT4X4{};
+			_boneStickTransforms[boneID] = XMFLOAT4X4{};
 			continue;
 		}
 
@@ -92,7 +89,7 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 		const float		angle = std::acosf(dotProduct);
 		const XMVECTOR	rotationAxis = XMVector3Cross(V0, V1);
 
-		XMStoreFloat4x4(&_boneStickTransforms[boneIndex],
+		XMStoreFloat4x4(&_boneStickTransforms[boneID],
 			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
 			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform);
 	}
@@ -147,13 +144,52 @@ void pa::Character::processInput(float deltaTime)
 	_isMoving = (_moveSpeed > 0.0f);
 }
 
-void pa::Character::controlAnimationPlayers()
+void pa::Character::updatePoses()
 {
-	// Update pose
+	using namespace DirectX;
 
+	// temporarily set these static
+	static AnimPlayerIndex baseAnimUp = {};
+	static AnimPlayerIndex baseAnimLo = {};
 
-	if (_isMoving)
+	static AnimPlayerIndex targetAnimUp = {};
+	static AnimPlayerIndex targetAnimLo = {};
+
+	if (_isJumping && 0 == _jumpTime)
 	{
-
+		targetAnimUp = AnimPlayerIndex::Jump_up;
+		targetAnimLo = AnimPlayerIndex::Jump_lo;
 	}
+
+	if (_isAttacking && 0 == _attackTime)
+	{
+		targetAnimUp = AnimPlayerIndex::Punch_up;
+		targetAnimLo = AnimPlayerIndex::Punch_lo;
+	}
+
+	if (_isMoving && 0 == _moveTime)
+	{
+		targetAnimLo = AnimPlayerIndex::Walk_lo;
+	}
+
+	
+
+	this->getAnimationPlayer(baseAnimUp).storePoses(_basePoses);
+	this->getAnimationPlayer(baseAnimLo).storePoses(_basePoses);
+
+	this->getAnimationPlayer(targetAnimUp).storePoses(_blendPoses);
+	this->getAnimationPlayer(targetAnimLo).storePoses(_blendPoses);
+
+	//// Update poses
+	//for (const size_t boneID : _skeleton->getHierarchy())
+	//{
+	//	XMVECTOR Q;
+	//	if (_skeleton->isInUpperBody(boneID))
+
+	//		Q = this->getAnimationPlayer(AnimPlayerIndex::Walk_up).getBoneRotation(boneID);
+	//	else
+	//		Q = this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).getBoneRotation(boneID);
+
+	//	XMStoreFloat4(&_poseRotations[boneID], Q);
+	//}
 }

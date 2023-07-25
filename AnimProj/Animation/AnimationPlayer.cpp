@@ -10,7 +10,7 @@ pa::AnimationPlayer::AnimationPlayer(const Animation& animation)
 	_activeKeys.resize(_animation.getTrackHeaders().size());
 	initializeActiveKeysWithMemCopy();
 
-	_rotations.resize(41);
+	//_rotations.resize(41);
 	_isRunning = false;
 }
 
@@ -48,6 +48,19 @@ void pa::AnimationPlayer::update(float deltaTime)
 		else
 			break;
 	}
+}
+
+//DirectX::XMVECTOR pa::AnimationPlayer::getBoneRotation(uint32_t boneIndex) const
+//{
+//	return _rotations[boneIndex];
+//}
+
+void pa::AnimationPlayer::storePoses(std::vector<Transform>& outPoses) const
+{
+	using namespace DirectX;
+
+	constexpr int fps = 120;
+	float elipsedFrame = _runningTime * fps;
 
 	//cache rotation
 	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
@@ -66,9 +79,11 @@ void pa::AnimationPlayer::update(float deltaTime)
 
 		if (AnimationTrackType::Rotation == _animation.getTrackHeaders()[trackID].type)
 		{
-			_rotations[boneID] = XMQuaternionSlerp(
+			XMVECTOR Q = XMQuaternionSlerp(
 				controlPoints[1].decompressAsQuaternion(),
 				controlPoints[2].decompressAsQuaternion(), weight);
+
+			XMStoreFloat4(&outPoses[boneID].rotation, Q);
 
 			//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
@@ -82,11 +97,6 @@ void pa::AnimationPlayer::update(float deltaTime)
 			//	controlPoints[3].decompressAsQuaternion(), weight));
 		}
 	}
-}
-
-DirectX::XMVECTOR pa::AnimationPlayer::getBoneRotation(uint32_t boneIndex) const
-{
-	return _rotations[boneIndex];
 }
 
 void pa::AnimationPlayer::play()

@@ -36,6 +36,16 @@ void pa::AnimationManager::initialize()
 	}
 
 	{
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(run.amc)");
+		RawAnimation rawAnimation = {};
+		AcclaimImporter::createRawAnimation(acclaimMotion, this->getDefaultSkeleton(), &rawAnimation);
+		AnimationBuilder animationBuilder(this->getDefaultSkeleton(), rawAnimation);
+
+		_animationList.push_back(animationBuilder.createUpperBodyAnimation());
+		_animationList.push_back(animationBuilder.createLowerBodyAnimation());
+	}
+
+	{
 		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(punch.amc)");
 		RawAnimation rawAnimation = {};
 		AcclaimImporter::createRawAnimation(acclaimMotion, this->getDefaultSkeleton(), &rawAnimation);

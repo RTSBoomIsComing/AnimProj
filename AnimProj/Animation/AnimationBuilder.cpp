@@ -401,7 +401,7 @@ pa::Animation pa::AnimationBuilder::createUpperBodyAnimation() const
 	for (const auto& track : _tracks)
 	{
 		uint16_t boneID = track.boneID;
-		if (_skeleton.getUpperBodyMask()[boneID])
+		if (_skeleton.isInUpperBody(boneID))
 			upperBodyTracks.push_back(track);
 	}
 
@@ -414,7 +414,7 @@ pa::Animation pa::AnimationBuilder::createLowerBodyAnimation() const
 	for (const auto& track : _tracks)
 	{
 		uint16_t boneID = track.boneID;
-		if (_skeleton.getLowerBodyMask()[boneID])
+		if (_skeleton.isInLowerBody(boneID))
 			lowerBodyTracks.push_back(track);
 	}
 
