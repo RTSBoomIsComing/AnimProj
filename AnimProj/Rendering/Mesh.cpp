@@ -48,7 +48,7 @@ UINT pa::Mesh::getIndexCount() const
 	return _indexCount;
 }
 
-void pa::Mesh::updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX* matrices, UINT count)
+void pa::Mesh::updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMFLOAT4X4* matrices, UINT count)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);

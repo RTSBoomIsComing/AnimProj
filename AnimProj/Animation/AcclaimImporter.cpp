@@ -80,7 +80,7 @@ void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotio
 		{
 			AnimationTrack track = {};
 			track.boneID = boneID;
-			track.type = AnimationTrack::Type::Translation;
+			track.type = AnimationTrackType::Translation;
 			track.values = std::move(translations);
 			track.times = times;
 
@@ -91,7 +91,7 @@ void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotio
 		{
 			AnimationTrack track = {};
 			track.boneID = skeleton.getParentBoneID(boneID);
-			track.type = AnimationTrack::Type::Rotation;
+			track.type = AnimationTrackType::Rotation;
 			track.values = std::move(rotations);
 			track.times = times;
 

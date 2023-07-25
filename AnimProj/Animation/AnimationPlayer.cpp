@@ -3,7 +3,7 @@
 #include "AnimationPlayer.h"
 #include "CompactAnimation.h"
 
-pa::AnimationPlayer::AnimationPlayer(const CompactAnimation& animation)
+pa::AnimationPlayer::AnimationPlayer(const Animation& animation)
 	: _animation(animation)
 	, _duration(_animation.getKeyframes().back().keytime)
 {
@@ -64,7 +64,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 		float weight = (elipsedFrame - controlPoints[1].keytime)
 			/ (controlPoints[2].keytime - controlPoints[1].keytime);
 
-		if (AnimationType::Rotation == _animation.getTrackHeaders()[trackID].type)
+		if (AnimationTrackType::Rotation == _animation.getTrackHeaders()[trackID].type)
 		{
 			_rotations[boneID] = XMQuaternionSlerp(
 				controlPoints[1].decompressAsQuaternion(),
@@ -94,6 +94,20 @@ void pa::AnimationPlayer::play()
 	_isRunning = true;
 }
 
+void pa::AnimationPlayer::stop()
+{
+	_isRunning = false;
+}
+
+void pa::AnimationPlayer::reset()
+{
+	if (0 == _runningTime)
+		return;
+
+	_runningTime = 0;
+	initializeActiveKeysWithMemCopy();
+}
+
 void pa::AnimationPlayer::initializeActiveKeys()
 {
 	const size_t trackCount = _animation.getTrackHeaders().size();
@@ -113,5 +127,5 @@ void pa::AnimationPlayer::initializeActiveKeysWithMemCopy()
 {
 	const size_t trackCount = _animation.getTrackHeaders().size();
 	_cursor = trackCount * 4;
-	std::memcpy(_activeKeys.data(), _animation.getKeyframes().data(), sizeof(CompactKeyframe) * _cursor);
+	std::memcpy(_activeKeys.data(), _animation.getKeyframes().data(), sizeof(CompactKey) * _cursor);
 }

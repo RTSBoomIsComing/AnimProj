@@ -3,26 +3,12 @@
 
 #pragma once
 #include "../Animation/Skeleton.h"
-//#include "../Animation/IAnimationController.h"
-//#include "../Animation/Animation.h"
-//#include "../Animation/AnimationController.h"
 #include "../Animation/AnimationPlayer.h"
 namespace pa
 {
 	class Mesh;
 	class Character
 	{
-	public:
-		enum class State : uint16_t
-		{
-			Idle,
-			Walk,
-			Run,
-			Jump,
-			Attack,
-		};
-
-
 	public:
 		Character(ID3D11Device* device);
 		~Character();
@@ -32,19 +18,36 @@ namespace pa
 		void render(ID3D11DeviceContext* deviceContext);
 		void processInput(float deltaTime);
 
-		//void transitState();
+	public:
+		inline DirectX::XMFLOAT3& getPosition()		{ return _position; }
+		inline DirectX::XMFLOAT3& getQrientation()	{ return _orientation; }
 
 	private:
-		Skeleton*							_skeleton				= nullptr;
+		void controlAnimationPlayers();
+
+	private:
+		DirectX::XMFLOAT3					_position				= {};
+		DirectX::XMFLOAT3					_orientation			= {};
+		float								_moveSpeed				= 0.0f;
+		bool								_isMoving				= false;
+		bool								_isJumping				= false;
+		bool								_isAttacking			= false;
+
+	private:
+		const Skeleton*						_skeleton				= nullptr;
 
 		// will be removed
 		Mesh*								_jointMesh				= nullptr;
 		Mesh*								_boneMesh				= nullptr;
 
+		enum class AnimationPlayerIndex
+		{
+			WALK_UPBODY, WALK_LOBODY, PUNCH_UPBODY, PUNCH_LOBODY, DANCE_UPBODY, DANCE_LOBODY
+		};
 		std::vector<AnimationPlayer>		_animationPlayers;
 
-		std::vector<DirectX::XMMATRIX>		_jointTransforms;
-		std::vector<DirectX::XMMATRIX>		_boneStickTransforms;
+		std::vector<DirectX::XMFLOAT4X4>	_jointTransforms;
+		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
 
 		std::vector<DirectX::XMVECTOR>		_poseScales;
 		std::vector<DirectX::XMVECTOR>		_poseRotations;

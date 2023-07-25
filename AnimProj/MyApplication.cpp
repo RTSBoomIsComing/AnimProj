@@ -7,6 +7,7 @@
 #include "Rendering/CubeMesh.h"
 #include "Rendering/Character.h"
 #include "Keyboard.h"
+#include "Animation/AnimationManager.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -14,6 +15,8 @@ pa::MyApplication::MyApplication()
 
 	initializeD3dDevices(getHwnd());
 	initializeGraphicsPipeline();
+
+	AnimationManager::get().initialize();
 
 	_camera		= new Camera(_device.Get());
 	_character	= new Character(_device.Get());
@@ -70,12 +73,12 @@ void pa::MyApplication::OnRender()
 
 void pa::MyApplication::OnKeyDown(UINT8 key)
 {
-	Keyboard::get()->getKeyState(key) = true;
+	Keyboard::get().getKeyState(key) = true;
 }
 
 void pa::MyApplication::OnKeyUp(UINT8 key)
 {
-	Keyboard::get()->getKeyState(key) = false;
+	Keyboard::get().getKeyState(key) = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

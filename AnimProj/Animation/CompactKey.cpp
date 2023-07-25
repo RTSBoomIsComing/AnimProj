@@ -1,10 +1,10 @@
 // author: Changwan Yu
 #include "pch.h"
-#include "CompactKeyframe.h"
+#include "CompactKey.h"
 
 // max compression error is 0.000021579
 // 1 * sqrt(2) / 65535 = 0.000021579
-pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR Q)
+pa::CompactKey pa::CompactKey::createFromQuaternion(DirectX::XMVECTOR Q)
 {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
@@ -60,7 +60,7 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 
 	Q = XMVectorSetW(Q, 0.0f);
 
-	CompactKeyframe keyframe = {};
+	CompactKey keyframe = {};
 	XMStoreUShort4(&keyframe.asUShort4, Q);
 
 	keyframe.opt_0 = static_cast<uint16_t>(biggestSign);
@@ -69,12 +69,12 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromQuaternion(DirectX::XMVECTOR 
 	return keyframe;
 }
 
-pa::CompactKeyframe pa::CompactKeyframe::createFromVector(DirectX::XMVECTOR V)
+pa::CompactKey pa::CompactKey::createFromVector(DirectX::XMVECTOR V)
 {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
 
-	CompactKeyframe keyframe = {};
+	CompactKey keyframe = {};
 	XMStoreHalf4(&keyframe.asHalf4, V);
 	keyframe.v[3] = 0;
 
@@ -83,7 +83,7 @@ pa::CompactKeyframe pa::CompactKeyframe::createFromVector(DirectX::XMVECTOR V)
 
 // max compression error is 0.000021579
 // 1 * sqrt(2) / 65535 = 0.000021579
-DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
+DirectX::XMVECTOR pa::CompactKey::decompressAsQuaternion() const
 {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;
@@ -141,7 +141,7 @@ DirectX::XMVECTOR pa::CompactKeyframe::decompressAsQuaternion() const
 	return Q;
 }
 
-DirectX::XMVECTOR pa::CompactKeyframe::decompressAsVector() const
+DirectX::XMVECTOR pa::CompactKey::decompressAsVector() const
 {
 	using namespace DirectX;
 	using namespace DirectX::PackedVector;

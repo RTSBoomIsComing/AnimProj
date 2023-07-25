@@ -17,7 +17,7 @@ namespace pa
 		UINT getVertexCount() const;
 		UINT getIndexCount() const;
 
-		void updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMMATRIX* matrices, UINT count);
+		void updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMFLOAT4X4* matrices, UINT count);
 	protected:
 		void processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors);
 		void processIndices(ID3D11Device* pDevice, std::vector<UINT> const& indices);

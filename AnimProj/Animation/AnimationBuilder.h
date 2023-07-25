@@ -5,7 +5,7 @@ namespace pa
 {
 	struct RawAnimation;
 	class Skeleton;
-	class CompactAnimation;
+	class Animation;
 	class AnimationBuilder
 	{
 		struct ExtendedKey
@@ -22,14 +22,14 @@ namespace pa
 		~AnimationBuilder() = default;
 	
 	public:
-		CompactAnimation	createFullBodyAnimation()  const;
-		CompactAnimation	createUpperBodyAnimation() const;
-		CompactAnimation	createLowerBodyAnimation() const;
+		Animation	createFullBodyAnimation()  const;
+		Animation	createUpperBodyAnimation() const;
+		Animation	createLowerBodyAnimation() const;
 	
 	private:
 		static AnimationTrack		removeDuplicateFrame(AnimationTrack const& track);
 		static AnimationTrack		fitCurveWithCatmullRom(AnimationTrack const& track, float threshold = 0.00005f);
-		static CompactAnimation		buildCompactAnimation(std::vector<AnimationTrack> const& tracks);
+		static Animation		buildCompactAnimation(std::vector<AnimationTrack> const& tracks);
 		static bool					SortingKeyframeBuilderLess(const ExtendedKey& a, const ExtendedKey& b);
 		
 		static std::vector<ExtendedKey>	mergeTracks(std::vector<AnimationTrack> const& tracks);

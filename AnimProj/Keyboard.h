@@ -8,10 +8,10 @@ namespace pa
 	public:
 		Keyboard() = default;
 		~Keyboard() = default;
-		inline static Keyboard* get()
+		inline static Keyboard& get()
 		{
-			static Keyboard sKeyboard;
-			return &sKeyboard;
+			static Keyboard keyboard;
+			return keyboard;
 		}
 		
 		inline bool& getKeyState(uint8_t key) { return _keyState[key]; }

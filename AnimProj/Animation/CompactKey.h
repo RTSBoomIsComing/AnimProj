@@ -2,7 +2,7 @@
 #pragma once
 namespace pa
 {
-	struct CompactKeyframe
+	struct CompactKey
 	{
 		union
 		{
@@ -22,8 +22,8 @@ namespace pa
 			};
 		};
 
-		static CompactKeyframe createFromQuaternion(DirectX::XMVECTOR Q);
-		static CompactKeyframe createFromVector(DirectX::XMVECTOR V);
+		static CompactKey createFromQuaternion(DirectX::XMVECTOR Q);
+		static CompactKey createFromVector(DirectX::XMVECTOR V);
 
 		DirectX::XMVECTOR decompressAsQuaternion()	const;
 		DirectX::XMVECTOR decompressAsVector()		const;
