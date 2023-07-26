@@ -29,7 +29,7 @@ namespace pa
 			return _animationPlayers[static_cast<size_t>(index)];
 		}
 
-		void updatePoses();
+		void updatePose();
 
 	private:
 		float								_moveTime				= 0.0f;
@@ -52,8 +52,6 @@ namespace pa
 		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
 
 		std::vector<Transform>				_poseCache[2];
-		std::vector<Transform>				_resultPoses;
-
 	};
 }
 

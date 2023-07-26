@@ -16,7 +16,6 @@ pa::Character::Character(ID3D11Device* device)
 	
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
-	_resultPoses.resize(_skeleton->getBoneCount());
 
 
 	_boneMesh = new StickMesh(device);
@@ -56,13 +55,13 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 		animationPlayer.update(deltaTime);
 	}
 
-	this->updatePoses();
+	this->updatePose();
 
 	for (const size_t boneID : _skeleton->getHierarchy())
 	{
-		XMVECTOR S = XMLoadFloat4(&_resultPoses[boneID].scale);
-		XMVECTOR R = XMLoadFloat4(&_resultPoses[boneID].rotation);
-		XMVECTOR T = XMLoadFloat4(&_resultPoses[boneID].translation);
+		XMVECTOR S = XMLoadFloat4(&_poseCache[0][boneID].scale);
+		XMVECTOR R = XMLoadFloat4(&_poseCache[0][boneID].rotation);
+		XMVECTOR T = XMLoadFloat4(&_poseCache[0][boneID].translation);
 
 		XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
@@ -150,7 +149,7 @@ void pa::Character::processInput(float deltaTime)
 	_isMoving = (_moveTime > 0.0f);
 }
 
-void pa::Character::updatePoses()
+void pa::Character::updatePose()
 {
 	using namespace DirectX;
 
@@ -214,13 +213,4 @@ void pa::Character::updatePoses()
 	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).blendPoseWithBase(_poseCache[0], _jumpTime);
 	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).blendPoseWithBase(_poseCache[0], _jumpTime);
 
-
-	// Update poses
-	for (const size_t boneID : _skeleton->getHierarchy())
-	{
-		if (_skeleton->isInUpperBody(boneID))
-			_resultPoses[boneID] = _poseCache[0][boneID];
-		else
-			_resultPoses[boneID] = _poseCache[0][boneID];
-	}
 }
