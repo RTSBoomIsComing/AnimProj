@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #pragma once
 #include "Skeleton.h"
-#include "CompactAnimation.h"
+#include "Animation.h"
 namespace pa
 {
 	class AnimationManager

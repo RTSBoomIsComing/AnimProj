@@ -18,10 +18,6 @@ namespace pa
 		void render(ID3D11DeviceContext* deviceContext);
 		void processInput(float deltaTime);
 
-	public:
-		inline DirectX::XMFLOAT3& getPosition()		{ return _position; }
-		inline DirectX::XMFLOAT3& getQrientation()	{ return _orientation; }
-
 	private:
 		enum class AnimPlayerIndex
 		{
@@ -36,8 +32,6 @@ namespace pa
 		void updatePoses();
 
 	private:
-		DirectX::XMFLOAT3					_position				= {};
-		DirectX::XMFLOAT3					_orientation			= {};
 		float								_moveSpeed				= 0.0f;
 		float								_moveTime				= 0.0f;
 		float								_jumpTime				= 0.0f;
@@ -58,8 +52,7 @@ namespace pa
 		std::vector<DirectX::XMFLOAT4X4>	_jointTransforms;
 		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
 
-		std::vector<Transform>				_basePoses;
-		std::vector<Transform>				_blendPoses;
+		std::vector<Transform>				_poseCache[2];
 		std::vector<Transform>				_resultPoses;
 
 	};

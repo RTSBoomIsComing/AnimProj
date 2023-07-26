@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "AnimationPlayer.h"
-#include "CompactAnimation.h"
+#include "Animation.h"
 
 pa::AnimationPlayer::AnimationPlayer(const Animation& animation)
 	: _animation(animation)
@@ -10,7 +10,6 @@ pa::AnimationPlayer::AnimationPlayer(const Animation& animation)
 	_activeKeys.resize(_animation.getTrackHeaders().size());
 	initializeActiveKeysWithMemCopy();
 
-	//_rotations.resize(41);
 	_isRunning = false;
 }
 
@@ -23,20 +22,26 @@ void pa::AnimationPlayer::update(float deltaTime)
 		return;
 		
 	_runningTime += deltaTime;
-	
-	float elipsedFrame = _runningTime * fps;
-	if (_isLooping && _duration < elipsedFrame)
+	_runningFrame = _runningTime * fps;
+
+	if (_isLooping && _duration < _runningFrame)
 	{
-		elipsedFrame = 0;
 		_runningTime = 0;
+		_runningFrame = 0;
 		initializeActiveKeysWithMemCopy();
+	}
+
+	if (_duration < _runningFrame)
+	{
+		_isRunning = false;
+		_runningFrame = _duration;
 	}
 
 	while (_cursor < _animation.getKeyframes().size())
 	{
 		uint16_t trackID = _animation.getTrackIDs()[_cursor];
 		auto& controlPoints = _activeKeys[trackID];
-		if (controlPoints[2].keytime < elipsedFrame)
+		if (controlPoints[2].keytime < _runningFrame)
 		{
 			controlPoints[0] = controlPoints[1];
 			controlPoints[1] = controlPoints[2];
@@ -50,40 +55,34 @@ void pa::AnimationPlayer::update(float deltaTime)
 	}
 }
 
-//DirectX::XMVECTOR pa::AnimationPlayer::getBoneRotation(uint32_t boneIndex) const
-//{
-//	return _rotations[boneIndex];
-//}
-
-void pa::AnimationPlayer::storePoses(std::vector<Transform>& outPoses) const
+void pa::AnimationPlayer::storePose(std::vector<Transform>& outPose) const
 {
 	using namespace DirectX;
 
-	constexpr int fps = 120;
-	float elipsedFrame = _runningTime * fps;
 
-	//cache rotation
 	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
 	{
-		uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
-		auto& controlPoints = _activeKeys[trackID];
+		const uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
+		const auto& controlPoints = _activeKeys[trackID];
 
 
 		if (!(controlPoints[1].keytime < controlPoints[2].keytime))
 			DebugBreak();
-		if (!(controlPoints[1].keytime <= elipsedFrame && elipsedFrame <= controlPoints[2].keytime))
-			DebugBreak();
+		//if (!(controlPoints[1].keytime <= _runningFrame && _runningFrame <= controlPoints[2].keytime))
+		//	DebugBreak();
 
-		float weight = (elipsedFrame - controlPoints[1].keytime)
+		float t = (_runningFrame - controlPoints[1].keytime)
 			/ (controlPoints[2].keytime - controlPoints[1].keytime);
+
+		t = std::min(1.0f, t);
 
 		if (AnimationTrackType::Rotation == _animation.getTrackHeaders()[trackID].type)
 		{
 			XMVECTOR Q = XMQuaternionSlerp(
 				controlPoints[1].decompressAsQuaternion(),
-				controlPoints[2].decompressAsQuaternion(), weight);
+				controlPoints[2].decompressAsQuaternion(), t);
 
-			XMStoreFloat4(&outPoses[boneID].rotation, Q);
+			XMStoreFloat4(&outPose[boneID].rotation, Q);
 
 			//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
@@ -95,6 +94,46 @@ void pa::AnimationPlayer::storePoses(std::vector<Transform>& outPoses) const
 			//	controlPoints[1].decompressAsQuaternion(),
 			//	controlPoints[2].decompressAsQuaternion(),
 			//	controlPoints[3].decompressAsQuaternion(), weight));
+		}
+	}
+}
+
+void pa::AnimationPlayer::blendPoseWithBase(std::vector<Transform>& basePose, float weight) const
+{
+	using namespace DirectX;
+
+	if (weight < 0.0001f)
+		return;
+
+	weight = std::min(weight, 1.0f);
+
+	//cache rotation
+	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
+	{
+		const uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
+		const auto& controlPoints = _activeKeys[trackID];
+
+
+		if (!(controlPoints[1].keytime < controlPoints[2].keytime))
+			DebugBreak();
+		//if (!(controlPoints[1].keytime <= _runningFrame && _runningFrame <= controlPoints[2].keytime))
+		//	DebugBreak();
+
+		float t = (_runningFrame - controlPoints[1].keytime)
+			/ (controlPoints[2].keytime - controlPoints[1].keytime);
+
+		t = std::min(1.0f, t);
+
+		if (AnimationTrackType::Rotation == _animation.getTrackHeaders()[trackID].type)
+		{
+			XMVECTOR Q1 = XMQuaternionSlerp(
+				controlPoints[1].decompressAsQuaternion(),
+				controlPoints[2].decompressAsQuaternion(), t);
+
+			XMVECTOR Q0 = XMLoadFloat4(&basePose[boneID].rotation);
+
+			XMVECTOR Qresult = XMQuaternionSlerp(Q0, Q1, weight);
+			XMStoreFloat4(&basePose[boneID].rotation, Qresult);
 		}
 	}
 }
@@ -114,14 +153,20 @@ void pa::AnimationPlayer::reset()
 	if (0 == _runningTime)
 		return;
 
-	_runningTime = 0;
+	_runningTime = 0.0f;
+	_runningFrame = 0.0f;
 	initializeActiveKeysWithMemCopy();
+}
+
+void pa::AnimationPlayer::setLoop(bool enable) 
+{
+	_isLooping = enable;
 }
 
 void pa::AnimationPlayer::initializeActiveKeys()
 {
 	const size_t trackCount = _animation.getTrackHeaders().size();
-	_cursor = trackCount * 4;
+	_cursor = static_cast<uint32_t>(trackCount) * 4;
 	for (size_t i = 0; i < _cursor; i++)
 	{
 		const uint16_t trackID = _animation.getTrackIDs()[i];
@@ -136,6 +181,6 @@ void pa::AnimationPlayer::initializeActiveKeys()
 void pa::AnimationPlayer::initializeActiveKeysWithMemCopy()
 {
 	const size_t trackCount = _animation.getTrackHeaders().size();
-	_cursor = trackCount * 4;
+	_cursor = static_cast<uint32_t>(trackCount) * 4;
 	std::memcpy(_activeKeys.data(), _animation.getKeyframes().data(), sizeof(CompactKey) * _cursor);
 }

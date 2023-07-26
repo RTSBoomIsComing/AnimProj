@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "AnimationBuilder.h"
-#include "CompactAnimation.h"
+#include "Animation.h"
 #include "Skeleton.h"
 
 pa::AnimationBuilder::AnimationBuilder(const Skeleton& skeleton, const RawAnimation& rawAnimation)

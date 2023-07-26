@@ -89,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationBlender.h" />
     <ClInclude Include="Animation\AcclaimImporter.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationBlender.cpp" />
     <ClCompile Include="Animation\AcclaimImporter.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
@@ -148,8 +150,8 @@
     </ClInclude>
     <ClCompile Include="Animation\AnimationPlayer.cpp" />
     <None Include="Animation\AnimationPlayer.h" />
-    <None Include="Animation\CompactAnimation.cpp" />
-    <None Include="Animation\CompactAnimation.h" />
+    <None Include="Animation\Animation.cpp" />
+    <None Include="Animation\Animation.h" />
     <None Include="cpp.hint" />
     <None Include="Rendering\SkeletonMesh.cpp" />
     <None Include="Rendering\SkeletonMesh.h" />

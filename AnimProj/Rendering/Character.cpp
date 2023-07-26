@@ -14,8 +14,8 @@ pa::Character::Character(ID3D11Device* device)
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
 	
-	_basePoses.resize(_skeleton->getBoneCount());
-	_blendPoses.resize(_skeleton->getBoneCount());
+	_poseCache[0].resize(_skeleton->getBoneCount());
+	_poseCache[1].resize(_skeleton->getBoneCount());
 	_resultPoses.resize(_skeleton->getBoneCount());
 
 
@@ -26,6 +26,9 @@ pa::Character::Character(ID3D11Device* device)
 	{
 		_animationPlayers.push_back(AnimationPlayer(anim));
 	}
+
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).setLoop(false);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).setLoop(false);
 }
 
 pa::Character::~Character()
@@ -94,8 +97,8 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform);
 	}
 
-	_boneMesh->updateInstanceData(deviceContext, _boneStickTransforms.data(), _boneStickTransforms.size());
-	_jointMesh->updateInstanceData(deviceContext, _jointTransforms.data(), _jointTransforms.size());
+	_boneMesh->updateInstanceData(deviceContext, _boneStickTransforms.data(), static_cast<UINT>(_boneStickTransforms.size()));
+	_jointMesh->updateInstanceData(deviceContext, _jointTransforms.data(), static_cast<UINT>(_jointTransforms.size()));
 }
 
 void pa::Character::render(ID3D11DeviceContext* deviceContext)
@@ -106,15 +109,6 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
-
-	if (Keyboard::get().getKeyState(32 /* space bar */))
-	{
-		for (auto& animationPlayer : _animationPlayers)
-		{
-			animationPlayer.play();
-		}
-	}
-
 	if (Keyboard::get().getKeyState(27 /* esc */))
 	{
 		for (auto& animationPlayer : _animationPlayers)
@@ -123,13 +117,26 @@ void pa::Character::processInput(float deltaTime)
 		}
 	}
 
+	if (Keyboard::get().getKeyState(32 /* space bar */))
+	{
+		_isJumping = true;
+		_jumpTime = std::min(1.0f, _jumpTime + deltaTime);
+	}
+	else
+	{
+		_isJumping = false;
+		_jumpTime = std::max(0.0f, _jumpTime - deltaTime);
+	}
+
 	if (Keyboard::get().getKeyState('F'))
 	{
 		_isAttacking = true;
+		_attackTime = std::min(1.0f, _attackTime + deltaTime);
 	}
 	else
 	{
 		_isAttacking = false;
+		_attackTime = std::max(0.0f, _attackTime - deltaTime);
 	}
 
 	if (Keyboard::get().getKeyState('W'))
@@ -148,48 +155,71 @@ void pa::Character::updatePoses()
 {
 	using namespace DirectX;
 
-	// temporarily set these static
-	static AnimPlayerIndex baseAnimUp = {};
-	static AnimPlayerIndex baseAnimLo = {};
-
-	static AnimPlayerIndex targetAnimUp = {};
-	static AnimPlayerIndex targetAnimLo = {};
-
-	if (_isJumping && 0 == _jumpTime)
+	if (_isJumping)
 	{
-		targetAnimUp = AnimPlayerIndex::Jump_up;
-		targetAnimLo = AnimPlayerIndex::Jump_lo;
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).play();
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).play();
 	}
 
-	if (_isAttacking && 0 == _attackTime)
+	if (this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).getRunningRate() >= 1.0f)
 	{
-		targetAnimUp = AnimPlayerIndex::Punch_up;
-		targetAnimLo = AnimPlayerIndex::Punch_lo;
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).reset();
 	}
 
-	if (_isMoving && 0 == _moveTime)
+	if (_isMoving)
 	{
-		targetAnimLo = AnimPlayerIndex::Walk_lo;
+		this->getAnimationPlayer(AnimPlayerIndex::Walk_up).play();
+		this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).play();
+		this->getAnimationPlayer(AnimPlayerIndex::Run_up).play();
+		this->getAnimationPlayer(AnimPlayerIndex::Run_lo).play();
+	}
+	else
+	{
+		this->getAnimationPlayer(AnimPlayerIndex::Walk_up).stop();
+		this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).stop();
+		this->getAnimationPlayer(AnimPlayerIndex::Run_up).stop();
+		this->getAnimationPlayer(AnimPlayerIndex::Run_lo).stop();
+	}
+	
+	if (_isAttacking)
+	{
+		this->getAnimationPlayer(AnimPlayerIndex::Punch_up).play();
+		this->getAnimationPlayer(AnimPlayerIndex::Punch_lo).play();
+	}
+	else
+	{
+		this->getAnimationPlayer(AnimPlayerIndex::Punch_up).stop();
+		this->getAnimationPlayer(AnimPlayerIndex::Punch_lo).stop();
 	}
 
+
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).storePose(_poseCache[0]);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).storePose(_poseCache[0]);
+
+	//if (!_isAttacking)
+	//{
+	//	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).storePose(_poseCache[0]);
+	//	this->getAnimationPlayer(AnimPlayerIndex::Run_up).blendPoseWithBase(_poseCache[0], _moveSpeed);
+	//}
+
+	//this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).storePose(_poseCache[0]);
+	//this->getAnimationPlayer(AnimPlayerIndex::Run_lo).blendPoseWithBase(_poseCache[0],  _moveSpeed);
+
+	//this->getAnimationPlayer(AnimPlayerIndex::Punch_up).blendPoseWithBase(_poseCache[0],  _attackTime);
 	
 
-	this->getAnimationPlayer(baseAnimUp).storePoses(_basePoses);
-	this->getAnimationPlayer(baseAnimLo).storePoses(_basePoses);
+	//if (!_isMoving)
+	//	this->getAnimationPlayer(targetAnimLo).blendPoseWithBase(_poseCache[0], (blendWeightLo) ? *blendWeightLo : 0);
 
-	this->getAnimationPlayer(targetAnimUp).storePoses(_blendPoses);
-	this->getAnimationPlayer(targetAnimLo).storePoses(_blendPoses);
 
-	//// Update poses
-	//for (const size_t boneID : _skeleton->getHierarchy())
-	//{
-	//	XMVECTOR Q;
-	//	if (_skeleton->isInUpperBody(boneID))
 
-	//		Q = this->getAnimationPlayer(AnimPlayerIndex::Walk_up).getBoneRotation(boneID);
-	//	else
-	//		Q = this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).getBoneRotation(boneID);
 
-	//	XMStoreFloat4(&_poseRotations[boneID], Q);
-	//}
+	// Update poses
+	for (const size_t boneID : _skeleton->getHierarchy())
+	{
+		if (_skeleton->isInUpperBody(boneID))
+			_resultPoses[boneID] = _poseCache[0][boneID];
+		else
+			_resultPoses[boneID] = _poseCache[0][boneID];
+	}
 }
