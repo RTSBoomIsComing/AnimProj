@@ -32,7 +32,6 @@ namespace pa
 		void updatePoses();
 
 	private:
-		float								_moveSpeed				= 0.0f;
 		float								_moveTime				= 0.0f;
 		float								_jumpTime				= 0.0f;
 		float								_attackTime				= 0.0f;

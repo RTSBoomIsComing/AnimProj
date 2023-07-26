@@ -120,12 +120,11 @@ void pa::Character::processInput(float deltaTime)
 	if (Keyboard::get().getKeyState(32 /* space bar */))
 	{
 		_isJumping = true;
-		_jumpTime = std::min(1.0f, _jumpTime + deltaTime);
 	}
-	else
+
+	if (_isJumping)
 	{
-		_isJumping = false;
-		_jumpTime = std::max(0.0f, _jumpTime - deltaTime);
+		_jumpTime = std::min(1.0f, _jumpTime + deltaTime);
 	}
 
 	if (Keyboard::get().getKeyState('F'))
@@ -141,29 +140,35 @@ void pa::Character::processInput(float deltaTime)
 
 	if (Keyboard::get().getKeyState('W'))
 	{
-		_moveSpeed = std::min(1.0f, _moveSpeed += deltaTime);
+		_moveTime = std::min(2.0f, _moveTime + deltaTime);
 	}
 	else
 	{
-		_moveSpeed = std::max(0.0f, _moveSpeed -= deltaTime);
+		_moveTime = std::max(0.0f, _moveTime - deltaTime);
 	}
 
-	_isMoving = (_moveSpeed > 0.0f);
+	_isMoving = (_moveTime > 0.0f);
 }
 
 void pa::Character::updatePoses()
 {
 	using namespace DirectX;
 
+	if (this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).getRunningRate() >= 1.0f)
+	{
+		_isJumping = false;
+		_jumpTime = 0.0f;
+		_moveTime = 0.0f;
+		_attackTime = 0.0f;
+		_moveTime = 0.0f;
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).reset();
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).reset();
+	}
+
 	if (_isJumping)
 	{
 		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).play();
 		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).play();
-	}
-
-	if (this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).getRunningRate() >= 1.0f)
-	{
-		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).reset();
 	}
 
 	if (_isMoving)
@@ -192,26 +197,22 @@ void pa::Character::updatePoses()
 		this->getAnimationPlayer(AnimPlayerIndex::Punch_lo).stop();
 	}
 
+	if (!_isJumping)
+	{
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).storePose(_poseCache[0]);
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).storePose(_poseCache[0]);
+	}
 
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).storePose(_poseCache[0]);
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).storePose(_poseCache[0]);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).blendPoseWithBase(_poseCache[0], _moveTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).blendPoseWithBase(_poseCache[0], _moveTime);
 
-	//if (!_isAttacking)
-	//{
-	//	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).storePose(_poseCache[0]);
-	//	this->getAnimationPlayer(AnimPlayerIndex::Run_up).blendPoseWithBase(_poseCache[0], _moveSpeed);
-	//}
-
-	//this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).storePose(_poseCache[0]);
-	//this->getAnimationPlayer(AnimPlayerIndex::Run_lo).blendPoseWithBase(_poseCache[0],  _moveSpeed);
-
-	//this->getAnimationPlayer(AnimPlayerIndex::Punch_up).blendPoseWithBase(_poseCache[0],  _attackTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_up).blendPoseWithBase(_poseCache[0], _moveTime - 1.0f);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_lo).blendPoseWithBase(_poseCache[0], _moveTime - 1.0f);
 	
-
-	//if (!_isMoving)
-	//	this->getAnimationPlayer(targetAnimLo).blendPoseWithBase(_poseCache[0], (blendWeightLo) ? *blendWeightLo : 0);
-
-
+	this->getAnimationPlayer(AnimPlayerIndex::Punch_up).blendPoseWithBase(_poseCache[0], _attackTime);
+	
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).blendPoseWithBase(_poseCache[0], _jumpTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).blendPoseWithBase(_poseCache[0], _jumpTime);
 
 
 	// Update poses
