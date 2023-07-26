@@ -24,10 +24,7 @@ namespace pa
 			Walk_up, Walk_lo, Run_up, Run_lo, Punch_up, Punch_lo, Jump_up, Jump_lo, Dance_up, Dance_lo
 		};
 
-		inline AnimationPlayer& getAnimationPlayer(AnimPlayerIndex index)
-		{
-			return _animationPlayers[static_cast<size_t>(index)];
-		}
+		AnimationPlayer& getAnimationPlayer(AnimPlayerIndex index);
 
 		void updatePose();
 

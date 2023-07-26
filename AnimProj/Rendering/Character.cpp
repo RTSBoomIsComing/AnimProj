@@ -149,6 +149,11 @@ void pa::Character::processInput(float deltaTime)
 	_isMoving = (_moveTime > 0.0f);
 }
 
+pa::AnimationPlayer& pa::Character::getAnimationPlayer(AnimPlayerIndex index)
+{
+	return _animationPlayers[static_cast<size_t>(index)];
+}
+
 void pa::Character::updatePose()
 {
 	using namespace DirectX;
