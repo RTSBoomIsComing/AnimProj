@@ -111,6 +111,7 @@
     <ClInclude Include="Animation\Skeleton.h" />
     <ClInclude Include="Rendering\StickMesh.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TwoBoneIKSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationBlender.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Rendering\StickMesh.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TwoBoneIKSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationManager.cpp">
