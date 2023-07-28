@@ -17,7 +17,6 @@ pa::Character::Character(ID3D11Device* device)
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
 
-
 	_boneMesh = new StickMesh(device);
 	_jointMesh = new CubeMesh(device, 0.25f);
 

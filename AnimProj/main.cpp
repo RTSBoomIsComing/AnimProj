@@ -10,7 +10,7 @@ int main()
 {
 	using namespace DirectX;
 	pa::TwoBoneIKSolver ikTest;
-	ikTest.solve({ 0, 0, 0 }, { 0, 1, 0 }, { 0, 2, 0 }, { 1, 1, 0 }, { 0,0,0,1 }, { 0,0,0,1 });
+	ikTest.solve({ 0, 0, 0 }, { -1, 0, 0 }, { -1, 1, 0 }, { 1, 0, 0 }, { 0,0,0,1 }, { 0,0,0,1 });
 
 
 	pa::MyApplication myApplication{};

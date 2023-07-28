@@ -5,7 +5,6 @@
 #include "Rendering/Mesh.h"
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
-#include "Rendering/Character.h"
 #include "Keyboard.h"
 #include "Animation/AnimationManager.h"
 
@@ -19,7 +18,7 @@ pa::MyApplication::MyApplication()
 	AnimationManager::get().initialize();
 
 	_camera		= new Camera(_device.Get());
-	_character	= new Character(_device.Get());
+	_characters.emplace_back(_device.Get());
 }
 
 pa::MyApplication::~MyApplication()
@@ -30,11 +29,11 @@ pa::MyApplication::~MyApplication()
 		_camera = nullptr;
 	}
 
-	if (nullptr != _character)
-	{
-		delete _character;
-		_character = nullptr;	
-	}
+	//if (nullptr != _character)
+	//{
+	//	delete _character;
+	//	_character = nullptr;	
+	//}
 }
 
 void pa::MyApplication::OnUpdate()
@@ -45,7 +44,10 @@ void pa::MyApplication::OnUpdate()
 	processInput(_timer.getDeltaTime());
 
 	_camera->update(_deviceContext.Get());
-	_character->update(_timer.getDeltaTime(), _deviceContext.Get());
+	for (Character& character : _characters)
+	{
+		character.update(_timer.getDeltaTime(), _deviceContext.Get());
+	}
 }
 
 void pa::MyApplication::OnRender()
@@ -64,8 +66,10 @@ void pa::MyApplication::OnRender()
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
 	_deviceContext->RSSetState(_rasterizerState.Get());
 
-
-	_character->render(_deviceContext.Get());
+	for (Character& character : _characters)
+	{
+		character.render(_deviceContext.Get());
+	}
 
 	// renderer
 	_swapChain->Present(0, 0);
@@ -126,7 +130,12 @@ void pa::MyApplication::processInput(float deltaTime)
 	using namespace DirectX;
 	float cameraDistance = 10.f;
 
-	_character->processInput(deltaTime);
+
+	for (Character& character : _characters)
+	{
+		character.processInput(deltaTime);
+	}
+
 	_camera->processInput(deltaTime);
 }
 

@@ -2,11 +2,11 @@
 #pragma once
 #include "App/Win32Application.h"
 #include "Timer.h"
+#include "Rendering/Character.h"
 namespace pa
 {
 	class Camera;
 	class Mesh;
-	class Character;
 
 	class MyApplication : public Win32Application
 	{
@@ -43,7 +43,7 @@ namespace pa
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
 
 		Camera*							_camera		= nullptr;
-		Character*						_character	= nullptr;
+		std::vector<Character>			_characters;
 
 	private:
 		int		_animationIndex			= 0;

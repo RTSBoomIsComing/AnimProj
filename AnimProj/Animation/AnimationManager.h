@@ -31,7 +31,7 @@ namespace pa
 
 
 	private:
-		std::vector<Skeleton>				_skeletonList;
+		std::vector<Skeleton>		_skeletonList;
 		std::vector<Animation>		_animationList;
 	};
 }

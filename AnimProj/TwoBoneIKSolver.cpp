@@ -21,44 +21,45 @@ bool pa::TwoBoneIKSolver::solve(DirectX::XMVECTOR A, DirectX::XMVECTOR B, Direct
     AC = XMVector3Normalize(AC);
     BC = XMVector3Normalize(BC);
     AT = XMVector3Normalize(AT);
+
     const float CAB = std::acosf(XMVectorGetX(XMVector3Dot(AB, AC)));
     const float ABC = std::acosf(XMVectorGetX(XMVector3Dot(BC, -AB)));
     const float TAC = std::acosf(XMVectorGetX(XMVector3Dot(AC, AT)));
 
-    float CABadjusted = (bc * bc - ab * ab - at * at) / (-2 * ab * at);
-    CABadjusted = std::acosf(CABadjusted);
+    float CABnew = (bc * bc - ab * ab - at * at) / (-2 * ab * at);
+    CABnew = std::acosf(CABnew);
 
-    float ABCadjusted = (at * at - ab * ab - bc * bc) / (-2 * ab * bc);
-    ABCadjusted = std::acosf(ABCadjusted);
+    float ABCnew = (at * at - ab * ab - bc * bc) / (-2 * ab * bc);
+    ABCnew = std::acosf(ABCnew);
 
-    XMVECTOR AxisCAB = XMVector3Normalize(XMVector3Cross(AB, AC));
-    XMVECTOR AxisTAC = XMVector3Normalize(XMVector3Cross(AC, AT));
+    XMVECTOR AxisABAC = XMVector3Normalize(XMVector3Cross(AB, AC));
+    XMVECTOR AxisACAT = XMVector3Normalize(XMVector3Cross(AC, AT));
 
-    bool isAxisCAB = true;
-    bool isAxisTAC = true;
-    if (XMVectorGetX(XMVectorSum(AxisCAB)) == 0)
+    bool isAxisABAC = true;
+    bool isAxisACAT = true;
+    if (XMVectorGetX(XMVectorSum(AxisABAC)) == 0)
     {
-        AxisCAB = AxisTAC;
-        isAxisCAB = false;
+        AxisABAC = AxisACAT;
+        isAxisABAC = false;
     }
 
-    if (XMVectorGetX(XMVectorSum(AxisTAC)) == 0)
+    if (XMVectorGetX(XMVectorSum(AxisACAT)) == 0)
     {
-        AxisTAC = AxisCAB;
-        isAxisTAC = false;
+        AxisACAT = AxisABAC;
+        isAxisACAT = false;
     }
 
-    if (!isAxisCAB && !isAxisTAC)
+    if (!isAxisABAC && !isAxisACAT)
         return false;
 
 
-    const XMVECTOR Axis0 = XMVector3InverseRotate(AxisCAB * -1.0f, RotAGlobal);
-    const XMVECTOR Axis1 = XMVector3InverseRotate(AxisCAB, RotBGlobal);
+    const XMVECTOR Axis0 = XMVector3InverseRotate(AxisABAC, RotAGlobal);
+    const XMVECTOR Axis1 = XMVector3InverseRotate(AxisABAC, RotBGlobal);
 
-    const XMVECTOR Q0 = XMQuaternionRotationAxis(Axis0, CABadjusted - CAB);
-    const XMVECTOR Q1 = XMQuaternionRotationAxis(Axis1, ABCadjusted - ABC);
+    const XMVECTOR Q0 = XMQuaternionRotationAxis(Axis0, CAB - CABnew);
+    const XMVECTOR Q1 = XMQuaternionRotationAxis(Axis1, ABC - ABCnew);
 
-    const XMVECTOR Axis2 = XMVector3InverseRotate(AxisTAC, RotAGlobal);
+    const XMVECTOR Axis2 = XMVector3InverseRotate(AxisACAT, RotAGlobal);
     const XMVECTOR Q2 = XMQuaternionRotationAxis(Axis2, TAC);
 
     XMStoreFloat4(&Qa, XMQuaternionMultiply(Q0, Q2));

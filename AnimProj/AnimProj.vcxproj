@@ -98,6 +98,7 @@
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\CompactKey.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Rendering\MeshManager.h" />
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="Animation\AnimationBuilder.cpp" />
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\CompactKey.cpp" />
+    <ClCompile Include="Rendering\MeshManager.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
