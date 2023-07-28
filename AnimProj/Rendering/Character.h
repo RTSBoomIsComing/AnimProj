@@ -48,6 +48,8 @@ namespace pa
 		std::vector<DirectX::XMFLOAT4X4>	_jointTransforms;
 		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
 
+
+
 		std::vector<Transform>				_poseCache[2];
 	};
 }

@@ -3,14 +3,7 @@
 
 pa::Mesh::Mesh(ID3D11Device* device)
 {
-	// Create mesh constant buffer
-	D3D11_BUFFER_DESC bufferDesc;
-	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	bufferDesc.ByteWidth = sizeof(DirectX::XMFLOAT4X4) * 100;
-	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	bufferDesc.MiscFlags = 0;
-	checkResult(device->CreateBuffer(&bufferDesc, nullptr, &_worldCBuffer));	
+	createDynamicCBuffer(device, &_worldCBuffer, sizeof(DirectX::XMFLOAT4X4) * 100);
 }
 
 void pa::Mesh::draw(ID3D11DeviceContext* pDeviceContext)

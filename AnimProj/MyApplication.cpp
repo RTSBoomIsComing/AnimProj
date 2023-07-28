@@ -7,6 +7,7 @@
 #include "Rendering/CubeMesh.h"
 #include "Keyboard.h"
 #include "Animation/AnimationManager.h"
+#include "Rendering/MeshManager.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -16,6 +17,7 @@ pa::MyApplication::MyApplication()
 	initializeGraphicsPipeline();
 
 	AnimationManager::get().initialize();
+	MeshManager::get().initialize(_device.Get());
 
 	_camera		= new Camera(_device.Get());
 	_characters.emplace_back(_device.Get());
