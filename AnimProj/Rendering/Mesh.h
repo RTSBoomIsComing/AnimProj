@@ -26,6 +26,8 @@ namespace pa
 		ComPtr<ID3D11Buffer>		_indexBuffer;
 		ComPtr<ID3D11Buffer>		_vertexPositionBuffer;
 		ComPtr<ID3D11Buffer>		_vertexColorBuffer;
+
+		// extract _worldCBuffer to outside
 		ComPtr<ID3D11Buffer>		_worldCBuffer;
 
 		UINT _strides[2]	= {};
