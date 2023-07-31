@@ -5,7 +5,8 @@
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"
-#include "../Keyboard.h"
+
+#include <DirectXTK/Keyboard.h>
 
 pa::Character::Character(ID3D11Device* device)
 {
@@ -107,15 +108,16 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
-	if (Keyboard::get().getKeyState(27 /* esc */))
-	{
-		for (auto& animationPlayer : _animationPlayers)
+	auto kb = DirectX::Keyboard::Get().GetState();
+	if (kb.Back)
 		{
-			animationPlayer.stop();
-		}
+			for (auto& animationPlayer : _animationPlayers)
+			{
+				animationPlayer.stop();
+			}
 	}
 
-	if (Keyboard::get().getKeyState(32 /* space bar */))
+	if (kb.Space)
 	{
 		_isJumping = true;
 	}
@@ -125,7 +127,7 @@ void pa::Character::processInput(float deltaTime)
 		_jumpTime = std::min(1.0f, _jumpTime + deltaTime);
 	}
 
-	if (Keyboard::get().getKeyState('F'))
+	if (kb.F)
 	{
 		_isAttacking = true;
 		_attackTime = std::min(1.0f, _attackTime + deltaTime);
@@ -136,7 +138,7 @@ void pa::Character::processInput(float deltaTime)
 		_attackTime = std::max(0.0f, _attackTime - deltaTime);
 	}
 
-	if (Keyboard::get().getKeyState('W'))
+	if (kb.W)
 	{
 		_moveTime = std::min(2.0f, _moveTime + deltaTime);
 	}

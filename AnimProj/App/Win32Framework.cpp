@@ -2,6 +2,9 @@
 #include "pch.h"
 #include "Win32Framework.h"
 #include "Win32Application.h"
+#include <DirectXTK/Keyboard.h>
+#include <DirectXTK/Mouse.h>
+
 pa::Win32Framework::Win32Framework(Win32Application* pApplication)
 {
 	const HWND hWnd = pApplication->getHwnd();
@@ -31,17 +34,26 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 
 	switch (message)
 	{
-	case WM_KEYDOWN:
-		if (nullptr != pApplication)
-			pApplication->OnKeyDown(static_cast<UINT8>(wParam));
-		
-		return 0;
+	case WM_ACTIVATE:
+	case WM_ACTIVATEAPP:
+		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
+		break;
 
+	case WM_SYSKEYDOWN:
+		if (wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)
+		{
+			// This is where you'd implement the classic ALT+ENTER hotkey for fullscreen toggle
+			// ...
+		}
+		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
+		break;
+
+	case WM_KEYDOWN:
 	case WM_KEYUP:
-		if (nullptr != pApplication)
-			pApplication->OnKeyUp(static_cast<UINT8>(wParam));
-	
-		return 0;
+	case WM_SYSKEYUP:
+		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
+		break;
+
 
 	case WM_PAINT:
 		if (nullptr != pApplication)

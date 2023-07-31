@@ -5,7 +5,6 @@
 #include "Rendering/Mesh.h"
 #include "Rendering/StickMesh.h"
 #include "Rendering/CubeMesh.h"
-#include "Keyboard.h"
 #include "Animation/AnimationManager.h"
 #include "Rendering/MeshManager.h"
 
@@ -75,16 +74,6 @@ void pa::MyApplication::OnRender()
 
 	// renderer
 	_swapChain->Present(0, 0);
-}
-
-void pa::MyApplication::OnKeyDown(UINT8 key)
-{
-	Keyboard::get().getKeyState(key) = true;
-}
-
-void pa::MyApplication::OnKeyUp(UINT8 key)
-{
-	Keyboard::get().getKeyState(key) = false;
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

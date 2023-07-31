@@ -57,9 +57,6 @@
     <ClInclude Include="Timer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Animation\AnimationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -84,7 +81,7 @@
     <ClInclude Include="AnimationBlender.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="TwoBoneIKSolver.h">
+    <ClInclude Include="IK\TwoBoneIKSolver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Rendering\MeshManager.h">
@@ -164,7 +161,7 @@
     <ClCompile Include="AnimationBlender.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="TwoBoneIKSolver.cpp">
+    <ClCompile Include="IK\TwoBoneIKSolver.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\MeshManager.cpp">

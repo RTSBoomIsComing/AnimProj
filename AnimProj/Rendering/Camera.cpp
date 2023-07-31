@@ -1,7 +1,7 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "Camera.h"
-#include "../Keyboard.h"
+#include <DirectXTK/Keyboard.h>
 
 pa::Camera::Camera(ID3D11Device* device)
 {
@@ -58,21 +58,19 @@ void pa::Camera::update(ID3D11DeviceContext* deviceContext)
 void pa::Camera::processInput(float deltaTime)
 {
 	using namespace DirectX;
-	// need to move to Camera class
-	// arrow keys
-	// left  : 37
-	// up    : 38
-	// right : 39
-	// down  : 40
+
 	float rotationY = 0.0f;
 	float rotationX = 0.0f;
-	if (Keyboard::get().getKeyState(37))
+
+	auto kb = DirectX::Keyboard::Get().GetState();
+	
+	if (kb.Left)
 		rotationX -= deltaTime;
-	if (Keyboard::get().getKeyState(39))
+	if (kb.Right)
 		rotationX += deltaTime;
-	if (Keyboard::get().getKeyState(38))
+	if (kb.Up)
 		rotationY += deltaTime;
-	if (Keyboard::get().getKeyState(40))
+	if (kb.Down)
 		rotationY -= deltaTime;
 
 	XMVECTOR quaternion = XMQuaternionRotationNormal({ 1.0f, 0.0f, 0.0f, 0.0f }, rotationY * 3.0f);

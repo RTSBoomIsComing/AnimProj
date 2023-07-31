@@ -15,8 +15,6 @@ namespace pa
 		~MyApplication();
 		virtual void OnUpdate(void) override;
 		virtual void OnRender(void) override;
-		virtual void OnKeyDown(UINT8 key) override;
-		virtual void OnKeyUp(UINT8 key) override;
 
 	private:
 		void initializeD3dDevices(HWND hWnd);

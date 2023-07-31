@@ -45,11 +45,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)Common\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Common\;$(SolutionDir)Lib\Inc\;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(SolutionDir)Lib\Inc\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)Lib\Bin\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)Common\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Common\;$(SolutionDir)Lib\Inc\;$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(SolutionDir)Lib\Inc\;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(SolutionDir)Lib\Bin\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnabled>false</VcpkgEnabled>
@@ -66,7 +70,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -85,7 +89,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;d3dcompiler.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -97,7 +101,6 @@
     <ClInclude Include="Animation\AnimationPch.h" />
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\CompactKey.h" />
-    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Rendering\MeshManager.h" />
     <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
@@ -112,7 +115,7 @@
     <ClInclude Include="Animation\Skeleton.h" />
     <ClInclude Include="Rendering\StickMesh.h" />
     <ClInclude Include="Timer.h" />
-    <ClInclude Include="TwoBoneIKSolver.h" />
+    <ClInclude Include="IK\TwoBoneIKSolver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationBlender.cpp" />
@@ -141,7 +144,7 @@
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Rendering\StickMesh.cpp" />
     <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="TwoBoneIKSolver.cpp" />
+    <ClCompile Include="IK\TwoBoneIKSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation\AnimationManager.cpp">

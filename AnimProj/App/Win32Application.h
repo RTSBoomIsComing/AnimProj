@@ -11,8 +11,6 @@ namespace pa
 	public:
 		virtual void OnUpdate(void) abstract;
 		virtual void OnRender(void) abstract;
-		virtual void OnKeyDown(UINT8 key) abstract;
-		virtual void OnKeyUp(UINT8 key) abstract;
 
 		HWND	getHwnd()	const;
 		int		getWidth()	const;
