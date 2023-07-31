@@ -1,6 +1,8 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "ImGuiManager.h"
+#include "imgui_impl_dx11.h"
+#include "imgui_impl_win32.h"
 
 pa::ImGuiManager::ImGuiManager(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
@@ -21,4 +23,17 @@ pa::ImGuiManager::~ImGuiManager()
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void pa::ImGuiManager::newFrame()
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+}
+
+void pa::ImGuiManager::endFrame()
+{
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }

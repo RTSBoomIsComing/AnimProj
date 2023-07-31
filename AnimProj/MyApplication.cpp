@@ -88,16 +88,13 @@ void pa::MyApplication::renderScene(void)
 
 void pa::MyApplication::renderImGui(void)
 {
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	_imguiManager->newFrame();
 
 	static bool show_demo_window = true;
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	_imguiManager->endFrame();
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()
