@@ -24,11 +24,6 @@ void pa::Camera::initialize()
 	constexpr float aspectRatio = 1280.0f / 720.0f;
 	_aspectRatio = aspectRatio;
 
-	using namespace DirectX;
-	XMStoreFloat4(&_eyePosition, XMVECTOR{ 0.0f, 0.0f, -10.0f, 1.0f });
-	XMStoreFloat4(&_eyeRotation, XMVECTOR{ 0.0f, 0.0f,   0.0f, 1.0f });
-	XMStoreFloat4(&_focusPosition, XMVECTOR{ 0.0f, 0.0f,  0.0f, 1.0f });
-
 	calculateMatrices();
 }
 
@@ -40,12 +35,12 @@ void pa::Camera::setAspectRatio(float aspectRatio)
 
 void pa::Camera::setEyePosition(const DirectX::XMVECTOR& eyePosition)
 {
-	DirectX::XMStoreFloat4(&_eyePosition, eyePosition);
+	DirectX::XMStoreFloat3(&_eyePosition, eyePosition);
 }
 
 void pa::Camera::setFocusPosition(const DirectX::XMVECTOR& focusPosition)
 {
-	DirectX::XMStoreFloat4(&_focusPosition, focusPosition);
+	DirectX::XMStoreFloat3(&_focusPosition, focusPosition);
 }
 
 void pa::Camera::update(ID3D11DeviceContext* deviceContext)
@@ -59,29 +54,30 @@ void pa::Camera::processInput(float deltaTime)
 {
 	using namespace DirectX;
 
-	float rotationY = 0.0f;
-	float rotationX = 0.0f;
+	float deltaPitch = 0.0f;
+	float deltaYaw = 0.0f;
 
 	auto kb = DirectX::Keyboard::Get().GetState();
 	
 	if (kb.Left)
-		rotationX -= deltaTime;
+		deltaYaw -= deltaTime;
 	if (kb.Right)
-		rotationX += deltaTime;
+		deltaYaw += deltaTime;
 	if (kb.Up)
-		rotationY += deltaTime;
+		deltaPitch += deltaTime;
 	if (kb.Down)
-		rotationY -= deltaTime;
+		deltaPitch -= deltaTime;
 
-	XMVECTOR quaternion = XMQuaternionRotationNormal({ 1.0f, 0.0f, 0.0f, 0.0f }, rotationY * 3.0f);
-	quaternion = XMQuaternionMultiply(quaternion, XMQuaternionRotationNormal({ 0.0f, 1.0f, 0.0f, 0.0f }, rotationX * 3.0f));
+	_eyeYaw += deltaYaw * 3.0f;
+	_eyePitch += deltaPitch * 3.0f;
+	_eyePitch = std::min(_eyePitch, DirectX::XM_PIDIV2 - 0.00001f);
+	_eyePitch = std::max(_eyePitch, -DirectX::XM_PIDIV2 + 0.00001f);
 
-	//XMVECTOR currentEyeRotation = XMLoadFloat4(&_eyeRotation);
-	//currentEyeRotation = XMQuaternionMultiply(currentEyeRotation, quaternion);
-	//XMStoreFloat4(&_eyeRotation, currentEyeRotation);
 
-	XMVECTOR currentEyePosition = XMLoadFloat4(&_eyePosition);
-	XMStoreFloat4(&_eyePosition, XMVector4Transform(currentEyePosition, XMMatrixRotationQuaternion(quaternion)));
+	const XMVECTOR Q = XMQuaternionRotationRollPitchYaw(_eyePitch, _eyeYaw, 0.0f);
+	XMVECTOR V = { 0.0f, 0.0f, -_eyeDistance };
+	V = XMVector3Rotate(V, Q);
+	XMStoreFloat3(&_eyePosition, V);
 }
 
 void pa::Camera::calculateMatrices()
@@ -90,7 +86,7 @@ void pa::Camera::calculateMatrices()
 
 	const XMVECTOR upDirection{ 0.0f, 1.0f, 0.0f, 0.0f };
 	XMStoreFloat4x4(&_matrices.View,
-		XMMatrixLookAtLH(XMLoadFloat4(&_eyePosition), XMLoadFloat4(&_focusPosition), upDirection));
+		XMMatrixLookAtLH(XMLoadFloat3(&_eyePosition), XMLoadFloat3(&_focusPosition), upDirection));
 
 	constexpr float nearZ = 0.01f;
 	constexpr float farZ = 100.0f;

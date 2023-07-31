@@ -33,9 +33,12 @@ namespace pa
 
 
 		Matrices						_matrices;
-		DirectX::XMFLOAT4				_eyePosition;
-		DirectX::XMFLOAT4				_eyeRotation;
-		DirectX::XMFLOAT4				_focusPosition;
+		DirectX::XMFLOAT3				_eyePosition	= { 0.0f, 0.0f, -10.0f };
+		DirectX::XMFLOAT3				_focusPosition	= { 0.0f, 0.0f,  0.0f };
+
+		float							_eyePitch		= 0.0f;
+		float							_eyeYaw			= 0.0f;
+		float							_eyeDistance	= 10.0f;
 		float							_aspectRatio;
 	};
 }
