@@ -32,18 +32,15 @@ pa::MyApplication::~MyApplication()
 		delete _camera;
 		_camera = nullptr;
 	}
-
-	//if (nullptr != _character)
-	//{
-	//	delete _character;
-	//	_character = nullptr;	
-	//}
 }
 
 void pa::MyApplication::onUpdate()
 {
 	using namespace DirectX;
-	
+
+	this->onPostResize();
+
+
 	_timer.update();
 	processInput(_timer.getDeltaTime());
 
@@ -76,6 +73,23 @@ void pa::MyApplication::onRender()
 
 	// renderer
 	_swapChain->Present(0, 0);
+}
+
+void pa::MyApplication::onPostResize(void)
+{
+	if (0 == _resizeWidth && 0 == _resizeHeight)
+		return;
+
+	if (_renderTargetView) 
+		_renderTargetView = nullptr;
+
+	_swapChain->ResizeBuffers(0, _resizeWidth, _resizeHeight, DXGI_FORMAT_UNKNOWN, 0);
+	_width = _resizeWidth;
+	_height = _resizeHeight;
+	_resizeWidth = _resizeHeight = 0;
+	createRenderTarget();	
+
+	_camera->setAspectRatio(static_cast<float>(_width) / _height);
 }
 
 void pa::MyApplication::renderScene(void)
@@ -177,6 +191,11 @@ void pa::MyApplication::initializeD3dDevices(HWND hWnd)
 		nullptr, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, featureLevels, ARRAYSIZE(featureLevels), D3D11_SDK_VERSION,
 		&swapChainDesc, _swapChain.GetAddressOf(), _device.GetAddressOf(), &featureLevel, _deviceContext.GetAddressOf()));
 
+	createRenderTarget();
+}
+
+void pa::MyApplication::createRenderTarget()
+{
 	ComPtr<ID3D11Texture2D> backBuffer;
 	checkResult(_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer)));
 	checkResult(_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &_renderTargetView));

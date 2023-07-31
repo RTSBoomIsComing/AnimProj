@@ -9,9 +9,14 @@
 pa::Win32Framework::Win32Framework(Win32Application* pApplication)
 {
 	const HWND hWnd = pApplication->getHwnd();
+
 	::SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApplication));
 	::SetWindowLongPtrW(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WindowProc));
 	::ShowWindow(hWnd, SW_SHOWDEFAULT);
+}
+
+pa::Win32Framework::~Win32Framework()
+{
 }
 
 int pa::Win32Framework::Run() noexcept
@@ -42,7 +47,12 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_ACTIVATE:
 	case WM_ACTIVATEAPP:
 		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
+		DirectX::Mouse::ProcessMessage(message, wParam, lParam);
 		break;
+
+	case WM_MOUSEACTIVATE:
+		// When you click to activate the window, we want Mouse to ignore that event.
+		return MA_ACTIVATEANDEAT;
 
 	case WM_SYSKEYDOWN:
 		if (wParam == VK_RETURN && (lParam & 0x60000000) == 0x20000000)
@@ -59,6 +69,20 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 		DirectX::Keyboard::ProcessMessage(message, wParam, lParam);
 		break;
 
+	case WM_INPUT:
+	case WM_MOUSEMOVE:
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONUP:
+	case WM_MOUSEWHEEL:
+	case WM_XBUTTONDOWN:
+	case WM_XBUTTONUP:
+	case WM_MOUSEHOVER:
+		DirectX::Mouse::ProcessMessage(message, wParam, lParam);
+		break;
 
 	case WM_PAINT:
 		if (nullptr != pApplication)
@@ -66,6 +90,13 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 			pApplication->onUpdate();
 			pApplication->onRender();
 		}
+		return 0;
+
+	case WM_SIZE:
+		if (wParam == SIZE_MINIMIZED)
+			return 0;
+
+		pApplication->onResize((UINT)LOWORD(lParam), (UINT)HIWORD(lParam));
 		return 0;
 
 	case WM_DESTROY:

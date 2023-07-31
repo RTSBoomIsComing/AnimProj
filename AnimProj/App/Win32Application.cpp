@@ -1,14 +1,13 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "Win32Application.h"
+#include <DirectXTK/Keyboard.h>
+#include <DirectXTK/Mouse.h>
 
-static const wchar_t* WindowClassName = L"AnimProjWindow";
+const wchar_t* pa::Win32Application::WindowClassName = L"AnimProjWindow";
 
 pa::Win32Application::Win32Application()
 {
-	_width = 1280;
-	_height = 720;
-
     const wchar_t* windowName = L"MainWindow";
 
 	WNDCLASSEXW windowClass = {};
@@ -31,12 +30,23 @@ pa::Win32Application::Win32Application()
 
     _hWnd = ::CreateWindowW(WindowClassName, windowName, WS_OVERLAPPEDWINDOW, 100, 100,
         adjustedWidth, adjustedHeight, NULL, NULL, GetModuleHandle(NULL), NULL);
+
+    _mouse = std::make_unique<DirectX::Mouse>();
+    _mouse->SetWindow(_hWnd);
+
+    _keyboard = std::make_unique<DirectX::Keyboard>();
 }
 
 pa::Win32Application::~Win32Application()
 {
     ::DestroyWindow(_hWnd);
     ::UnregisterClassW(WindowClassName, GetModuleHandle(NULL));
+}
+
+void pa::Win32Application::onResize(UINT width, UINT height)
+{
+    _resizeWidth = width;
+    _resizeHeight = height;
 }
 
 HWND pa::Win32Application::getHwnd() const

@@ -1,4 +1,10 @@
+// author: Changwan Yu
 #pragma once
+namespace DirectX
+{
+	class Mouse;
+	class Keyboard;
+}
 
 namespace pa
 {
@@ -12,13 +18,26 @@ namespace pa
 		virtual void onUpdate(void) abstract;
 		virtual void onRender(void) abstract;
 
+		virtual void onPostResize(void) abstract;
+		void onResize(UINT width, UINT height);
+
 		HWND	getHwnd()	const;
 		int		getWidth()	const;
 		int		getHeight()	const;
 
-	private:
+	public:
+		static const wchar_t* WindowClassName;
+
+	protected:
 		HWND	_hWnd;
-		int		_width;
-		int		_height;		
+		UINT	_width			= 1280;
+		UINT	_height			= 720;
+
+		UINT	_resizeWidth	= 0;
+		UINT	_resizeHeight	= 0;
+
+	private:
+		std::unique_ptr<DirectX::Keyboard>	_keyboard;
+		std::unique_ptr<DirectX::Mouse>		_mouse;
 	};
 }

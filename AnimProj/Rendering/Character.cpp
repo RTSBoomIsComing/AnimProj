@@ -7,6 +7,7 @@
 #include "../Rendering/CubeMesh.h"
 
 #include <DirectXTK/Keyboard.h>
+#include <DirectXTK/Mouse.h>
 
 pa::Character::Character(ID3D11Device* device)
 {
@@ -108,13 +109,19 @@ void pa::Character::render(ID3D11DeviceContext* deviceContext)
 
 void pa::Character::processInput(float deltaTime)
 {
+	auto mouse = DirectX::Mouse::Get().GetState();
+	if (mouse.leftButton)
+	{
+		std::cout << mouse.x << " " << mouse.y << std::endl;
+	}
+
 	auto kb = DirectX::Keyboard::Get().GetState();
 	if (kb.Back)
+	{
+		for (auto& animationPlayer : _animationPlayers)
 		{
-			for (auto& animationPlayer : _animationPlayers)
-			{
-				animationPlayer.stop();
-			}
+			animationPlayer.stop();
+		}
 	}
 
 	if (kb.Space)

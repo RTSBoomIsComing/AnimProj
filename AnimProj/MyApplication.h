@@ -16,12 +16,14 @@ namespace pa
 		~MyApplication();
 		virtual void	onUpdate(void) override;
 		virtual void	onRender(void) override;
+		virtual void	onPostResize(void) override;
 		void			renderScene(void);
 		void			renderImGui(void);
 
 	private:
 		void initializeD3dDevices(HWND hWnd);
 		void initializeGraphicsPipeline();
+		void createRenderTarget();
 		void processInput(float deltaTime);
 
 	private:
@@ -38,7 +40,7 @@ namespace pa
 		ComPtr<ID3D11PixelShader>			_pixelShader;
 		ComPtr<ID3D11RasterizerState>		_rasterizerState;
 
-		std::unique_ptr<ImGuiManager> _imguiManager;
+		std::unique_ptr<ImGuiManager>		_imguiManager;
 	private:
 
 		Timer	_timer;
