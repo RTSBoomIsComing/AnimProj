@@ -9,8 +9,8 @@ namespace pa
 		virtual	~Win32Application();
 
 	public:
-		virtual void OnUpdate(void) abstract;
-		virtual void OnRender(void) abstract;
+		virtual void onUpdate(void) abstract;
+		virtual void onRender(void) abstract;
 
 		HWND	getHwnd()	const;
 		int		getWidth()	const;

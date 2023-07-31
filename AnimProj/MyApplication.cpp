@@ -7,6 +7,7 @@
 #include "Rendering/CubeMesh.h"
 #include "Animation/AnimationManager.h"
 #include "Rendering/MeshManager.h"
+#include "App/ImGuiManager.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -14,6 +15,8 @@ pa::MyApplication::MyApplication()
 
 	initializeD3dDevices(getHwnd());
 	initializeGraphicsPipeline();
+
+	_imguiManager = std::make_unique<ImGuiManager>(getHwnd(), _device.Get(), _deviceContext.Get());
 
 	AnimationManager::get().initialize();
 	MeshManager::get().initialize(_device.Get());
@@ -37,7 +40,7 @@ pa::MyApplication::~MyApplication()
 	//}
 }
 
-void pa::MyApplication::OnUpdate()
+void pa::MyApplication::onUpdate()
 {
 	using namespace DirectX;
 	
@@ -51,7 +54,7 @@ void pa::MyApplication::OnUpdate()
 	}
 }
 
-void pa::MyApplication::OnRender()
+void pa::MyApplication::onRender()
 {
 	// rendering screen 
 	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
@@ -67,13 +70,34 @@ void pa::MyApplication::OnRender()
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
 	_deviceContext->RSSetState(_rasterizerState.Get());
 
+
+	this->renderScene();
+	this->renderImGui();
+
+	// renderer
+	_swapChain->Present(0, 0);
+}
+
+void pa::MyApplication::renderScene(void)
+{
 	for (Character& character : _characters)
 	{
 		character.render(_deviceContext.Get());
 	}
+}
 
-	// renderer
-	_swapChain->Present(0, 0);
+void pa::MyApplication::renderImGui(void)
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	static bool show_demo_window = true;
+	if (show_demo_window)
+		ImGui::ShowDemoWindow(&show_demo_window);
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
 void pa::MyApplication::initializeGraphicsPipeline()

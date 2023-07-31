@@ -7,14 +7,17 @@ namespace pa
 {
 	class Camera;
 	class Mesh;
+	class ImGuiManager;
 
 	class MyApplication : public Win32Application
 	{
 	public:
 		MyApplication();
 		~MyApplication();
-		virtual void OnUpdate(void) override;
-		virtual void OnRender(void) override;
+		virtual void	onUpdate(void) override;
+		virtual void	onRender(void) override;
+		void			renderScene(void);
+		void			renderImGui(void);
 
 	private:
 		void initializeD3dDevices(HWND hWnd);
@@ -35,7 +38,9 @@ namespace pa
 		ComPtr<ID3D11PixelShader>			_pixelShader;
 		ComPtr<ID3D11RasterizerState>		_rasterizerState;
 
+		std::unique_ptr<ImGuiManager> _imguiManager;
 	private:
+
 		Timer	_timer;
 
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };

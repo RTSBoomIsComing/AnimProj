@@ -4,6 +4,7 @@
 #include "Win32Application.h"
 #include <DirectXTK/Keyboard.h>
 #include <DirectXTK/Mouse.h>
+#include "imgui.h"
 
 pa::Win32Framework::Win32Framework(Win32Application* pApplication)
 {
@@ -27,8 +28,12 @@ int pa::Win32Framework::Run() noexcept
 	return static_cast<char>(msg.wParam);
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
 
 	Win32Application* pApplication = reinterpret_cast<Win32Application*>(::GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
@@ -58,8 +63,8 @@ LRESULT pa::Win32Framework::WindowProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_PAINT:
 		if (nullptr != pApplication)
 		{
-			pApplication->OnUpdate();
-			pApplication->OnRender();
+			pApplication->onUpdate();
+			pApplication->onRender();
 		}
 		return 0;
 
