@@ -42,6 +42,8 @@ namespace pa
 		// will be removed
 		Mesh*								_jointMesh				= nullptr;
 		Mesh*								_boneMesh				= nullptr;
+		std::shared_ptr<class SkeletonRenderer> _skeletonRenderer;
+
 
 		std::vector<AnimationPlayer>		_animationPlayers;
 

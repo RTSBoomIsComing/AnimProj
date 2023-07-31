@@ -5,6 +5,7 @@
 #include "../Rendering/Mesh.h"
 #include "../Rendering/StickMesh.h"
 #include "../Rendering/CubeMesh.h"
+#include "../Rendering/SkeletonRenderer.h"
 
 #include <DirectXTK/Keyboard.h>
 #include <DirectXTK/Mouse.h>
@@ -12,6 +13,7 @@
 pa::Character::Character(ID3D11Device* device)
 {
 	_skeleton = &AnimationManager::get().getDefaultSkeleton();
+	_skeletonRenderer = std::make_shared<SkeletonRenderer>(_skeleton);
 
 	_jointTransforms.resize(_skeleton->getBoneCount());
 	_boneStickTransforms.resize(_skeleton->getBoneCount());
@@ -71,31 +73,10 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 			XMLoadFloat4x4(&_jointTransforms[parentID]) : XMMatrixIdentity();
 
 		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
-
-		XMVECTOR boneTranslation		= {};
-		XMVECTOR dummyVector			= {};
-		XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
-
 		XMStoreFloat4x4(&_jointTransforms[boneID], animationMatrix * boneMatrix * parentWorldTransform);
-
-		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
-		if (boneStickScale <= 0)
-		{
-			_boneStickTransforms[boneID] = XMFLOAT4X4{};
-			continue;
-		}
-
-		const XMVECTOR V0 = XMVECTOR{ 0.0f, 1.0f, 0.0f, 0.0f };
-		const XMVECTOR V1 = XMVector3Normalize(boneTranslation);
-
-		const float		dotProduct = XMVectorGetX(XMVector3Dot(V0, V1));
-		const float		angle = std::acosf(dotProduct);
-		const XMVECTOR	rotationAxis = XMVector3Cross(V0, V1);
-
-		XMStoreFloat4x4(&_boneStickTransforms[boneID],
-			XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
-			* XMMatrixTranslation(0.f, 0.f, 0.f) * parentWorldTransform);
 	}
+
+	_skeletonRenderer->render(deviceContext, _jointTransforms, _boneStickTransforms);
 
 	_boneMesh->updateInstanceData(deviceContext, _boneStickTransforms.data(), static_cast<UINT>(_boneStickTransforms.size()));
 	_jointMesh->updateInstanceData(deviceContext, _jointTransforms.data(), static_cast<UINT>(_jointTransforms.size()));
