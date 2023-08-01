@@ -47,8 +47,8 @@ namespace pa
 
 		std::vector<AnimationPlayer>		_animationPlayers;
 
-		std::vector<DirectX::XMFLOAT4X4>	_jointTransforms;
-		std::vector<DirectX::XMFLOAT4X4>	_boneStickTransforms;
+		std::vector<DirectX::XMFLOAT4X4>	_boneGTs;
+		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneGTs;
 
 
 

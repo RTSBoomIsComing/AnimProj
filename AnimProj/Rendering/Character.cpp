@@ -15,8 +15,8 @@ pa::Character::Character(ID3D11Device* device)
 	_skeleton = &AnimationManager::get().getDefaultSkeleton();
 	_skeletonRenderer = std::make_shared<SkeletonRenderer>(_skeleton);
 
-	_jointTransforms.resize(_skeleton->getBoneCount());
-	_boneStickTransforms.resize(_skeleton->getBoneCount());
+	_boneGTs.resize(_skeleton->getBoneCount());
+	_boneToBoneGTs.resize(_skeleton->getBoneCount());
 	
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
@@ -70,16 +70,16 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 
 		const size_t	parentID				= _skeleton->getParentBoneID(boneID);
 		const XMMATRIX& parentWorldTransform	= (boneID != 0) ?
-			XMLoadFloat4x4(&_jointTransforms[parentID]) : XMMatrixIdentity();
+			XMLoadFloat4x4(&_boneGTs[parentID]) : XMMatrixIdentity();
 
 		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
-		XMStoreFloat4x4(&_jointTransforms[boneID], animationMatrix * boneMatrix * parentWorldTransform);
+		XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);
 	}
 
-	_skeletonRenderer->render(deviceContext, _jointTransforms, _boneStickTransforms);
+	_skeletonRenderer->render(deviceContext, _boneGTs, _boneToBoneGTs);
 
-	_boneMesh->updateInstanceData(deviceContext, _boneStickTransforms.data(), static_cast<UINT>(_boneStickTransforms.size()));
-	_jointMesh->updateInstanceData(deviceContext, _jointTransforms.data(), static_cast<UINT>(_jointTransforms.size()));
+	_boneMesh->updateInstanceData(deviceContext, _boneToBoneGTs.data(), static_cast<UINT>(_boneToBoneGTs.size()));
+	_jointMesh->updateInstanceData(deviceContext, _boneGTs.data(), static_cast<UINT>(_boneGTs.size()));
 }
 
 void pa::Character::render(ID3D11DeviceContext* deviceContext)

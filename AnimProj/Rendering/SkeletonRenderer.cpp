@@ -7,7 +7,7 @@ pa::SkeletonRenderer::SkeletonRenderer(const Skeleton* skeleton)
 	: _skeleton(skeleton)
 {
 	using namespace DirectX;
-	_jointToJointLTs.resize(_skeleton->getBoneCount());
+	_boneToBoneLTs.resize(_skeleton->getBoneCount());
 
 	for (const size_t boneID : _skeleton->getHierarchy())
 	{
@@ -21,7 +21,7 @@ pa::SkeletonRenderer::SkeletonRenderer(const Skeleton* skeleton)
 		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0.00001f)
 		{
-			_jointToJointLTs[boneID] = XMFLOAT4X4{};
+			_boneToBoneLTs[boneID] = XMFLOAT4X4{};
 			continue;
 		}
 
@@ -32,28 +32,27 @@ pa::SkeletonRenderer::SkeletonRenderer(const Skeleton* skeleton)
 		const float		angle = std::acosf(dotProduct);
 		const XMVECTOR	rotationAxis = XMVector3Cross(V0, V1);
 		
-		
-		XMStoreFloat4x4(&_jointToJointLTs[boneID],
+		XMStoreFloat4x4(&_boneToBoneLTs[boneID],
 			DirectX::XMMatrixScaling(0.15f, boneStickScale, 0.15f) * XMMatrixRotationAxis(rotationAxis, angle)
 			* DirectX::XMMatrixTranslation(0.f, 0.f, 0.f));
 	}
 }
 
-void pa::SkeletonRenderer::render(ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& jointGTs, std::vector<DirectX::XMFLOAT4X4>& jointToJointGTs)
+void pa::SkeletonRenderer::render(ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& boneGTs, std::vector<DirectX::XMFLOAT4X4>& boneToBoneGTs)
 {
-	assert(jointGTs.size() >= _skeleton->getBoneCount());
-	assert(jointToJointGTs.size() >= _skeleton->getBoneCount());
+	assert(boneGTs.size() >= _skeleton->getBoneCount());
+	assert(boneToBoneGTs.size() >= _skeleton->getBoneCount());
 
 	using namespace DirectX;
 	for (const size_t boneID : _skeleton->getHierarchy())
 	{
 		const size_t parentID = _skeleton->getParentBoneID(boneID);
 
-		const XMMATRIX jointToJointLT = XMLoadFloat4x4(&_jointToJointLTs[boneID]);
-		const XMMATRIX parentGT = (boneID != 0) ?
-			XMLoadFloat4x4(&jointGTs[parentID]) : XMMatrixIdentity();
+		const XMMATRIX boneToBoneLT = XMLoadFloat4x4(&_boneToBoneLTs[boneID]);
+		const XMMATRIX parentGT = (boneID != 0) ? 
+			XMLoadFloat4x4(&boneGTs[parentID]) : XMMatrixIdentity();
 
-		XMStoreFloat4x4(&jointToJointGTs[boneID],
-			jointToJointLT * parentGT);
+		XMStoreFloat4x4(&boneToBoneGTs[boneID],
+			boneToBoneLT * parentGT);
 	}
 }
