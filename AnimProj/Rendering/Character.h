@@ -1,12 +1,10 @@
 // author: Changwan Yu
 // Character has a skeleton and can hold several animations that are compatible with the skeleton
-
 #pragma once
-#include "../Animation/Skeleton.h"
 #include "../Animation/AnimationPlayer.h"
 namespace pa
 {
-	class Mesh;
+	class Skeleton;
 	class Character
 	{
 	public:
@@ -15,7 +13,6 @@ namespace pa
 
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
-		void render(ID3D11DeviceContext* deviceContext);
 		void processInput(float deltaTime);
 
 	private:
@@ -39,20 +36,13 @@ namespace pa
 	private:
 		const Skeleton*						_skeleton				= nullptr;
 
-		// will be removed
-		Mesh*								_jointMesh				= nullptr;
-		Mesh*								_boneMesh				= nullptr;
-		std::shared_ptr<class SkeletonRenderer> _skeletonRenderer;
-
 
 		std::vector<AnimationPlayer>		_animationPlayers;
+		std::vector<Transform>				_poseCache[2];
 
+	public:
 		std::vector<DirectX::XMFLOAT4X4>	_boneGTs;
 		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneGTs;
-
-
-
-		std::vector<Transform>				_poseCache[2];
 	};
 }
 

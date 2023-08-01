@@ -3,21 +3,21 @@
 #include "SkeletonRenderer.h"
 #include "../Animation/Skeleton.h"
 
-pa::SkeletonRenderer::SkeletonRenderer(const Skeleton* skeleton)
+pa::SkeletonRenderer::SkeletonRenderer(const Skeleton& skeleton)
 	: _skeleton(skeleton)
 {
 	using namespace DirectX;
-	_boneToBoneLTs.resize(_skeleton->getBoneCount());
+	_boneToBoneLTs.resize(_skeleton.getBoneCount());
 
-	for (const size_t boneID : _skeleton->getHierarchy())
+	for (const size_t boneID : _skeleton.getHierarchy())
 	{
-		const size_t	parentID = _skeleton->getParentBoneID(boneID);
-		const XMMATRIX	boneMatrix = _skeleton->getBoneMatrix(boneID);
+		const size_t	parentID = _skeleton.getParentBoneID(boneID);
+		const XMMATRIX	boneMatrix = _skeleton.getBoneMatrix(boneID);
 
-		XMVECTOR boneTranslation = {};
-		XMVECTOR dummyVector = {};
-		DirectX::XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
-
+		XMVECTOR boneTranslation = boneMatrix.r[3];
+		//XMVECTOR dummyVector = {};
+		//DirectX::XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
+		
 		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0.00001f)
 		{
@@ -38,15 +38,12 @@ pa::SkeletonRenderer::SkeletonRenderer(const Skeleton* skeleton)
 	}
 }
 
-void pa::SkeletonRenderer::render(ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& boneGTs, std::vector<DirectX::XMFLOAT4X4>& boneToBoneGTs)
+void pa::SkeletonRenderer::getBoneToBoneGTs(const DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs)
 {
-	assert(boneGTs.size() >= _skeleton->getBoneCount());
-	assert(boneToBoneGTs.size() >= _skeleton->getBoneCount());
-
 	using namespace DirectX;
-	for (const size_t boneID : _skeleton->getHierarchy())
+	for (const size_t boneID : _skeleton.getHierarchy())
 	{
-		const size_t parentID = _skeleton->getParentBoneID(boneID);
+		const size_t parentID = _skeleton.getParentBoneID(boneID);
 
 		const XMMATRIX boneToBoneLT = XMLoadFloat4x4(&_boneToBoneLTs[boneID]);
 		const XMMATRIX parentGT = (boneID != 0) ? 

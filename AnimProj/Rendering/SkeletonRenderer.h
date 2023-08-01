@@ -6,14 +6,13 @@ namespace pa
 	class SkeletonRenderer
 	{
 	public:
-		SkeletonRenderer(const Skeleton* skeleton);
+		SkeletonRenderer(const Skeleton& skeleton);
 		~SkeletonRenderer() = default;
 
-		void render(ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& boneGTs,
-			std::vector<DirectX::XMFLOAT4X4>& boneToBoneGTs);
+		void getBoneToBoneGTs(const DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs);
 
 	private:
-		const Skeleton* const				_skeleton;
+		const Skeleton&						_skeleton;
 		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneLTs;
 	};
 }

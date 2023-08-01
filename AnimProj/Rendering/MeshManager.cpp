@@ -8,5 +8,5 @@ pa::MeshManager::MeshManager()
 void pa::MeshManager::initialize(ID3D11Device* device)
 {
 	cubeList.push_back(CubeMesh(device, 0.25f));
-	stickList.push_back(CubeMesh(device));
+	stickList.push_back(StickMesh(device));
 }

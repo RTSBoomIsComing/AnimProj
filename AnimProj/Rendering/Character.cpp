@@ -2,27 +2,18 @@
 #include "Character.h"
 #include "../Animation/AnimationManager.h"
 
-#include "../Rendering/Mesh.h"
-#include "../Rendering/StickMesh.h"
-#include "../Rendering/CubeMesh.h"
-#include "../Rendering/SkeletonRenderer.h"
-
 #include <DirectXTK/Keyboard.h>
 #include <DirectXTK/Mouse.h>
 
 pa::Character::Character(ID3D11Device* device)
 {
 	_skeleton = &AnimationManager::get().getDefaultSkeleton();
-	_skeletonRenderer = std::make_shared<SkeletonRenderer>(_skeleton);
 
 	_boneGTs.resize(_skeleton->getBoneCount());
 	_boneToBoneGTs.resize(_skeleton->getBoneCount());
 	
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
-
-	_boneMesh = new StickMesh(device); 
-	_jointMesh = new CubeMesh(device, 0.25f);
 
 	for (const auto& anim : AnimationManager::get().getAnimationList())
 	{
@@ -35,18 +26,6 @@ pa::Character::Character(ID3D11Device* device)
 
 pa::Character::~Character()
 {
-
-	if (nullptr != _boneMesh)
-	{
-		delete _boneMesh;
-		_boneMesh = nullptr;
-	}
-
-	if (nullptr != _jointMesh)
-	{
-		delete _jointMesh;
-		_jointMesh = nullptr;
-	}
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
@@ -75,17 +54,6 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
 		XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);
 	}
-
-	_skeletonRenderer->render(deviceContext, _boneGTs, _boneToBoneGTs);
-
-	_boneMesh->updateInstanceData(deviceContext, _boneToBoneGTs.data(), static_cast<UINT>(_boneToBoneGTs.size()));
-	_jointMesh->updateInstanceData(deviceContext, _boneGTs.data(), static_cast<UINT>(_boneGTs.size()));
-}
-
-void pa::Character::render(ID3D11DeviceContext* deviceContext)
-{
-	_boneMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
-	_jointMesh->drawInstanced(deviceContext, static_cast<UINT>(_skeleton->getBoneCount()));
 }
 
 void pa::Character::processInput(float deltaTime)

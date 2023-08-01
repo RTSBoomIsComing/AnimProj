@@ -8,6 +8,7 @@ namespace pa
 	class Camera;
 	class Mesh;
 	class ImGuiManager;
+	class SkeletonRenderer;
 
 	class MyApplication : public Win32Application
 	{
@@ -40,19 +41,28 @@ namespace pa
 		ComPtr<ID3D11PixelShader>			_pixelShader;
 		ComPtr<ID3D11RasterizerState>		_rasterizerState;
 
+		std::unique_ptr<SkeletonRenderer>	_skeletonRenderer;
 		std::unique_ptr<ImGuiManager>		_imguiManager;
+
 	private:
+		ComPtr<ID3D11Buffer>				_boneWorldCBuffer;
+		ComPtr<ID3D11Buffer>				_boneToBoneWorldCBuffer;
 
+		// These would be object pools
+		std::vector<DirectX::XMFLOAT3>		_objectPositions;
+		std::vector<DirectX::XMFLOAT4>		_objectRotations;
+		std::vector<DirectX::XMFLOAT4X4>	_boneWorldMatrices;
+		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneWorldMatrices;
+
+	private:
 		Timer	_timer;
-
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
+		
 
+		const Mesh*						_boneMesh	= nullptr;
+		const Mesh*						_boneToBoneMesh	= nullptr;
 		Camera*							_camera		= nullptr;
 		std::vector<Character>			_characters;
-
-	private:
-		int		_animationIndex			= 0;
-		float	_animationBlendFactor	= 0.0f;
 	};
 }
 

@@ -3,22 +3,21 @@
 
 pa::Mesh::Mesh(ID3D11Device* device)
 {
-	createDynamicCBuffer(device, &_worldCBuffer, sizeof(DirectX::XMFLOAT4X4) * 100);
 }
 
-void pa::Mesh::draw(ID3D11DeviceContext* pDeviceContext)
+void pa::Mesh::draw(ID3D11DeviceContext* pDeviceContext) const
 {
 	setGraphicsPipeline(pDeviceContext);
 	pDeviceContext->DrawIndexed(getIndexCount(), 0, 0);
 }
 
-void pa::Mesh::drawInstanced(ID3D11DeviceContext* pDeviceContext, UINT instanceCount)
+void pa::Mesh::drawInstanced(ID3D11DeviceContext* pDeviceContext, UINT instanceCount, UINT startInstanceLocation) const
 {
 	setGraphicsPipeline(pDeviceContext);
-	pDeviceContext->DrawIndexedInstanced(getIndexCount(), instanceCount, 0, 0, 0);
+	pDeviceContext->DrawIndexedInstanced(getIndexCount(), instanceCount, 0, 0, startInstanceLocation);
 }
 
-void pa::Mesh::setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext)
+void pa::Mesh::setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext) const
 {
 	ID3D11Buffer* const vertexBuffers[] = {
 		_vertexPositionBuffer.Get(),
@@ -27,8 +26,6 @@ void pa::Mesh::setGraphicsPipeline(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->IASetPrimitiveTopology(_primitiveTopology);
 	pDeviceContext->IASetVertexBuffers(0, ARRAYSIZE(vertexBuffers), vertexBuffers, _strides, _offsets);
 	pDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	pDeviceContext->VSSetConstantBuffers(1, 1, _worldCBuffer.GetAddressOf());
 }
 
 UINT pa::Mesh::getVertexCount() const
@@ -39,14 +36,6 @@ UINT pa::Mesh::getVertexCount() const
 UINT pa::Mesh::getIndexCount() const
 {
 	return _indexCount;
-}
-
-void pa::Mesh::updateInstanceData(ID3D11DeviceContext* deviceContext, const DirectX::XMFLOAT4X4* matrices, UINT count)
-{
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	deviceContext->Map(_worldCBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	memcpy(mappedResource.pData, matrices, sizeof(DirectX::XMFLOAT4X4) * count);
-	deviceContext->Unmap(_worldCBuffer.Get(), 0);
 }
 
 void pa::Mesh::processVertices(ID3D11Device* pDevice, std::vector<DirectX::XMFLOAT4> const& positions, std::vector<DirectX::XMFLOAT4> const& colors)

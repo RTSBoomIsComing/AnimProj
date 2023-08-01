@@ -24,7 +24,7 @@ namespace pa
 
 	private:
 		std::vector<CubeMesh> cubeList;
-		std::vector<CubeMesh> stickList;
+		std::vector<StickMesh> stickList;
 	};
 }
 
