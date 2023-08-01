@@ -22,15 +22,15 @@ pa::MyApplication::MyApplication()
 	MeshManager::get().initialize(_device.Get());
 
 	_camera		= new Camera(_device.Get());
-	_characters.emplace_back(_device.Get());
+	for (int i = 0; i < 3; i++)
+	{
+		_characters.emplace_back(_device.Get());
+		_characters.back()._worldPosition.x = 5.0f * i;
+	}
 
 	_skeletonRenderer = std::make_unique<SkeletonRenderer>(AnimationManager::get().getDefaultSkeleton());
 	_boneToBoneMesh	= &MeshManager::get().getDefaultStick();
 	_boneMesh		= &MeshManager::get().getDefaultCube();
-
-	createDynamicCBuffer(_device.Get(), &_boneToBoneWorldCBuffer, sizeof(XMFLOAT4X4) * 1000);
-	createDynamicCBuffer(_device.Get(), &_boneWorldCBuffer, sizeof(XMFLOAT4X4) * 1000);
-	
 }
 
 pa::MyApplication::~MyApplication()
@@ -48,21 +48,17 @@ void pa::MyApplication::onUpdate()
 
 	this->onPostResize();
 
-
 	_timer.update();
 	processInput(_timer.getDeltaTime());
 
 	_camera->update(_deviceContext.Get());
 
-	size_t chracterID = 0;
 	for (Character& character : _characters)
 	{
 		character.update(_timer.getDeltaTime(), _deviceContext.Get());
 		_skeletonRenderer->getBoneToBoneGTs(character._boneGTs.data(), character._boneToBoneGTs.data());
-		uploadDynamicCBuffer(_deviceContext.Get(), _boneToBoneWorldCBuffer.Get(), character._boneToBoneGTs.data(), (UINT)character._boneToBoneGTs.size());
-		uploadDynamicCBuffer(_deviceContext.Get(), _boneWorldCBuffer.Get(), character._boneGTs.data(), (UINT)character._boneGTs.size());
-
-		chracterID++;
+		uploadDynamicCBuffer(_deviceContext.Get(), character._boneToBoneWorldCBuffer.Get(), character._boneToBoneGTs.data(), (UINT)character._boneToBoneGTs.size());
+		uploadDynamicCBuffer(_deviceContext.Get(), character._boneWorldCBuffer.Get(), character._boneGTs.data(), (UINT)character._boneGTs.size());
 	}
 }
 
@@ -111,10 +107,10 @@ void pa::MyApplication::renderScene(void)
 {
 	for (Character& character : _characters)
 	{	
-		_deviceContext->VSSetConstantBuffers(1, 1, _boneWorldCBuffer.GetAddressOf());
+		_deviceContext->VSSetConstantBuffers(1, 1, character._boneWorldCBuffer.GetAddressOf());
 		_boneMesh->drawInstanced(_deviceContext.Get(), (UINT)character._boneGTs.size(), 0);
 
-		_deviceContext->VSSetConstantBuffers(1, 1, _boneToBoneWorldCBuffer.GetAddressOf());
+		_deviceContext->VSSetConstantBuffers(1, 1, character._boneToBoneWorldCBuffer.GetAddressOf());
 		_boneToBoneMesh->drawInstanced(_deviceContext.Get(), (UINT)character._boneToBoneGTs.size(), 0);
 	}
 }

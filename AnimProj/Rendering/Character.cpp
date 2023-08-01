@@ -11,7 +11,10 @@ pa::Character::Character(ID3D11Device* device)
 
 	_boneGTs.resize(_skeleton->getBoneCount());
 	_boneToBoneGTs.resize(_skeleton->getBoneCount());
-	
+
+	createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
+	createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
+
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
 
@@ -41,15 +44,25 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 
 	for (const size_t boneID : _skeleton->getHierarchy())
 	{
-		XMVECTOR S = XMLoadFloat4(&_poseCache[0][boneID].scale);
-		XMVECTOR R = XMLoadFloat4(&_poseCache[0][boneID].rotation);
-		XMVECTOR T = XMLoadFloat4(&_poseCache[0][boneID].translation);
+		const XMVECTOR S = XMLoadFloat4(&_poseCache[0][boneID].scale);
+		const XMVECTOR R = XMLoadFloat4(&_poseCache[0][boneID].rotation);
+		const XMVECTOR T = XMLoadFloat4(&_poseCache[0][boneID].translation);
 
-		XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
+		const XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
 		const size_t	parentID				= _skeleton->getParentBoneID(boneID);
-		const XMMATRIX& parentWorldTransform	= (boneID != 0) ?
-			XMLoadFloat4x4(&_boneGTs[parentID]) : XMMatrixIdentity();
+
+		XMMATRIX parentWorldTransform = {};
+		if (boneID == 0)
+		{
+			parentWorldTransform = XMMatrixAffineTransformation(
+				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), XMVectorZero(), 
+				XMLoadFloat4(&_worldRotation), XMLoadFloat3(&_worldPosition));
+		}
+		else
+		{
+			parentWorldTransform = XMLoadFloat4x4(&_boneGTs[parentID]);
+		}
 
 		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
 		XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);

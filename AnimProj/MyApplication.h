@@ -45,14 +45,14 @@ namespace pa
 		std::unique_ptr<ImGuiManager>		_imguiManager;
 
 	private:
-		ComPtr<ID3D11Buffer>				_boneWorldCBuffer;
-		ComPtr<ID3D11Buffer>				_boneToBoneWorldCBuffer;
+		//ComPtr<ID3D11Buffer>				_boneWorldCBuffer;
+		//ComPtr<ID3D11Buffer>				_boneToBoneWorldCBuffer;
 
 		// These would be object pools
-		std::vector<DirectX::XMFLOAT3>		_objectPositions;
-		std::vector<DirectX::XMFLOAT4>		_objectRotations;
-		std::vector<DirectX::XMFLOAT4X4>	_boneWorldMatrices;
-		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneWorldMatrices;
+		//std::vector<DirectX::XMFLOAT3>		_objectPositions;
+		//std::vector<DirectX::XMFLOAT4>		_objectRotations;
+		//std::vector<DirectX::XMFLOAT4X4>	_boneWorldMatrices;
+		//std::vector<DirectX::XMFLOAT4X4>	_boneToBoneWorldMatrices;
 
 	private:
 		Timer	_timer;

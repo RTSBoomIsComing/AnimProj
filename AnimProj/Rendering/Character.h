@@ -43,6 +43,11 @@ namespace pa
 	public:
 		std::vector<DirectX::XMFLOAT4X4>	_boneGTs;
 		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneGTs;
+		ComPtr<ID3D11Buffer>				_boneWorldCBuffer;
+		ComPtr<ID3D11Buffer>				_boneToBoneWorldCBuffer;
+
+		DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 }
 
