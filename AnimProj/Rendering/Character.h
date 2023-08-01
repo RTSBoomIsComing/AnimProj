@@ -13,6 +13,7 @@ namespace pa
 
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
+		Character clone() const;
 		void processInput(float deltaTime);
 
 	private:
