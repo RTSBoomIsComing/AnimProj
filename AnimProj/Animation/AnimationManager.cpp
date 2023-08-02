@@ -21,6 +21,7 @@ void pa::AnimationManager::initialize()
 	_skeletonList.emplace_back();
 	AcclaimImporter::createSkeleton(acclaimSkeleton, &_skeletonList.back());
 	_skeletonList.back().generateBoneMasks();
+	_skeletonList.back().generateBoneToBoneLTs();
 
 	std::wstring amcDirectory = _SOLUTIONDIR;
 	amcDirectory += LR"(Assets\ASFAMC\integrate\)";

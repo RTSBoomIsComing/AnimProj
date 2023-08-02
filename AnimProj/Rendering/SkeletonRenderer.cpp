@@ -15,8 +15,6 @@ pa::SkeletonRenderer::SkeletonRenderer(const Skeleton& skeleton)
 		const XMMATRIX	boneMatrix = _skeleton.getBoneMatrix(boneID);
 
 		XMVECTOR boneTranslation = boneMatrix.r[3];
-		//XMVECTOR dummyVector = {};
-		//DirectX::XMMatrixDecompose(&dummyVector, &dummyVector, &boneTranslation, boneMatrix);
 		
 		const float boneStickScale = XMVectorGetX(XMVector3Length(boneTranslation));
 		if (boneStickScale <= 0.00001f)

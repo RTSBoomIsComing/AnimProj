@@ -94,6 +94,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimationBlender.h" />
+    <ClInclude Include="Common\CommonTypes.h" />
+    <ClInclude Include="Component\AnimationComponent.h" />
     <ClInclude Include="Animation\AcclaimImporter.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
@@ -102,6 +104,7 @@
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\CompactKey.h" />
     <ClInclude Include="App\ImGuiManager.h" />
+    <ClInclude Include="Component\GameComponent.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -110,6 +113,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Common\MatrixPool.h" />
     <ClInclude Include="Rendering\MeshRenderer.h" />
     <ClInclude Include="Rendering\MeshManager.h" />
     <ClInclude Include="Rendering\Character.h" />
@@ -131,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationBlender.cpp" />
+    <ClCompile Include="Component\AnimationComponent.cpp" />
     <ClCompile Include="Animation\AcclaimImporter.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
@@ -138,6 +143,7 @@
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\CompactKey.cpp" />
     <ClCompile Include="App\ImGuiManager.cpp" />
+    <ClCompile Include="Component\GameComponent.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -166,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Common\MatrixPool.cpp" />
     <ClCompile Include="Rendering\MeshRenderer.cpp" />
     <ClCompile Include="Rendering\MeshManager.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />

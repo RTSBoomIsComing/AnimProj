@@ -13,10 +13,12 @@ namespace pa
 		~Skeleton() = default;
 
 	public:
-		void generateBoneMasks();
+		void								generateBoneMasks();
+		void								generateBoneToBoneLTs();
 
 
 		DirectX::XMMATRIX					getBoneMatrix(size_t index)		const;
+		DirectX::XMMATRIX					getBoneToBoneLT(size_t index)	const;
 
 		inline size_t						getBoneCount()					const { return _boneMatrices.size(); }
 		inline size_t						getParentBoneID(size_t index)	const { return _parents[index]; }
@@ -26,6 +28,8 @@ namespace pa
 
 	private:
 		std::vector<DirectX::XMFLOAT4X4>	_boneMatrices;
+		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneLTs;
+
 		std::vector<std::uint16_t>			_parents;
 		std::vector<std::uint16_t>			_hierarchy;
 

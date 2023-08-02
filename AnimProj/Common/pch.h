@@ -28,4 +28,6 @@ using Microsoft::WRL::ComPtr;
 #include <DirectXPackedVector.h>
 #include "DirectX11Helper.h"
 
+
+#include "CommonTypes.h"
 #include "../Animation/AnimationPch.h"

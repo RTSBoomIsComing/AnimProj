@@ -8,7 +8,6 @@ namespace pa
 	class Camera;
 	class Mesh;
 	class ImGuiManager;
-	class SkeletonRenderer;
 
 	class MyApplication : public Win32Application
 	{
@@ -41,7 +40,6 @@ namespace pa
 		ComPtr<ID3D11PixelShader>			_pixelShader;
 		ComPtr<ID3D11RasterizerState>		_rasterizerState;
 
-		std::unique_ptr<SkeletonRenderer>	_skeletonRenderer;
 		std::unique_ptr<ImGuiManager>		_imguiManager;
 
 	private:

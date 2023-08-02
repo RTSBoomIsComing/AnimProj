@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Character.h"
+#include "../Animation/Skeleton.h"
+#include "../Component/SkeletonComponent.h"
 #include "../Animation/AnimationManager.h"
 
 #include <DirectXTK/Keyboard.h>
@@ -8,12 +10,13 @@
 pa::Character::Character(ID3D11Device* device)
 {
 	_skeleton = &AnimationManager::get().getDefaultSkeleton();
+	_skeletonComp = new SkeletonComponent(device, *_skeleton);
 
-	_boneGTs.resize(_skeleton->getBoneCount());
-	_boneToBoneGTs.resize(_skeleton->getBoneCount());
+	//_boneGTs.resize(_skeleton->getBoneCount());
+	//_boneToBoneGTs.resize(_skeleton->getBoneCount());
 
-	createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
-	createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
+	//createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
+	//createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * _skeleton->getBoneCount());
 
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
@@ -29,6 +32,8 @@ pa::Character::Character(ID3D11Device* device)
 
 pa::Character::~Character()
 {
+	if (nullptr != _skeletonComp)
+		delete _skeletonComp;
 }
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
@@ -41,32 +46,32 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 	}
 
 	this->updatePose();
+	_skeletonComp->update(_poseCache[0].data(), _worldPosition, _worldRotation);
+	//for (const size_t boneID : _skeleton->getHierarchy())
+	//{
+	//	const XMVECTOR S = XMLoadFloat4(&_poseCache[0][boneID].scale);
+	//	const XMVECTOR R = XMLoadFloat4(&_poseCache[0][boneID].rotation);
+	//	const XMVECTOR T = XMLoadFloat4(&_poseCache[0][boneID].translation);
 
-	for (const size_t boneID : _skeleton->getHierarchy())
-	{
-		const XMVECTOR S = XMLoadFloat4(&_poseCache[0][boneID].scale);
-		const XMVECTOR R = XMLoadFloat4(&_poseCache[0][boneID].rotation);
-		const XMVECTOR T = XMLoadFloat4(&_poseCache[0][boneID].translation);
+	//	const XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
-		const XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
+	//	const size_t	parentID				= _skeleton->getParentBoneID(boneID);
 
-		const size_t	parentID				= _skeleton->getParentBoneID(boneID);
+	//	XMMATRIX parentWorldTransform = {};
+	//	if (boneID == 0)
+	//	{
+	//		parentWorldTransform = XMMatrixAffineTransformation(
+	//			XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), XMVectorZero(), 
+	//			XMLoadFloat4(&_worldRotation), XMLoadFloat3(&_worldPosition));
+	//	}
+	//	else
+	//	{
+	//		parentWorldTransform = XMLoadFloat4x4(&_boneGTs[parentID]);
+	//	}
 
-		XMMATRIX parentWorldTransform = {};
-		if (boneID == 0)
-		{
-			parentWorldTransform = XMMatrixAffineTransformation(
-				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), XMVectorZero(), 
-				XMLoadFloat4(&_worldRotation), XMLoadFloat3(&_worldPosition));
-		}
-		else
-		{
-			parentWorldTransform = XMLoadFloat4x4(&_boneGTs[parentID]);
-		}
-
-		XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
-		XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);
-	}
+	//	XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
+	//	XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);
+	//}
 }
 
 void pa::Character::processInput(float deltaTime)
