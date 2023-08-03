@@ -57,10 +57,10 @@ void pa::AnimationPlayer::update(float deltaTime)
 
 void pa::AnimationPlayer::cachePose(std::vector<Transform>& outPose) const
 {
-	cachePoseWithBlend(outPose, 1.0f);
+	cachePoseWithBlending(outPose, 1.0f);
 }
 
-void pa::AnimationPlayer::cachePoseWithBlend(std::vector<Transform>& basePose, float weight) const
+void pa::AnimationPlayer::cachePoseWithBlending(std::vector<Transform>& basePose, float weight) const
 {
 	using namespace DirectX;
 

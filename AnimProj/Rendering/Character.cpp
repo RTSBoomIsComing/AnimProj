@@ -149,15 +149,15 @@ void pa::Character::updatePose()
 		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).cachePose(_poseCache[0]);
 	}
 
-	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).cachePoseWithBlend(_poseCache[0], _moveTime);
-	this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).cachePoseWithBlend(_poseCache[0], _moveTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).cachePoseWithBlending(_poseCache[0], _moveTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).cachePoseWithBlending(_poseCache[0], _moveTime);
 
-	this->getAnimationPlayer(AnimPlayerIndex::Run_up).cachePoseWithBlend(_poseCache[0], _moveTime - 1.0f);
-	this->getAnimationPlayer(AnimPlayerIndex::Run_lo).cachePoseWithBlend(_poseCache[0], _moveTime - 1.0f);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_up).cachePoseWithBlending(_poseCache[0], _moveTime - 1.0f);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_lo).cachePoseWithBlending(_poseCache[0], _moveTime - 1.0f);
 	
-	this->getAnimationPlayer(AnimPlayerIndex::Punch_up).cachePoseWithBlend(_poseCache[0], _attackTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Punch_up).cachePoseWithBlending(_poseCache[0], _attackTime);
 	
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).cachePoseWithBlend(_poseCache[0], _jumpTime);
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).cachePoseWithBlend(_poseCache[0], _jumpTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).cachePoseWithBlending(_poseCache[0], _jumpTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).cachePoseWithBlending(_poseCache[0], _jumpTime);
 
 }
