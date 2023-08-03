@@ -8,12 +8,10 @@ namespace pa
 	{
 	public:
 		SkeletonComponent(ID3D11Device* device, const Skeleton& skeleton);
-		~SkeletonComponent() = default;
-
-		SkeletonComponent(SkeletonComponent&& other) = default;
+		~SkeletonComponent();
 	
 	public:
-		void update(const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation);
+		void update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation);
 		void render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh);
 	private:
 		const Skeleton*						_skeleton				= nullptr;

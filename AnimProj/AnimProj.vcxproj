@@ -128,7 +128,6 @@
     <ClInclude Include="Common\pch.h" />
     <ClInclude Include="Animation\Skeleton.h" />
     <ClInclude Include="Rendering\StickMesh.h" />
-    <ClInclude Include="Rendering\SkeletonRenderer.h" />
     <ClInclude Include="Component\SkeletonComponent.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="IK\TwoBoneIKSolver.h" />
@@ -192,7 +191,6 @@
     <ClCompile Include="Animation\Skeleton.cpp" />
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Rendering\StickMesh.cpp" />
-    <ClCompile Include="Rendering\SkeletonRenderer.cpp" />
     <ClCompile Include="Component\SkeletonComponent.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="IK\TwoBoneIKSolver.cpp" />

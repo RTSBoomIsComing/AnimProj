@@ -10,6 +10,7 @@ namespace pa
 	{
 	public:
 		Character(ID3D11Device* device);
+		//Character(Character&& other) noexcept;
 		~Character();
 
 	public:
@@ -44,11 +45,7 @@ namespace pa
 		std::vector<Transform>				_poseCache[2];
 
 	public:
-		SkeletonComponent*					_skeletonComp			= nullptr;
-		//std::vector<DirectX::XMFLOAT4X4>	_boneGTs;
-		//std::vector<DirectX::XMFLOAT4X4>	_boneToBoneGTs;
-		//ComPtr<ID3D11Buffer>				_boneWorldCBuffer;
-		//ComPtr<ID3D11Buffer>				_boneToBoneWorldCBuffer;
+		std::shared_ptr<SkeletonComponent>	_skeletonComp;
 
 		DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };

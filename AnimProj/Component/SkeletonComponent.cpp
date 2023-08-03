@@ -11,11 +11,15 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 	_boneGTs.resize(boneCount);
 	_boneToBoneGTs.resize(boneCount);
 
-	createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * boneCount);
-	createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * boneCount);
+	createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, (UINT)sizeof(DirectX::XMFLOAT4X4) * boneCount);
+	createDynamicCBuffer(device, &_boneWorldCBuffer, (UINT)sizeof(DirectX::XMFLOAT4X4) * boneCount);
 }
 
-void pa::SkeletonComponent::update(const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation)
+pa::SkeletonComponent::~SkeletonComponent()
+{
+}
+
+void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation)
 {
 	using namespace DirectX;
 
@@ -57,6 +61,10 @@ void pa::SkeletonComponent::update(const Transform* pose, DirectX::XMFLOAT3 cons
 		XMStoreFloat4x4(&_boneToBoneGTs[boneID],
 			boneToBoneLT * parentGT);
 	}
+
+	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs.data(), (UINT)_boneToBoneGTs.size());
+	uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs.data(), (UINT)_boneGTs.size());
+
 }
 
 void pa::SkeletonComponent::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)

@@ -114,9 +114,6 @@
     <ClInclude Include="imgui\imstb_truetype.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Rendering\SkeletonRenderer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Rendering\MeshRenderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -237,9 +234,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Rendering\SkeletonRenderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Rendering\MeshRenderer.cpp">

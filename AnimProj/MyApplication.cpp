@@ -26,7 +26,7 @@ pa::MyApplication::MyApplication()
 	_camera		= new Camera(_device.Get());
 	for (int i = 0; i < 3; i++)
 	{
-		_characters.push_back(Character(_device.Get()));
+		_characters.emplace_back(_device.Get());
 		_characters.back()._worldPosition.x = 5.0f * i;
 	}
 
@@ -55,9 +55,6 @@ void pa::MyApplication::onUpdate()
 	for (Character& character : _characters)
 	{
 		character.update(_timer.getDeltaTime(), _deviceContext.Get());
-		//_skeletonRenderer->getBoneToBoneGTs(character._boneGTs.data(), character._boneToBoneGTs.data());
-		//uploadDynamicCBuffer(_deviceContext.Get(), character._boneToBoneWorldCBuffer.Get(), character._boneToBoneGTs.data(), (UINT)character._boneToBoneGTs.size());
-		//uploadDynamicCBuffer(_deviceContext.Get(), character._boneWorldCBuffer.Get(), character._boneGTs.data(), (UINT)character._boneGTs.size());
 	}
 }
 
@@ -107,11 +104,6 @@ void pa::MyApplication::renderScene(void)
 	for (Character& character : _characters)
 	{	
 		character._skeletonComp->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
-		//_deviceContext->VSSetConstantBuffers(1, 1, character._boneWorldCBuffer.GetAddressOf());
-		//_boneMesh->drawInstanced(_deviceContext.Get(), (UINT)character._boneGTs.size(), 0);
-
-		//_deviceContext->VSSetConstantBuffers(1, 1, character._boneToBoneWorldCBuffer.GetAddressOf());
-		//_boneToBoneMesh->drawInstanced(_deviceContext.Get(), (UINT)character._boneToBoneGTs.size(), 0);
 	}
 }
 
