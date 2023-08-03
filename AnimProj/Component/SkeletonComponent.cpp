@@ -51,7 +51,6 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 	{
 		const size_t parentID = _skeleton->getParentBoneID(boneID);
 
-		//const XMMATRIX boneToBoneLT = XMLoadFloat4x4(&_boneToBoneLTs[boneID]);
 		const XMMATRIX boneToBoneLT = _skeleton->getBoneToBoneLT(boneID);
 		const XMMATRIX parentGT = (boneID != 0) ?
 			XMLoadFloat4x4(&_boneGTs[parentID]) : XMMatrixIdentity();
