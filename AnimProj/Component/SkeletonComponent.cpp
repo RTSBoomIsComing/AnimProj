@@ -7,7 +7,7 @@
 pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& skeleton)
 	: _skeleton(&skeleton)
 {
-	const size_t boneCount = _skeleton->getBoneCount();
+	const size_t boneCount = skeleton.getBoneCount();
 	_boneGTs.resize(boneCount);
 	_boneToBoneGTs.resize(boneCount);
 
@@ -15,9 +15,7 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 	createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * 1024);
 }
 
-pa::SkeletonComponent::~SkeletonComponent()
-{
-}
+pa::SkeletonComponent::~SkeletonComponent() = default;
  
 void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation)
 {
@@ -64,7 +62,6 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 
 	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs.data(), (UINT)_boneToBoneGTs.size());
 	uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs.data(), (UINT)_boneGTs.size());
-
 }
 
 void pa::SkeletonComponent::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)
@@ -74,5 +71,4 @@ void pa::SkeletonComponent::render(ID3D11DeviceContext* deviceContext, const Mes
 
 	deviceContext->VSSetConstantBuffers(1, 1, _boneToBoneWorldCBuffer.GetAddressOf());
 	boneToBoneMesh->drawInstanced(deviceContext, (UINT)_boneToBoneGTs.size(), 0);
-
 }

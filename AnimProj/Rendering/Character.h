@@ -1,7 +1,6 @@
 // author: Changwan Yu
 // Character has a skeleton and can hold several animations that are compatible with the skeleton
 #pragma once
-#include "../Animation/AnimationPlayer.h"
 
 namespace pa
 {
@@ -20,17 +19,7 @@ namespace pa
 		//Character clone() const;
 		void processInput(float deltaTime);
 
-	private:
-		enum class AnimPlayerIndex
-		{
-			Walk_up, Walk_lo, Run_up, Run_lo, Punch_up, Punch_lo, Jump_up, Jump_lo, Dance_up, Dance_lo
-		};
-
-		AnimationPlayer& getAnimationPlayer(AnimPlayerIndex index);
-
-		void updatePose();
-
-	private:
+	public:
 		float								_moveTime				= 0.0f;
 		float								_jumpTime				= 0.0f;
 		float								_attackTime				= 0.0f;
@@ -40,10 +29,6 @@ namespace pa
 
 	private:
 		const Skeleton*						_skeleton				= nullptr;
-
-
-		std::vector<AnimationPlayer>		_animationPlayers;
-		std::vector<Transform>				_poseCache[2];
 
 	public:
 		std::shared_ptr<SkeletonComponent>	_skeletonComp;
