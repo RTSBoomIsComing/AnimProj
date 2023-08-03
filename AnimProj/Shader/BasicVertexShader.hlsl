@@ -6,7 +6,7 @@ cbuffer CameraCBuffer : register(b0)
 
 cbuffer WorldCBuffer : register(b1)
 {
-	float4x4 World[100];
+	float4x4 World[1024];
 };
 
 

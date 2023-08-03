@@ -10,7 +10,6 @@ namespace pa
 	{
 	public:
 		Character(ID3D11Device* device);
-		//Character(Character&& other) noexcept;
 		~Character();
 
 	public:

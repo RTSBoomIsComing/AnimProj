@@ -104,7 +104,6 @@
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\CompactKey.h" />
     <ClInclude Include="App\ImGuiManager.h" />
-    <ClInclude Include="Component\GameComponent.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -142,7 +141,6 @@
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\CompactKey.cpp" />
     <ClCompile Include="App\ImGuiManager.cpp" />
-    <ClCompile Include="Component\GameComponent.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
