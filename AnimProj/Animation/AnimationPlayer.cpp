@@ -20,7 +20,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 
 	if (!_isRunning)
 		return;
-		
+
 	_runningTime += deltaTime;
 	_runningFrame = _runningTime * fps;
 
@@ -47,7 +47,7 @@ void pa::AnimationPlayer::update(float deltaTime)
 			controlPoints[1] = controlPoints[2];
 			controlPoints[2] = controlPoints[3];
 			controlPoints[3] = _animation.getKeyframes()[_cursor];
-		
+
 			_cursor++;
 		}
 		else
@@ -55,57 +55,19 @@ void pa::AnimationPlayer::update(float deltaTime)
 	}
 }
 
-void pa::AnimationPlayer::storePose(std::vector<Transform>& outPose) const
+void pa::AnimationPlayer::cachePose(std::vector<Transform>& outPose) const
 {
-	using namespace DirectX;
-
-
-	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
-	{
-		const uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
-		const auto& controlPoints = _activeKeys[trackID];
-
-
-		if (!(controlPoints[1].keytime < controlPoints[2].keytime))
-			DebugBreak();
-		//if (!(controlPoints[1].keytime <= _runningFrame && _runningFrame <= controlPoints[2].keytime))
-		//	DebugBreak();
-
-		float t = (_runningFrame - controlPoints[1].keytime)
-			/ (controlPoints[2].keytime - controlPoints[1].keytime);
-
-		t = std::min(1.0f, t);
-
-		if (AnimationTrackType::Rotation == _animation.getTrackHeaders()[trackID].type)
-		{
-			XMVECTOR Q = XMQuaternionSlerp(
-				controlPoints[1].decompressAsQuaternion(),
-				controlPoints[2].decompressAsQuaternion(), t);
-
-			XMStoreFloat4(&outPose[boneID].rotation, Q);
-
-			//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
-
-			//_rotations[_animation->_trackDescriptors[i]] = 
-			//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
-
-			//_rotations[boneID] = XMQuaternionNormalize(XMVectorCatmullRom(
-			//	controlPoints[0].decompressAsQuaternion(),
-			//	controlPoints[1].decompressAsQuaternion(),
-			//	controlPoints[2].decompressAsQuaternion(),
-			//	controlPoints[3].decompressAsQuaternion(), weight));
-		}
-	}
+	cachePoseWithBlend(outPose, 1.0f);
 }
 
-void pa::AnimationPlayer::blendPoseWithBase(std::vector<Transform>& basePose, float weight) const
+void pa::AnimationPlayer::cachePoseWithBlend(std::vector<Transform>& basePose, float weight) const
 {
 	using namespace DirectX;
 
-	if (weight < 0.0001f)
-		return;
-
+	weight = std::max(weight, 0.0f);
 	weight = std::min(weight, 1.0f);
+	if (0.0f == weight)
+		return;
 
 	//cache rotation
 	for (int trackID = 0; trackID < _activeKeys.size(); trackID++)
@@ -113,11 +75,11 @@ void pa::AnimationPlayer::blendPoseWithBase(std::vector<Transform>& basePose, fl
 		const uint16_t boneID = _animation.getTrackHeaders()[trackID].boneID;
 		const auto& controlPoints = _activeKeys[trackID];
 
-
-		if (!(controlPoints[1].keytime < controlPoints[2].keytime))
+		if (controlPoints[1].keytime >= controlPoints[2].keytime)
 			DebugBreak();
-		//if (!(controlPoints[1].keytime <= _runningFrame && _runningFrame <= controlPoints[2].keytime))
-		//	DebugBreak();
+
+		if (controlPoints[1].keytime > _runningFrame || _runningFrame > controlPoints[2].keytime)
+			DebugBreak();
 
 		float t = (_runningFrame - controlPoints[1].keytime)
 			/ (controlPoints[2].keytime - controlPoints[1].keytime);
@@ -130,10 +92,26 @@ void pa::AnimationPlayer::blendPoseWithBase(std::vector<Transform>& basePose, fl
 				controlPoints[1].decompressAsQuaternion(),
 				controlPoints[2].decompressAsQuaternion(), t);
 
-			XMVECTOR Q0 = XMLoadFloat4(&basePose[boneID].rotation);
+			if (1.0f == weight)
+			{
+				XMStoreFloat4(&basePose[boneID].rotation, Q1);
+				continue;
+			}
 
+			XMVECTOR Q0 = XMLoadFloat4(&basePose[boneID].rotation);
 			XMVECTOR Qresult = XMQuaternionSlerp(Q0, Q1, weight);
 			XMStoreFloat4(&basePose[boneID].rotation, Qresult);
+
+			//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
+
+			//_rotations[_animation->_trackDescriptors[i]] = 
+			//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
+
+			//_rotations[boneID] = XMQuaternionNormalize(XMVectorCatmullRom(
+			//	controlPoints[0].decompressAsQuaternion(),
+			//	controlPoints[1].decompressAsQuaternion(),
+			//	controlPoints[2].decompressAsQuaternion(),
+			//	controlPoints[3].decompressAsQuaternion(), weight));
 		}
 	}
 }
@@ -158,7 +136,7 @@ void pa::AnimationPlayer::reset()
 	initializeActiveKeysWithMemCopy();
 }
 
-void pa::AnimationPlayer::setLoop(bool enable) 
+void pa::AnimationPlayer::setLoop(bool enable)
 {
 	_isLooping = enable;
 }
@@ -170,11 +148,11 @@ void pa::AnimationPlayer::initializeActiveKeys()
 	for (size_t i = 0; i < _cursor; i++)
 	{
 		const uint16_t trackID = _animation.getTrackIDs()[i];
-		
+
 		_activeKeys[trackID][0] = _activeKeys[trackID][1];
 		_activeKeys[trackID][1] = _activeKeys[trackID][2];
 		_activeKeys[trackID][2] = _activeKeys[trackID][3];
-		_activeKeys[trackID][3] = _animation.getKeyframes()[i];	
+		_activeKeys[trackID][3] = _animation.getKeyframes()[i];
 	}
 }
 

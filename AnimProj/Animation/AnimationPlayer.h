@@ -1,10 +1,10 @@
 // author: Changwan Yu
 #pragma once
+#include "CompactKey.h"
 
 namespace pa
 {
 	class Animation;
-	struct CompactKey;
 	class AnimationPlayer
 	{
 	public:
@@ -13,8 +13,8 @@ namespace pa
 
 	public:
 		void update(float deltaTime);
-		void storePose(std::vector<Transform>& outPose) const;
-		void blendPoseWithBase(std::vector<Transform>& basePose, float weight) const;
+		void cachePose(std::vector<Transform>& outPose) const;
+		void cachePoseWithBlend(std::vector<Transform>& basePose, float weight) const;
 		void play();
 		void stop();
 		void reset();

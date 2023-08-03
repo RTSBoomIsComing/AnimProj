@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "../Animation/Skeleton.h"
 #include "../Component/SkeletonComponent.h"
+#include "../Component/AnimationComponent.h"
 #include "../Animation/AnimationManager.h"
 
 #include <DirectXTK/Keyboard.h>
@@ -11,6 +12,7 @@ pa::Character::Character(ID3D11Device* device)
 {
 	_skeleton = &AnimationManager::get().getDefaultSkeleton();
 	_skeletonComp = std::make_shared<SkeletonComponent>(device, *_skeleton);
+	_animationComp = std::make_shared<AnimationComponent>(device);
 
 	_poseCache[0].resize(_skeleton->getBoneCount());
 	_poseCache[1].resize(_skeleton->getBoneCount());
@@ -24,9 +26,7 @@ pa::Character::Character(ID3D11Device* device)
 	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).setLoop(false);
 }
 
-pa::Character::~Character()
-{
-}
+pa::Character::~Character() = default;
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
@@ -145,19 +145,19 @@ void pa::Character::updatePose()
 
 	if (!_isJumping)
 	{
-		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).storePose(_poseCache[0]);
-		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).storePose(_poseCache[0]);
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_up).cachePose(_poseCache[0]);
+		this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).cachePose(_poseCache[0]);
 	}
 
-	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).blendPoseWithBase(_poseCache[0], _moveTime);
-	this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).blendPoseWithBase(_poseCache[0], _moveTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_up).cachePoseWithBlend(_poseCache[0], _moveTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Walk_lo).cachePoseWithBlend(_poseCache[0], _moveTime);
 
-	this->getAnimationPlayer(AnimPlayerIndex::Run_up).blendPoseWithBase(_poseCache[0], _moveTime - 1.0f);
-	this->getAnimationPlayer(AnimPlayerIndex::Run_lo).blendPoseWithBase(_poseCache[0], _moveTime - 1.0f);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_up).cachePoseWithBlend(_poseCache[0], _moveTime - 1.0f);
+	this->getAnimationPlayer(AnimPlayerIndex::Run_lo).cachePoseWithBlend(_poseCache[0], _moveTime - 1.0f);
 	
-	this->getAnimationPlayer(AnimPlayerIndex::Punch_up).blendPoseWithBase(_poseCache[0], _attackTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Punch_up).cachePoseWithBlend(_poseCache[0], _attackTime);
 	
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).blendPoseWithBase(_poseCache[0], _jumpTime);
-	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).blendPoseWithBase(_poseCache[0], _jumpTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_up).cachePoseWithBlend(_poseCache[0], _jumpTime);
+	this->getAnimationPlayer(AnimPlayerIndex::Jump_lo).cachePoseWithBlend(_poseCache[0], _jumpTime);
 
 }

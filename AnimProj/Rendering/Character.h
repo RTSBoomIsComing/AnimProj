@@ -2,9 +2,11 @@
 // Character has a skeleton and can hold several animations that are compatible with the skeleton
 #pragma once
 #include "../Animation/AnimationPlayer.h"
+
 namespace pa
 {
 	class SkeletonComponent;
+	class AnimationComponent;
 	class Skeleton;
 	class Character
 	{
@@ -45,6 +47,7 @@ namespace pa
 
 	public:
 		std::shared_ptr<SkeletonComponent>	_skeletonComp;
+		std::shared_ptr<AnimationComponent>	_animationComp;
 
 		DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
