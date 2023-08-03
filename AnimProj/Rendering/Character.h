@@ -7,13 +7,11 @@ namespace pa
 	class SceneComponent;
 	class SkeletonComponent;
 	class AnimationComponent;
-	class Skeleton;
 	class Character
 	{
 	public:
 		Character(ID3D11Device* device);
 		~Character();
-		//Character clone() const;
 
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
@@ -28,16 +26,10 @@ namespace pa
 		bool								_isJumping				= false;
 		bool								_isAttacking			= false;
 
-	private:
-		const Skeleton*						_skeleton				= nullptr;
-
 	public:
 		std::shared_ptr<SceneComponent>		_sceneComp;
 		std::shared_ptr<SkeletonComponent>	_skeletonComp;
 		std::shared_ptr<AnimationComponent>	_animationComp;
-
-		//DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
-		//DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 }
 
