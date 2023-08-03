@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "../Animation/AnimationManager.h"
 
+#include "../Component/SceneComponent.h"
 #include "../Component/SkeletonComponent.h"
 #include "../Component/AnimationComponent.h"
 
@@ -12,16 +13,20 @@ pa::Character::Character(ID3D11Device* device)
 {
 	const Skeleton& skeleton = AnimationManager::get().getDefaultSkeleton();
 
-	_skeletonComp = std::make_shared<SkeletonComponent>(device, skeleton);
-	_animationComp = std::make_shared<AnimationComponent>(device, skeleton);
+	_sceneComp		= std::make_shared<SceneComponent>();
+	_skeletonComp	= std::make_shared<SkeletonComponent>(device, skeleton);
+	_animationComp	= std::make_shared<AnimationComponent>(device, skeleton);
 }
 
 pa::Character::~Character() = default;
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
+	using namespace DirectX;
 	_animationComp->update(*this, deltaTime);
-	_skeletonComp->update(deviceContext, _animationComp->getResultPose().data(), _worldPosition, _worldRotation);
+	_skeletonComp->update(deviceContext, _animationComp->getResultPose().data(),
+		XMLoadFloat3(&_sceneComp->position),
+		XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&_sceneComp->euler)));
 }
 
 void pa::Character::processInput(float deltaTime)
@@ -65,4 +70,11 @@ void pa::Character::processInput(float deltaTime)
 	}
 
 	_isMoving = (_moveTime > 0.0f);
+}
+
+void pa::Character::setPosition(float x, float y, float z)
+{
+	_sceneComp->position.x = x;
+	_sceneComp->position.y = y;
+	_sceneComp->position.z = z;
 }

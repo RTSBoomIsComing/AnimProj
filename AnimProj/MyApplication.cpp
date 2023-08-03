@@ -24,10 +24,10 @@ pa::MyApplication::MyApplication()
 	_boneMesh		= &MeshManager::get().getDefaultCube();
 
 	_camera		= new Camera(_device.Get());
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		_characters.emplace_back(_device.Get());
-		_characters.back()._worldPosition.x = 5.0f * i;
+		_characters.back().setPosition(5.0f * i, 0.0f, 0.0f);
 	}
 
 }

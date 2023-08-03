@@ -11,7 +11,7 @@ namespace pa
 		~SkeletonComponent();
 	
 	public:
-		void update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation);
+		void update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation);
 		void render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh);
 	private:
 		const Skeleton*						_skeleton				= nullptr;

@@ -17,10 +17,10 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 
 pa::SkeletonComponent::~SkeletonComponent() = default;
  
-void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMFLOAT3 const& worldPosition, DirectX::XMFLOAT4 const& worldRotation)
+void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation)
 {
 	using namespace DirectX;
-
+	
 	for (const size_t boneID : _skeleton->getHierarchy())
 	{
 		const XMVECTOR S = XMLoadFloat4(&pose[boneID].scale);
@@ -36,7 +36,7 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 		{
 			parentWorldTransform = XMMatrixAffineTransformation(
 				XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), XMVectorZero(),
-				XMLoadFloat4(&worldRotation), XMLoadFloat3(&worldPosition));
+				QWorldRotation, worldPosition);
 		}
 		else
 		{
@@ -63,6 +63,8 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs.data(), (UINT)_boneToBoneGTs.size());
 	uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs.data(), (UINT)_boneGTs.size());
 }
+
+
 
 void pa::SkeletonComponent::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)
 {

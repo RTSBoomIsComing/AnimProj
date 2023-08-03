@@ -4,6 +4,7 @@
 
 namespace pa
 {
+	class SceneComponent;
 	class SkeletonComponent;
 	class AnimationComponent;
 	class Skeleton;
@@ -12,12 +13,12 @@ namespace pa
 	public:
 		Character(ID3D11Device* device);
 		~Character();
+		//Character clone() const;
 
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
-		
-		//Character clone() const;
 		void processInput(float deltaTime);
+		void setPosition(float x, float y, float z);
 
 	public:
 		float								_moveTime				= 0.0f;
@@ -31,11 +32,12 @@ namespace pa
 		const Skeleton*						_skeleton				= nullptr;
 
 	public:
+		std::shared_ptr<SceneComponent>		_sceneComp;
 		std::shared_ptr<SkeletonComponent>	_skeletonComp;
 		std::shared_ptr<AnimationComponent>	_animationComp;
 
-		DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+		//DirectX::XMFLOAT3					_worldPosition = { 0.0f, 0.0f, 0.0f };
+		//DirectX::XMFLOAT4					_worldRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 }
 
