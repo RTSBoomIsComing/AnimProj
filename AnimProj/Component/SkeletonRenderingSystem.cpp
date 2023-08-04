@@ -11,7 +11,7 @@ void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceConte
 	for (int i = 0; i < SkeletonComponent::_s_boneMatrixPool.size(); i = i + 1024)
 	{
 		const int bufferID = i / 1024;
-		if (_boneWorldCBuffers.size() <= i)
+		if (_boneWorldCBuffers.size() <= bufferID)
 		{
 			_boneWorldCBuffers.emplace_back();
 			createDynamicCBuffer(device, &_boneWorldCBuffers.back(), sizeof(DirectX::XMFLOAT4X4) * 1024);
@@ -25,7 +25,7 @@ void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceConte
 	for (int i = 0; i < SkeletonComponent::_s_boneToBoneMatrixPool.size(); i = i + 1024)
 	{
 		const int bufferID = i / 1024;
-		if (_boneToBoneWorldCBuffers.size() <= i)
+		if (_boneToBoneWorldCBuffers.size() <= bufferID)
 		{
 			_boneToBoneWorldCBuffers.emplace_back();
 			createDynamicCBuffer(device, &_boneToBoneWorldCBuffers.back(), sizeof(DirectX::XMFLOAT4X4) * 1024);
