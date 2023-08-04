@@ -13,7 +13,7 @@ pa::Character::Character(ID3D11Device* device)
 {
 	const Skeleton& skeleton = AnimationManager::get().getDefaultSkeleton();
 
-	SkeletonComponent::create(device, &_skeletonComp, skeleton);
+	SkeletonComponent::create(&_skeletonComp, skeleton);
 
 	_sceneComp		= std::make_shared<SceneComponent>();
 	_animationComp	= std::make_shared<AnimationComponent>(device, skeleton);
@@ -40,11 +40,29 @@ pa::Character::~Character()
 	SkeletonComponent::destroy(&_skeletonComp);
 }
 
+pa::Character& pa::Character::operator=(Character&& other) noexcept
+{
+	_moveTime = other._moveTime;
+	_jumpTime = other._jumpTime;
+	_attackTime = other._attackTime;
+	_isMoving = other._isMoving;
+	_isJumping = other._isJumping;
+	_isAttacking = other._isAttacking;
+
+	_skeletonComp = other._skeletonComp;
+	other._skeletonComp = nullptr;
+
+	_sceneComp = std::move(other._sceneComp);
+	_animationComp = std::move(other._animationComp);
+
+	return *this;
+}
+
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
 	using namespace DirectX;
 	_animationComp->update(*this, deltaTime);
-	_skeletonComp->update(deviceContext, _animationComp->getResultPose().data(),
+	_skeletonComp->update(_animationComp->getResultPose().data(),
 		XMLoadFloat3(&_sceneComp->position),
 		XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&_sceneComp->euler)));
 }
@@ -52,11 +70,6 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 void pa::Character::processInput(float deltaTime)
 {
 	auto mouse = DirectX::Mouse::Get().GetState();
-	if (mouse.leftButton)
-	{
-		std::cout << mouse.x << " " << mouse.y << std::endl;
-	}
-
 	auto kb = DirectX::Keyboard::Get().GetState();
 	
 	if (kb.Space)

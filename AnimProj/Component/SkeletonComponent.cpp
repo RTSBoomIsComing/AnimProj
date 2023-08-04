@@ -9,7 +9,7 @@ std::vector<DirectX::XMFLOAT4X4>	pa::SkeletonComponent::_s_boneMatrixPool;
 std::vector<DirectX::XMFLOAT4X4>	pa::SkeletonComponent::_s_boneToBoneMatrixPool;
 std::vector<std::unique_ptr<pa::SkeletonComponent>>	pa::SkeletonComponent::_s_components;
 
-pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& skeleton, DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs)
+pa::SkeletonComponent::SkeletonComponent(const Skeleton& skeleton, DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs)
 	: _skeleton(&skeleton)
 	, _boneGTs(boneGTs)
 	, _boneToBoneGTs(boneToBoneGTs)
@@ -17,16 +17,16 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 
 pa::SkeletonComponent::~SkeletonComponent() = default;
  
-void pa::SkeletonComponent::create(ID3D11Device* device, SkeletonComponent** outComp, const Skeleton& skeleton)
+void pa::SkeletonComponent::create(SkeletonComponent** outComp, const Skeleton& skeleton)
 {
 	const size_t boneCount = skeleton.getBoneCount();
 	const size_t componentID = _s_components.size();
 	_s_ownerIDs.push_back(static_cast<uint32_t>(componentID));
 
-	DirectX::XMFLOAT4X4* boneGTs = _s_boneMatrixPool.data() + _s_boneMatrixPool.size();
-	DirectX::XMFLOAT4X4* boneToBoneGTs = _s_boneToBoneMatrixPool.data() + _s_boneToBoneMatrixPool.size();
+	DirectX::XMFLOAT4X4* boneGTs		= _s_boneMatrixPool.data() + _s_boneMatrixPool.size();
+	DirectX::XMFLOAT4X4* boneToBoneGTs	= _s_boneToBoneMatrixPool.data() + _s_boneToBoneMatrixPool.size();
 
-	auto skeletonComp = std::make_unique<SkeletonComponent>(device, skeleton, boneGTs, boneToBoneGTs);
+	auto skeletonComp = std::make_unique<SkeletonComponent>(skeleton, boneGTs, boneToBoneGTs);
 	_s_components.push_back(std::move(skeletonComp));
 	*outComp = _s_components.back().get();
 
@@ -62,10 +62,24 @@ void pa::SkeletonComponent::destroy(SkeletonComponent** skeletonComp)
 	if (nullptr == *skeletonComp)
 		return;
 
+	const size_t boneCount = (*skeletonComp)->_skeleton->getBoneCount();
+	
+	const uint32_t componentID = _s_ownerIDs.back();
+	SkeletonComponent& lastOwner = *_s_components[componentID];
+
+	std::copy_n(lastOwner._boneGTs, boneCount, (*skeletonComp)->_boneGTs);
+	std::copy_n(lastOwner._boneToBoneGTs, boneCount, (*skeletonComp)->_boneToBoneGTs);
+
+	lastOwner._boneGTs = (*skeletonComp)->_boneGTs;
+	lastOwner._boneToBoneGTs = (*skeletonComp)->_boneToBoneGTs;
+
+	_s_boneMatrixPool.resize(_s_boneMatrixPool.size() - boneCount);
+	_s_boneToBoneMatrixPool.resize(_s_boneToBoneMatrixPool.size() - boneCount);
+
 	*skeletonComp = nullptr;
 }
 
-void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation)
+void pa::SkeletonComponent::update(const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation)
 {
 	using namespace DirectX;
 	
@@ -106,7 +120,4 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 		XMStoreFloat4x4(&_boneToBoneGTs[boneID],
 			boneToBoneLT * parentGT);
 	}
-
-	//uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs, (UINT)_skeleton->getBoneCount());
-	//uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs, (UINT)_skeleton->getBoneCount());
 }

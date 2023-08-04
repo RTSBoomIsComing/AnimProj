@@ -15,6 +15,9 @@ namespace pa
 		Character(Character&& other) noexcept;
 		~Character();
 
+		Character& operator=(Character const& other) = delete;
+		Character& operator=(Character&& other) noexcept;
+
 	public:
 		void update(float deltaTime, ID3D11DeviceContext* deviceContext);
 		void processInput(float deltaTime);

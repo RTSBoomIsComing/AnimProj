@@ -25,13 +25,21 @@ pa::MyApplication::MyApplication()
 	_boneToBoneMesh	= &MeshManager::get().getDefaultStick();
 	_boneMesh		= &MeshManager::get().getDefaultCube();
 
-	_camera		= new Camera(_device.Get());
+	_camera			= new Camera(_device.Get());
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 200; i++)
 	{
 		_characters.emplace_back(_device.Get());
-		_characters.back().setPosition(5.0f * i, 0.0f, 0.0f);
+		_characters.back().setPosition(5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20));
 	}
+
+	//for (int i = 0; i < _characters.size(); i++)
+	//{
+	//	if (i % 2 == 0)
+	//		continue;
+
+	//	_characters.erase(_characters.begin() + i);
+	//}
 
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>();
 
@@ -105,21 +113,18 @@ void pa::MyApplication::onPostResize(void)
 	_camera->setAspectRatio(static_cast<float>(_width) / _height);
 }
 
-//void pa::MyApplication::renderScene(void)
-//{
-//	for (Character& character : _characters)
-//	{	
-//		character._skeletonComp->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
-//	}
-//}
-
 void pa::MyApplication::renderImGui(void)
 {
 	_imguiManager->newFrame();
 
-	static bool show_demo_window = true;
+	static bool show_demo_window = false;
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
+
+	ImGui::Begin("Hello, world!");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+		1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
 
 	_imguiManager->endFrame();
 }

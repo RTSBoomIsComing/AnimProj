@@ -18,7 +18,6 @@ namespace pa
 		virtual void	onUpdate(void) override;
 		virtual void	onRender(void) override;
 		virtual void	onPostResize(void) override;
-		//void			renderScene(void);
 		void			renderImGui(void);
 
 	private:

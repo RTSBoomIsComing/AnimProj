@@ -38,7 +38,7 @@ namespace pa
 
 		float							_eyePitch		= 0.0f;
 		float							_eyeYaw			= 0.0f;
-		float							_eyeDistance	= 10.0f;
+		float							_eyeDistance	= 20.0f;
 		float							_aspectRatio;
 	};
 }

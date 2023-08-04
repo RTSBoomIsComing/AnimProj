@@ -9,7 +9,7 @@ namespace pa
 		friend class SkeletonRenderingSystem;
 	public:
 		~SkeletonComponent();
-		SkeletonComponent(ID3D11Device* device, const Skeleton& skeleton, DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs);
+		SkeletonComponent(const Skeleton& skeleton, DirectX::XMFLOAT4X4* boneGTs, DirectX::XMFLOAT4X4* boneToBoneGTs);
 		
 	private:
 		static std::vector<uint32_t>							_s_ownerIDs;
@@ -18,12 +18,11 @@ namespace pa
 		static std::vector<std::unique_ptr<SkeletonComponent>>	_s_components;
 
 	public:
-		static void create(ID3D11Device* device, SkeletonComponent** skeletonComp, const Skeleton& skeleton);
+		static void create(SkeletonComponent** skeletonComp, const Skeleton& skeleton);
 		static void destroy(SkeletonComponent** skeletonComp);
 	
 	public:
-		void update(ID3D11DeviceContext* deviceContext, const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation);
-		//void render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh);
+		void update(const Transform* pose, DirectX::XMVECTOR const& worldPosition, DirectX::XMVECTOR const& QWorldRotation);
 
 	private:
 		const Skeleton*						_skeleton				= nullptr;
