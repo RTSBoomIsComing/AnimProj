@@ -129,6 +129,7 @@
     <ClInclude Include="Rendering\StickMesh.h" />
     <ClInclude Include="Component\SkeletonComponent.h" />
     <ClInclude Include="Component\SceneComponent.h" />
+    <ClInclude Include="Component\SkeletonRenderingSystem.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="IK\TwoBoneIKSolver.h" />
   </ItemGroup>
@@ -192,6 +193,7 @@
     <ClCompile Include="Rendering\StickMesh.cpp" />
     <ClCompile Include="Component\SkeletonComponent.cpp" />
     <ClCompile Include="Component\SceneComponent.cpp" />
+    <ClCompile Include="Component\SkeletonRenderingSystem.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="IK\TwoBoneIKSolver.cpp" />
   </ItemGroup>

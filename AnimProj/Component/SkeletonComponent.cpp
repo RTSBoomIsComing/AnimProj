@@ -25,11 +25,6 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 
 pa::SkeletonComponent::~SkeletonComponent() = default;
  
-void pa::SkeletonComponent::globalInitialize()
-{
-	_s_components.reserve(1000);
-}
-
 void pa::SkeletonComponent::create(ID3D11Device* device, SkeletonComponent** outComp, const Skeleton& skeleton)
 {
 	const size_t boneCount = skeleton.getBoneCount();
