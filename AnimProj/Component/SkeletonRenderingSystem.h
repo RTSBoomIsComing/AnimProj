@@ -8,7 +8,7 @@ namespace pa
 	class SkeletonRenderingSystem
 	{
 	public:
-		SkeletonRenderingSystem();
+		SkeletonRenderingSystem(ID3D11Device* device);
 		~SkeletonRenderingSystem();
 		SkeletonRenderingSystem(SkeletonRenderingSystem const&)	= delete;
 		SkeletonRenderingSystem(SkeletonRenderingSystem&&)		= delete;
@@ -18,8 +18,14 @@ namespace pa
 		void render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh);
 
 	private:
-		std::vector<ComPtr<ID3D11Buffer>>	_boneWorldCBuffers;
-		std::vector<ComPtr<ID3D11Buffer>>	_boneToBoneWorldCBuffers;
+		//std::vector<ComPtr<ID3D11Buffer>>	_boneWorldCBuffers;
+		//std::vector<ComPtr<ID3D11Buffer>>	_boneToBoneWorldCBuffers;
+
+		ComPtr<ID3D11Buffer> _boneWorldSBuffer;
+		ComPtr<ID3D11ShaderResourceView> _SRVBoneWorld;
+
+		ComPtr<ID3D11Buffer> _boneToBoneWorldSBuffer;
+		ComPtr<ID3D11ShaderResourceView> _SRVBoneToBoneWorld;
 
 	private:
 	};

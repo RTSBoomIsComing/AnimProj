@@ -41,7 +41,7 @@ pa::MyApplication::MyApplication()
 	//	_characters.erase(_characters.begin() + i);
 	//}
 
-	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>();
+	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
 
 }
 
