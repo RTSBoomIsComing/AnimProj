@@ -4,6 +4,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
 #include "Component/SkeletonComponent.h"
+#include "Component/SkeletonRenderingSystem.h"
 #include "Rendering/MeshManager.h"
 
 #include "Animation/AnimationManager.h"
@@ -32,6 +33,8 @@ pa::MyApplication::MyApplication()
 		_characters.back().setPosition(5.0f * i, 0.0f, 0.0f);
 	}
 
+	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>();
+
 }
 
 pa::MyApplication::~MyApplication()
@@ -58,6 +61,8 @@ void pa::MyApplication::onUpdate()
 	{
 		character.update(_timer.getDeltaTime(), _deviceContext.Get());
 	}
+
+	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get());
 }
 
 void pa::MyApplication::onRender()
@@ -76,8 +81,7 @@ void pa::MyApplication::onRender()
 	_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
 	_deviceContext->RSSetState(_rasterizerState.Get());
 
-
-	this->renderScene();
+	_skeletonRenderingSystem->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
 	this->renderImGui();
 
 	// renderer
@@ -101,13 +105,13 @@ void pa::MyApplication::onPostResize(void)
 	_camera->setAspectRatio(static_cast<float>(_width) / _height);
 }
 
-void pa::MyApplication::renderScene(void)
-{
-	for (Character& character : _characters)
-	{	
-		character._skeletonComp->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
-	}
-}
+//void pa::MyApplication::renderScene(void)
+//{
+//	for (Character& character : _characters)
+//	{	
+//		character._skeletonComp->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
+//	}
+//}
 
 void pa::MyApplication::renderImGui(void)
 {

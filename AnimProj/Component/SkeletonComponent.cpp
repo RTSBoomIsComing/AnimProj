@@ -4,9 +4,6 @@
 #include "../Animation/Skeleton.h"
 #include "../Rendering/Mesh.h"
 
-std::vector<ComPtr<ID3D11Buffer>>	pa::SkeletonComponent::s_boneWorldCBuffer;
-std::vector<ComPtr<ID3D11Buffer>>	pa::SkeletonComponent::s_boneToBoneWorldCBuffer;
-
 std::vector<uint32_t>				pa::SkeletonComponent::_s_ownerIDs;
 std::vector<DirectX::XMFLOAT4X4>	pa::SkeletonComponent::_s_boneMatrixPool;
 std::vector<DirectX::XMFLOAT4X4>	pa::SkeletonComponent::_s_boneToBoneMatrixPool;
@@ -16,12 +13,7 @@ pa::SkeletonComponent::SkeletonComponent(ID3D11Device* device, const Skeleton& s
 	: _skeleton(&skeleton)
 	, _boneGTs(boneGTs)
 	, _boneToBoneGTs(boneToBoneGTs)
-{
-	//const size_t boneCount = skeleton.getBoneCount();
-
-	createDynamicCBuffer(device, &_boneToBoneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * 1024);
-	createDynamicCBuffer(device, &_boneWorldCBuffer, sizeof(DirectX::XMFLOAT4X4) * 1024);
-}
+{}
 
 pa::SkeletonComponent::~SkeletonComponent() = default;
  
@@ -115,17 +107,6 @@ void pa::SkeletonComponent::update(ID3D11DeviceContext* deviceContext, const Tra
 			boneToBoneLT * parentGT);
 	}
 
-	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs, (UINT)_skeleton->getBoneCount());
-	uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs, (UINT)_skeleton->getBoneCount());
-}
-
-
-
-void pa::SkeletonComponent::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)
-{
-	deviceContext->VSSetConstantBuffers(1, 1, _boneWorldCBuffer.GetAddressOf());
-	boneMesh->drawInstanced(deviceContext, (UINT)_skeleton->getBoneCount(), 0);
-
-	deviceContext->VSSetConstantBuffers(1, 1, _boneToBoneWorldCBuffer.GetAddressOf());
-	boneToBoneMesh->drawInstanced(deviceContext, (UINT)_skeleton->getBoneCount(), 0);
+	//uploadDynamicCBuffer(deviceContext, _boneToBoneWorldCBuffer.Get(), _boneToBoneGTs, (UINT)_skeleton->getBoneCount());
+	//uploadDynamicCBuffer(deviceContext, _boneWorldCBuffer.Get(), _boneGTs, (UINT)_skeleton->getBoneCount());
 }
