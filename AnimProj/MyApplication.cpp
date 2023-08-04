@@ -20,10 +20,12 @@ pa::MyApplication::MyApplication()
 
 	AnimationManager::get().initialize();
 	MeshManager::get().initialize(_device.Get());
+
 	_boneToBoneMesh	= &MeshManager::get().getDefaultStick();
 	_boneMesh		= &MeshManager::get().getDefaultCube();
 
 	_camera		= new Camera(_device.Get());
+
 	for (int i = 0; i < 100; i++)
 	{
 		_characters.emplace_back(_device.Get());

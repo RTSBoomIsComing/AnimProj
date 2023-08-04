@@ -11,6 +11,8 @@ namespace pa
 	{
 	public:
 		Character(ID3D11Device* device);
+		Character(Character& other) = delete;
+		Character(Character&& other) noexcept;
 		~Character();
 
 	public:
@@ -27,8 +29,8 @@ namespace pa
 		bool								_isAttacking			= false;
 
 	public:
+		SkeletonComponent*					_skeletonComp;
 		std::shared_ptr<SceneComponent>		_sceneComp;
-		std::shared_ptr<SkeletonComponent>	_skeletonComp;
 		std::shared_ptr<AnimationComponent>	_animationComp;
 	};
 }

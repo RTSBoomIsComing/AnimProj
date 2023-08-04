@@ -13,12 +13,32 @@ pa::Character::Character(ID3D11Device* device)
 {
 	const Skeleton& skeleton = AnimationManager::get().getDefaultSkeleton();
 
+	SkeletonComponent::create(device, &_skeletonComp, skeleton);
+
 	_sceneComp		= std::make_shared<SceneComponent>();
-	_skeletonComp	= std::make_shared<SkeletonComponent>(device, skeleton);
 	_animationComp	= std::make_shared<AnimationComponent>(device, skeleton);
 }
 
-pa::Character::~Character() = default;
+pa::Character::Character(Character&& other) noexcept
+{
+	_moveTime		= other._moveTime;
+	_jumpTime		= other._jumpTime;
+	_attackTime		= other._attackTime;
+	_isMoving		= other._isMoving;
+	_isJumping		= other._isJumping;
+	_isAttacking	= other._isAttacking;
+
+	_skeletonComp	= other._skeletonComp;
+	other._skeletonComp = nullptr;
+
+	_sceneComp		= std::move(other._sceneComp);
+	_animationComp	= std::move(other._animationComp);
+}
+
+pa::Character::~Character()
+{
+	SkeletonComponent::destroy(&_skeletonComp);
+}
 
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
