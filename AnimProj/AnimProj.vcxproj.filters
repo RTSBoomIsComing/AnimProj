@@ -135,6 +135,12 @@
     <ClInclude Include="Behavior\BehaviorTree.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Component\BehaviorTreeComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Behavior\Behavior.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App\Win32Application.cpp">
@@ -255,6 +261,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Behavior\BehaviorTree.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\BehaviorTreeComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Behavior\Behavior.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
