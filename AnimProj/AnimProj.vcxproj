@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClInclude Include="AnimationBlender.h" />
     <ClInclude Include="Behavior\Behavior.h" />
+    <ClInclude Include="Behavior\CharacterBehaviorTree.h" />
     <ClInclude Include="Component\BehaviorTreeComponent.h" />
     <ClInclude Include="Behavior\BehaviorTree.h" />
     <ClInclude Include="Common\CommonTypes.h" />
@@ -138,6 +139,7 @@
   <ItemGroup>
     <ClCompile Include="AnimationBlender.cpp" />
     <ClCompile Include="Behavior\Behavior.cpp" />
+    <ClCompile Include="Behavior\CharacterBehaviorTree.cpp" />
     <ClCompile Include="Component\BehaviorTreeComponent.cpp" />
     <ClCompile Include="Behavior\BehaviorTree.cpp" />
     <ClCompile Include="Component\AnimationComponent.cpp" />
