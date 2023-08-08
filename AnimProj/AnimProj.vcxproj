@@ -94,6 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AnimationBlender.h" />
+    <ClInclude Include="Behavior\BehaviorTree.h" />
     <ClInclude Include="Common\CommonTypes.h" />
     <ClInclude Include="Component\AnimationComponent.h" />
     <ClInclude Include="Animation\AcclaimImporter.h" />
@@ -134,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationBlender.cpp" />
+    <ClCompile Include="Behavior\BehaviorTree.cpp" />
     <ClCompile Include="Component\AnimationComponent.cpp" />
     <ClCompile Include="Animation\AcclaimImporter.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
