@@ -10,7 +10,9 @@ namespace pa
 	class ComponentHandle
 	{
 	public:
-		ComponentHandle(std::vector<ComponentType>& componentPool) : _componentPool(&componentPool) {}
+		ComponentHandle(std::vector<ComponentType>& pool, size_t id)
+			: _componentPool(&pool)
+			, _componentID(id) {}
 		ComponentType& get()
 		{
 			assert(_componentID < _componentPool->size());

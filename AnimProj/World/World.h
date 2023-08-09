@@ -1,6 +1,7 @@
 // author: Changwan Yu
 #pragma once
 #include "../Component/Component.h"
+#include "../Component/ComponentManager.h"
 namespace pa
 {
 	class Map;
@@ -18,13 +19,16 @@ namespace pa
 		bool spawnActor(Transform const& transform);
 
 		template<typename ComponentType>
+		std::vector<ComponentType>& getComponents();
+
+		template<typename ComponentType>
 		ComponentHandle<ComponentType> createComponent();
 
 	private:
 		std::shared_ptr<Map>					_map;
 		std::vector<std::shared_ptr<Actor>>		_acters;
 
-		std::vector<SceneComponent>				_sceneComponents;
+		std::tuple<ComponentManager<SceneComponent>> _componentManagers;
 	};
 }
 
@@ -39,15 +43,17 @@ inline bool pa::World::spawnActor(Transform const& transform)
 }
 
 template<typename ComponentType>
+inline std::vector<ComponentType>& pa::World::getComponents()
+{
+	return std::get<ComponentManager<SceneComponent>>(_componentManagers).components;
+}
+
+template<typename ComponentType>
 inline pa::ComponentHandle<ComponentType> pa::World::createComponent() 
 {
-	return ComponentHandle<ComponentType>();
+	std::vector<ComponentType>& components = this->getComponents<ComponentType>();
+	ComponentHandle<ComponentType> handle(components, components.size());
+	components.emplace_back();
+	return handle;
 }
 
-template<>
-inline pa::ComponentHandle<pa::SceneComponent> pa::World::createComponent()
-{
-	ComponentHandle<SceneComponent> handle(_sceneComponents);
-
-	return handle; 
-}

@@ -97,6 +97,7 @@
     <ClInclude Include="AnimationBlender.h" />
     <ClInclude Include="Behavior\Behavior.h" />
     <ClInclude Include="Behavior\CharacterBehaviorTree.h" />
+    <ClInclude Include="Component\ComponentManager.h" />
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Component\BehaviorTreeComponent.h" />
     <ClInclude Include="Behavior\BehaviorTree.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="AnimationBlender.cpp" />
     <ClCompile Include="Behavior\Behavior.cpp" />
     <ClCompile Include="Behavior\CharacterBehaviorTree.cpp" />
+    <ClCompile Include="Component\ComponentManager.cpp" />
     <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Component\BehaviorTreeComponent.cpp" />
     <ClCompile Include="Behavior\BehaviorTree.cpp" />
