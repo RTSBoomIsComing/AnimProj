@@ -93,9 +93,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\Actor.h" />
     <ClInclude Include="AnimationBlender.h" />
     <ClInclude Include="Behavior\Behavior.h" />
     <ClInclude Include="Behavior\CharacterBehaviorTree.h" />
+    <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Component\BehaviorTreeComponent.h" />
     <ClInclude Include="Behavior\BehaviorTree.h" />
     <ClInclude Include="Common\CommonTypes.h" />
@@ -108,6 +110,8 @@
     <ClInclude Include="AcclaimMotionCapture\Acclaim.h" />
     <ClInclude Include="Animation\CompactKey.h" />
     <ClInclude Include="App\ImGuiManager.h" />
+    <ClInclude Include="Map\GridMap.h" />
+    <ClInclude Include="Map\Map.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -116,6 +120,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="Actor\MyActor.h" />
     <ClInclude Include="Rendering\MeshRenderer.h" />
     <ClInclude Include="Rendering\MeshManager.h" />
     <ClInclude Include="Rendering\Character.h" />
@@ -133,13 +138,16 @@
     <ClInclude Include="Component\SkeletonComponent.h" />
     <ClInclude Include="Component\SceneComponent.h" />
     <ClInclude Include="Component\SkeletonRenderingSystem.h" />
+    <ClInclude Include="World\World.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="IK\TwoBoneIKSolver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="AnimationBlender.cpp" />
     <ClCompile Include="Behavior\Behavior.cpp" />
     <ClCompile Include="Behavior\CharacterBehaviorTree.cpp" />
+    <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Component\BehaviorTreeComponent.cpp" />
     <ClCompile Include="Behavior\BehaviorTree.cpp" />
     <ClCompile Include="Component\AnimationComponent.cpp" />
@@ -150,6 +158,8 @@
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp" />
     <ClCompile Include="Animation\CompactKey.cpp" />
     <ClCompile Include="App\ImGuiManager.cpp" />
+    <ClCompile Include="Map\GridMap.cpp" />
+    <ClCompile Include="Map\Map.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -178,6 +188,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Actor\MyActor.cpp" />
     <ClCompile Include="Rendering\MeshRenderer.cpp" />
     <ClCompile Include="Rendering\MeshManager.cpp" />
     <ClCompile Include="Rendering\Character.cpp" />
@@ -200,6 +211,7 @@
     <ClCompile Include="Component\SkeletonComponent.cpp" />
     <ClCompile Include="Component\SceneComponent.cpp" />
     <ClCompile Include="Component\SkeletonRenderingSystem.cpp" />
+    <ClCompile Include="World\World.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="IK\TwoBoneIKSolver.cpp" />
   </ItemGroup>

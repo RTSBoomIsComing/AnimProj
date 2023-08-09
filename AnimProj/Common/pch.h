@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <numeric>
+#include <tuple>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

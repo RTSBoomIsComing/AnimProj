@@ -10,6 +10,8 @@ namespace pa
 		class Node abstract
 		{
 		public:
+			Node() = default;
+			virtual ~Node() = default;
 			virtual bool run() abstract;
 		};
 
@@ -20,7 +22,6 @@ namespace pa
 
 		protected:
 			std::vector<std::shared_ptr<Node>> _children;
-
 		};
 
 		class Sequence final : public Composite

@@ -1,0 +1,16 @@
+// author: Changwan Yu
+#pragma once
+#include "Actor.h"
+#include "../Component/Component.h"
+namespace pa
+{
+	class SceneComponent;
+	class MyActor : public Actor
+	{
+	public:
+		virtual void initializeComponents(World& world) override;
+	private:
+		ComponentHandle<SceneComponent> _sceneComp;
+	};
+}
+
