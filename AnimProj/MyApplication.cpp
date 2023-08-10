@@ -10,6 +10,9 @@
 #include "Animation/AnimationManager.h"
 #include "App/ImGuiManager.h"
 
+#include "World/World.h"
+#include "Actor/MyActor.h"
+
 pa::MyApplication::MyApplication()
 {
 	using namespace DirectX;
@@ -27,11 +30,11 @@ pa::MyApplication::MyApplication()
 
 	_camera			= new Camera(_device.Get());
 
-	for (int i = 0; i < 200; i++)
-	{
-		_characters.emplace_back(_device.Get());
-		_characters.back().setPosition(5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20));
-	}
+	//for (int i = 0; i < 200; i++)
+	//{
+	//	_characters.emplace_back(_device.Get());
+	//	_characters.back().setPosition(5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20));
+	//}
 
 	//for (int i = 0; i < _characters.size(); i++)
 	//{
@@ -42,6 +45,12 @@ pa::MyApplication::MyApplication()
 	//}
 
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
+
+	_world = std::make_unique<World>();
+	//_world->setDefaultMap(nullptr);
+	_world->spawnActor<MyActor>(Transform());
+	_world->spawnActor<MyActor>(Transform());
+	_world->spawnActor<MyActor>(Transform());
 
 }
 

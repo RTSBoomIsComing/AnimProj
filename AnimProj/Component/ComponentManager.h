@@ -8,6 +8,6 @@ namespace pa
 	struct ComponentManager
 	{
 		std::vector<ComponentType>			components;
-		std::vector <std::weak_ptr<Actor>>	owners;
+		std::vector<std::weak_ptr<Actor>>	owners;
 	};
 }

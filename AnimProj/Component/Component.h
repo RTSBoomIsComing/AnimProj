@@ -6,22 +6,13 @@ namespace pa
 	{
 	};
 
-	template<typename ComponentType>
-	class ComponentHandle
+	template <typename ComponentType>
+	struct ComponentHandle
 	{
-	public:
-		ComponentHandle(std::vector<ComponentType>& pool, size_t id)
-			: _componentPool(&pool)
-			, _componentID(id) {}
-		ComponentType& get()
-		{
-			assert(_componentID < _componentPool->size());
-			return (*_componentPool)[_componentID];
-		}
+		ComponentHandle() = default;
+		explicit ComponentHandle(size_t id) : id(id) {}
 
-	private:
-		std::vector<ComponentType>* _componentPool;
-		size_t _componentID;
+		size_t id = std::numeric_limits<size_t>::max();
 	};
 }
 

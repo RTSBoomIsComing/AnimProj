@@ -2,6 +2,15 @@
 #include "pch.h"
 #include "World.h"
 
+pa::World::World()
+{
+
+}
+
+pa::World::~World()
+{
+}
+
 bool pa::World::setDefaultMap(std::shared_ptr<Map> map)
 {
 	if (!map)

@@ -48,11 +48,13 @@ namespace pa
 		Timer	_timer;
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
 		
-
 		const Mesh*						_boneMesh	= nullptr;
 		const Mesh*						_boneToBoneMesh	= nullptr;
 		Camera*							_camera		= nullptr;
 		std::vector<Character>			_characters;
+
+
+		std::unique_ptr<class World>	_world;
 	};
 }
 

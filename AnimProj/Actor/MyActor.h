@@ -8,9 +8,10 @@ namespace pa
 	class MyActor : public Actor
 	{
 	public:
-		virtual void initializeComponents(World& world) override;
+		virtual void initializeComponents(World& world)			override;
+		virtual void onStartGame(World& world)					override;
+		virtual void onUpdate(World& world, float deltaTime)	override;
 	private:
-		ComponentHandle<SceneComponent> _sceneComp;
 	};
 }
 
