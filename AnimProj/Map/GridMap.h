@@ -1,16 +1,24 @@
 // author: Changwan Yu
 #pragma once
 #include "Map.h"
+#include "../Component/Component.h"
+#include "../Component/SceneComponent.h"
 namespace pa
 {
+	class World;
 	class GridMap : public Map
 	{
 	public:
-		GridMap()	= default;
+		GridMap(float cellSize) : _cellSize(cellSize) {}
 		~GridMap()	= default;
 
-	protected:
-
+	public:
+		virtual bool placeActor(World& world, std::weak_ptr<Actor> actor) override;
+		virtual void clearMap() override;
+	private:
+		static constexpr size_t	_mapSize	= 40;
+		float					_cellSize	= 1.0f;
+		std::array<std::array<std::vector<std::weak_ptr<Actor>>, _mapSize>, _mapSize> _cells;
 	};
 }
 

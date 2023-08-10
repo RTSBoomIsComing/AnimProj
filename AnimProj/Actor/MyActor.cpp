@@ -6,11 +6,12 @@
 
 void pa::MyActor::initializeComponents(World& world)
 {
-	setComponentHandle<SceneComponent>(world.createComponent<SceneComponent>(weak_from_this()));
+	initializeComponent<SceneComponent>(world);
 }
 
 void pa::MyActor::onStartGame(World& world)
 {
+	getComponent<SceneComponent>(world).position = { 1.0f, 1.0f, 1.0f };
 }
 
 void pa::MyActor::onUpdate(World& world, float deltaTime)

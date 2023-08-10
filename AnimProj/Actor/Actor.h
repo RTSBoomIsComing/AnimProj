@@ -1,9 +1,8 @@
 // author: Changwan Yu
 #pragma once
-#include "../Component/Component.h"
+#include "../World/World.h"
 namespace pa
 {
-	class World;
 	class SceneComponent;
 	class Actor abstract :  public std::enable_shared_from_this<Actor>
 	{
@@ -17,9 +16,9 @@ namespace pa
 		Actor& operator=(Actor&& other)			= delete;
 
 	public:
-		virtual void initializeComponents(World& world)			abstract;
-		virtual void onStartGame(World& world)					abstract;
-		virtual void onUpdate(World& world, float deltaTime)	abstract;
+		virtual void initializeComponents(World& world)			{};
+		virtual void onStartGame(World& world)					{};
+		virtual void onUpdate(World& world, float deltaTime)	{};
 
 	public:
 		template<typename ComponentType>
@@ -27,6 +26,12 @@ namespace pa
 
 		template<typename ComponentType>
 		void setComponentHandle(ComponentHandle<ComponentType> handle);
+
+		template<typename ComponentType>
+		ComponentType& getComponent(World& world);
+
+		template<typename ComponentType>
+		void initializeComponent(World& world);
 
 
 	protected:
@@ -47,6 +52,18 @@ namespace pa
 	inline void Actor::setComponentHandle(ComponentHandle<ComponentType> handle)
 	{
 		getComponentHandleRef<ComponentType>() = handle;
+	}
+
+	template<typename ComponentType>
+	inline ComponentType& Actor::getComponent(World& world)
+	{
+		return world.getComponent(getComponentHandle<SceneComponent>());
+	}
+
+	template<typename ComponentType>
+	inline void Actor::initializeComponent(World& world)
+	{
+		setComponentHandle<SceneComponent>(world.createComponent<SceneComponent>(weak_from_this()));
 	}
 
 	template<typename ComponentType>

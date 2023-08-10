@@ -2,7 +2,8 @@
 #pragma once
 namespace pa
 {
-	class Character;
+	class World;
+	class Actor;
 	class Map abstract
 	{
 	public:
@@ -10,7 +11,8 @@ namespace pa
 		virtual ~Map()	= default;
 
 	public:
-		virtual bool placeObject(Character* object) abstract;
+		virtual bool placeActor(World& world, std::weak_ptr<Actor> actor) { return false; }
+		virtual void clearMap() abstract;
 	};
 }
 

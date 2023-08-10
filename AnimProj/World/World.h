@@ -13,10 +13,13 @@ namespace pa
 		World();
 		~World();
 	public:
-		bool setDefaultMap(std::shared_ptr<Map> map);
-
+		void startGame();
+	public:
 		template<typename ActorType>
-		bool spawnActor(Transform const& transform);
+		void createActor(Transform const& transform);
+
+		template<typename ComponentType>
+		std::shared_ptr<ComponentManager<SceneComponent>>& getComponentManager();
 
 		template<typename ComponentType>
 		std::vector<ComponentType>& getComponents();
@@ -29,36 +32,44 @@ namespace pa
 
 		template<typename ComponentType>
 		void destroyComponent(ComponentHandle<ComponentType> componentHandle);
+
+		template<typename ComponentType>
+		ComponentType& getComponent(ComponentHandle<ComponentType> handle);
 		
 
 	private:
 		std::shared_ptr<Map>						_map;
-		std::vector<std::shared_ptr<Actor>>			_acters;
+		std::vector<std::shared_ptr<Actor>>			_actors;
 
-		std::tuple<std::shared_ptr<ComponentManager<SceneComponent>>> _componentManagers;
+		std::tuple<
+			std::shared_ptr<ComponentManager<SceneComponent>>> _componentManagers;
 	};
 
 	template<typename ActorType>
-	inline bool World::spawnActor(Transform const& transform)
+	inline void World::createActor(Transform const& transform)
 	{
 		std::shared_ptr<ActorType> spawnedActor = std::make_shared<ActorType>();
 		spawnedActor->initializeComponents(*this);
-		_acters.push_back(std::move(spawnedActor));
+		_actors.push_back(std::move(spawnedActor));
+	}
 
-		// add to map
-		return true;
+	template<typename ComponentType>
+	inline std::shared_ptr<ComponentManager<SceneComponent>>& World::getComponentManager()
+	{
+		
+		return std::get<std::shared_ptr<ComponentManager<ComponentType>>>(_componentManagers);
 	}
 
 	template<typename ComponentType>
 	inline std::vector<ComponentType>& World::getComponents()
 	{
-		return std::get<std::shared_ptr<ComponentManager<ComponentType>>>(_componentManagers)->components;
+		return getComponentManager<ComponentType>()->components;
 	}
 
 	template<typename ComponentType>
 	inline std::vector<std::weak_ptr<Actor>>& World::getOwners()
 	{
-		return std::get<std::shared_ptr<ComponentManager<ComponentType>>>(_componentManagers)->owners;
+		return getComponentManager<ComponentType>()->owners;
 	}
 
 	template<typename ComponentType>
@@ -82,7 +93,7 @@ namespace pa
 	{
 		std::vector<ComponentType>& components = this->getComponents<ComponentType>();
 		std::vector<std::weak_ptr<Actor>>& owners = this->getOwners<ComponentType>();
-
+		owners.back().lock()->setComponentHandle(componentHandle);
 		assert(components.size() == owners.size());
 
 		std::iter_swap(components.begin() + componentHandle.id, components.end() - 1);
@@ -92,6 +103,13 @@ namespace pa
 		// components.resize(components.size() - 1);
 		components.pop_back();
 		owners.pop_back();
+	}
+
+	template<typename ComponentType>
+	inline ComponentType& World::getComponent(ComponentHandle<ComponentType> handle)
+	{
+		std::vector<ComponentType>& components = this->getComponents<ComponentType>();
+		return components[handle.id];
 	}
 }
 

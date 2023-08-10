@@ -48,10 +48,10 @@ pa::MyApplication::MyApplication()
 
 	_world = std::make_unique<World>();
 	//_world->setDefaultMap(nullptr);
-	_world->spawnActor<MyActor>(Transform());
-	_world->spawnActor<MyActor>(Transform());
-	_world->spawnActor<MyActor>(Transform());
-
+	_world->createActor<MyActor>(Transform());
+	_world->createActor<MyActor>(Transform());
+	_world->createActor<MyActor>(Transform());
+	_world->startGame();
 }
 
 pa::MyApplication::~MyApplication()
