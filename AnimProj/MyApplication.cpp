@@ -47,7 +47,7 @@ pa::MyApplication::MyApplication()
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
 
 	_world = std::make_unique<World>();
-	//_world->setDefaultMap(nullptr);
+
 	_world->createActor<MyActor>(Transform());
 	_world->createActor<MyActor>(Transform());
 	_world->createActor<MyActor>(Transform());

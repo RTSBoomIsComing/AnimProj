@@ -2,7 +2,7 @@
 #include "CharacterBehaviorTree.h"
 #include "../Rendering/Character.h"
 
-pa::CharacterBehaviorTree::PrintID::PrintID(Character& character) : _character(&character) {}
+pa::CharacterBehaviorTree::PrintID::PrintID(MyActor* character) : _character(character) {}
 
 bool pa::CharacterBehaviorTree::PrintID::run()
 {
@@ -10,7 +10,7 @@ bool pa::CharacterBehaviorTree::PrintID::run()
 	return true;
 }
 
-pa::CharacterBehaviorTree::CharacterBehaviorTree(Character& character)
+pa::CharacterBehaviorTree::CharacterBehaviorTree(MyActor* character)
 {
 	std::shared_ptr<Behavior::Sequence> rootSequence = std::make_shared<Behavior::Sequence>();
 	_root = rootSequence;

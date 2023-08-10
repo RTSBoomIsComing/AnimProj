@@ -4,9 +4,10 @@
 #include "../Component/ComponentManager.h"
 namespace pa
 {
-	class Map;
+	class GridMap;
 	class Actor;
 	class SceneComponent;
+	class BehaviorTreeComponent;
 	class World final
 	{
 	public:
@@ -15,12 +16,16 @@ namespace pa
 	public:
 		void startGame();
 		void update(float deltaTime);
+
+	public:
+		inline std::shared_ptr<GridMap> getDefaultMap() { return _map; }
+
 	public:
 		template<typename ActorType>
 		void createActor(Transform const& transform);
 
 		template<typename ComponentType>
-		std::shared_ptr<ComponentManager<SceneComponent>>& getComponentManager();
+		std::shared_ptr<ComponentManager<ComponentType>>& getComponentManager();
 
 		template<typename ComponentType>
 		std::vector<ComponentType>& getComponents();
@@ -39,23 +44,24 @@ namespace pa
 		
 
 	private:
-		std::shared_ptr<Map>						_map;
+		std::shared_ptr<GridMap>					_map;
 		std::vector<std::shared_ptr<Actor>>			_actors;
 
 		std::tuple<
-			std::shared_ptr<ComponentManager<SceneComponent>>> _componentManagers;
+			std::shared_ptr<ComponentManager<SceneComponent>>,
+			std::shared_ptr<ComponentManager<BehaviorTreeComponent>>> _componentManagers;
 	};
 
 	template<typename ActorType>
 	inline void World::createActor(Transform const& transform)
 	{
-		std::shared_ptr<ActorType> spawnedActor = std::make_shared<ActorType>();
-		spawnedActor->initializeComponents(*this);
-		_actors.push_back(std::move(spawnedActor));
+		std::shared_ptr<ActorType> actor = std::make_shared<ActorType>();
+		actor->initializeComponents(*this);
+		_actors.push_back(std::move(actor));
 	}
 
 	template<typename ComponentType>
-	inline std::shared_ptr<ComponentManager<SceneComponent>>& World::getComponentManager()
+	inline std::shared_ptr<ComponentManager<ComponentType>>& World::getComponentManager()
 	{
 		
 		return std::get<std::shared_ptr<ComponentManager<ComponentType>>>(_componentManagers);

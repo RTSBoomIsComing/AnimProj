@@ -4,6 +4,7 @@
 namespace pa
 {
 	class SceneComponent;
+	class BehaviorTreeComponent;
 	class Actor abstract :  public std::enable_shared_from_this<Actor>
 	{
 	public:
@@ -39,13 +40,15 @@ namespace pa
 		ComponentHandle<ComponentType>& getComponentHandleRef();
 
 	protected:
-		std::tuple<ComponentHandle<SceneComponent>> _componentHandles;
+		std::tuple<
+			ComponentHandle<SceneComponent>,
+			ComponentHandle<BehaviorTreeComponent>> _componentHandles;
 	};
 
 	template<typename ComponentType>
 	inline ComponentHandle<ComponentType> Actor::getComponentHandle() const
 	{
-		return std::get<ComponentHandle<SceneComponent>>(_componentHandles);
+		return std::get<ComponentHandle<ComponentType>>(_componentHandles);
 	}
 
 	template<typename ComponentType>
@@ -57,19 +60,19 @@ namespace pa
 	template<typename ComponentType>
 	inline ComponentType& Actor::getComponent(World& world)
 	{
-		return world.getComponent(getComponentHandle<SceneComponent>());
+		return world.getComponent(getComponentHandle<ComponentType>());
 	}
 
 	template<typename ComponentType>
 	inline void Actor::initializeComponent(World& world)
 	{
-		setComponentHandle<SceneComponent>(world.createComponent<SceneComponent>(weak_from_this()));
+		setComponentHandle<ComponentType>(world.createComponent<ComponentType>(weak_from_this()));
 	}
 
 	template<typename ComponentType>
 	inline ComponentHandle<ComponentType>& Actor::getComponentHandleRef()
 	{
-		return std::get<ComponentHandle<SceneComponent>>(_componentHandles);
+		return std::get<ComponentHandle<ComponentType>>(_componentHandles);
 	}
 }
 

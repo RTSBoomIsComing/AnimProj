@@ -4,9 +4,11 @@
 #include "../Map/GridMap.h"
 #include "../Actor/Actor.h"
 #include "../Component/SceneComponent.h"
+#include "../Component/BehaviorTreeComponent.h"
 pa::World::World()
 {
 	getComponentManager<SceneComponent>() = std::make_shared<ComponentManager<SceneComponent>>();
+	getComponentManager<BehaviorTreeComponent>() = std::make_shared<ComponentManager<BehaviorTreeComponent>>();
 
 	_map = std::make_shared<GridMap>(5.0f);
 }

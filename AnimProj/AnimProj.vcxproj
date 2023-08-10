@@ -139,6 +139,7 @@
     <ClInclude Include="Component\SkeletonComponent.h" />
     <ClInclude Include="Component\SceneComponent.h" />
     <ClInclude Include="Component\SkeletonRenderingSystem.h" />
+    <ClInclude Include="Component\SphereComponent.h" />
     <ClInclude Include="World\World.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="IK\TwoBoneIKSolver.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="Component\SkeletonComponent.cpp" />
     <ClCompile Include="Component\SceneComponent.cpp" />
     <ClCompile Include="Component\SkeletonRenderingSystem.cpp" />
+    <ClCompile Include="Component\SphereComponent.cpp" />
     <ClCompile Include="World\World.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="IK\TwoBoneIKSolver.cpp" />

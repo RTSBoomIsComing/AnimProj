@@ -3,22 +3,22 @@
 #include "BehaviorTree.h"
 namespace pa
 {
-	class Character;
+	class MyActor;
 	class CharacterBehaviorTree : public BehaviorTree
 	{
 		class PrintID : public Behavior::Node
 		{
 		public:
-			PrintID(Character& character);
+			PrintID(MyActor* character);
 
 		public:
 			virtual bool run() override;
 
 		private:
-			Character* _character;
+			MyActor* _character;
 		};
 	public:
-		CharacterBehaviorTree(Character& character);
+		CharacterBehaviorTree(MyActor* character);
 	};
 
 }

@@ -5,11 +5,8 @@
 #include "../Component/SceneComponent.h"
 bool pa::GridMap::placeActor(World& world, std::weak_ptr<Actor> actor)
 {
-	SceneComponent sceneComponent = actor.lock()->getComponent<SceneComponent>(world);
-	size_t cellX = sceneComponent.position.x / _cellSize + _mapSize * 0.5;
-	size_t cellZ = sceneComponent.position.z / _cellSize + _mapSize * 0.5;
-
-	_cells[cellX][cellZ].push_back(actor);
+	std::pair<size_t, size_t> cellXZ = getCellCoordinate(world, actor);
+	_cells[cellXZ.first][cellXZ.second].push_back(actor);
 
 	return true;
 }
@@ -23,4 +20,13 @@ void pa::GridMap::clearMap()
 			cell.resize(0);
 		}
 	}
+}
+
+std::pair<size_t, size_t> pa::GridMap::getCellCoordinate(World& world, std::weak_ptr<Actor> actor) const
+{
+	SceneComponent sceneComponent = actor.lock()->getComponent<SceneComponent>(world);
+	size_t cellX = sceneComponent.position.x / _cellSize + _mapSize * 0.5;
+	size_t cellZ = sceneComponent.position.z / _cellSize + _mapSize * 0.5;
+
+	return std::pair<size_t, size_t>(cellX, cellZ);
 }

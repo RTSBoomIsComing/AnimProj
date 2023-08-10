@@ -15,6 +15,8 @@ namespace pa
 	public:
 		virtual bool placeActor(World& world, std::weak_ptr<Actor> actor) override;
 		virtual void clearMap() override;
+
+		std::pair<size_t, size_t> getCellCoordinate(World& world, std::weak_ptr<Actor> actor) const;
 	private:
 		static constexpr size_t	_mapSize	= 40;
 		float					_cellSize	= 1.0f;
