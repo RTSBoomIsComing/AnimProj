@@ -37,4 +37,14 @@ void pa::World::update(float deltaTime)
 	{
 		_map->placeActor(*this, actor);
 	}
+
+	std::vector<BehaviorTreeComponent>&	behaviorTreeComponents = this->getComponents<BehaviorTreeComponent>();
+	std::vector<std::weak_ptr<Actor>>&	owners = this->getOwners<BehaviorTreeComponent>();
+	for (size_t i = 0; i < behaviorTreeComponents.size(); i++)
+	{
+		auto& behaviorTreeComp = behaviorTreeComponents[i];
+		auto& owner = owners[i];
+		behaviorTreeComp.onUpdate(*this, owner, deltaTime);
+	}
+
 }

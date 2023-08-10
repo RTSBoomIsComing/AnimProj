@@ -3,6 +3,8 @@
 
 namespace pa
 {
+	class World;
+	class Actor;
 	class Behavior
 	{
 
@@ -12,7 +14,7 @@ namespace pa
 		public:
 			Node() = default;
 			virtual ~Node() = default;
-			virtual bool run() abstract;
+			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) abstract;
 		};
 
 		class Composite abstract : public Node
@@ -27,13 +29,13 @@ namespace pa
 		class Sequence final : public Composite
 		{
 		public:
-			virtual bool run() override;
+			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
 		};
 
 		class Selector final : public Composite
 		{
 		public:
-			virtual bool run() override;
+			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
 		};
 
 	public:

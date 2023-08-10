@@ -3,22 +3,21 @@
 #include "BehaviorTree.h"
 namespace pa
 {
-	class MyActor;
+	class World;
+	class Actor;
 	class CharacterBehaviorTree : public BehaviorTree
 	{
-		class PrintID : public Behavior::Node
+		class FindTarget : public Behavior::Node
 		{
 		public:
-			PrintID(MyActor* character);
+			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
+			std::weak_ptr<Actor> _actor;
+			std::weak_ptr<Actor> _target;
 
-		public:
-			virtual bool run() override;
-
-		private:
-			MyActor* _character;
 		};
+
 	public:
-		CharacterBehaviorTree(MyActor* character);
+		CharacterBehaviorTree();
 	};
 
 }

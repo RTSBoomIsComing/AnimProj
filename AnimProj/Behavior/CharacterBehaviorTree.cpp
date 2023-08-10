@@ -2,20 +2,13 @@
 #include "CharacterBehaviorTree.h"
 #include "../Rendering/Character.h"
 
-pa::CharacterBehaviorTree::PrintID::PrintID(MyActor* character) : _character(character) {}
 
-bool pa::CharacterBehaviorTree::PrintID::run()
-{
-	//std::cout << _character->id << std::endl;
-	return true;
-}
-
-pa::CharacterBehaviorTree::CharacterBehaviorTree(MyActor* character)
+pa::CharacterBehaviorTree::CharacterBehaviorTree()
 {
 	std::shared_ptr<Behavior::Sequence> rootSequence = std::make_shared<Behavior::Sequence>();
 	_root = rootSequence;
 
-	rootSequence->addChild(std::make_shared<PrintID>(character));
-	rootSequence->addChild(std::make_shared<PrintID>(character));
-	rootSequence->addChild(std::make_shared<PrintID>(character));
+	//rootSequence->addChild(std::make_shared<PrintID>(actor));
+	//rootSequence->addChild(std::make_shared<PrintID>(actor));
+	//rootSequence->addChild(std::make_shared<PrintID>(actor));
 }

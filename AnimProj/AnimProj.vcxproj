@@ -232,6 +232,8 @@
     <None Include="Animation\AnimationPlayer.h" />
     <None Include="Animation\Animation.cpp" />
     <None Include="Animation\Animation.h" />
+    <None Include="Component\CombatComponent.cpp" />
+    <None Include="Component\CombatComponent.h" />
     <None Include="cpp.hint" />
     <None Include="Rendering\SkeletonMesh.cpp" />
     <None Include="Rendering\SkeletonMesh.h" />
