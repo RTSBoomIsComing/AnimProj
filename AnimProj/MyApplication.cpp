@@ -74,6 +74,8 @@ void pa::MyApplication::onUpdate()
 
 	_camera->update(_deviceContext.Get());
 
+	_world->update(_timer.getDeltaTime());
+
 	for (Character& character : _characters)
 	{
 		character.update(_timer.getDeltaTime(), _deviceContext.Get());

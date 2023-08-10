@@ -14,6 +14,7 @@ namespace pa
 		~World();
 	public:
 		void startGame();
+		void update(float deltaTime);
 	public:
 		template<typename ActorType>
 		void createActor(Transform const& transform);
