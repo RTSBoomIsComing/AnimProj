@@ -206,9 +206,6 @@
     <ClCompile Include="Rendering\Rendering.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Sandbox.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="AcclaimMotionCapture\Acclaim.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>

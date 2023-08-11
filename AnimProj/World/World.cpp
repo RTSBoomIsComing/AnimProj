@@ -15,6 +15,8 @@ pa::World::World()
 	getComponentManager<SkeletalMeshComponent>() = std::make_shared<ComponentManager<SkeletalMeshComponent>>();
 
 	_map = std::make_shared<GridMap>(20.0f);
+	int a, b;
+	size_t diff = std::distance(&a, &b);
 }
 
 pa::World::~World()

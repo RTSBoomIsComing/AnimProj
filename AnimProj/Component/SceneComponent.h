@@ -1,9 +1,8 @@
 // author: Changwan Yu
 #pragma once
-
 namespace pa
 {
-	class SceneComponent
+	class SceneComponent 
 	{
 	public:
 		DirectX::XMFLOAT3 position		= {};

@@ -120,8 +120,6 @@ namespace pa
 		std::iter_swap(components.begin() + componentHandle.id, components.end() - 1);
 		std::iter_swap(owners.begin() + componentHandle.id, owners.end() - 1);
 
-		// need to consider using resize() instead of pop_back()
-		// components.resize(components.size() - 1);
 		components.pop_back();
 		owners.pop_back();
 	}

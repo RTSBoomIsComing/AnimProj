@@ -1,12 +1,14 @@
 // author: Changwan Yu
 #pragma once
 #include "../World/World.h"
+#include "../Component/Component.h"
 namespace pa
 {
 	class SceneComponent;
 	class BehaviorTreeComponent;
 	class MovementComponent;
 	class SkeletalMeshComponent;
+
 	class Actor abstract :  public std::enable_shared_from_this<Actor>
 	{
 	public:

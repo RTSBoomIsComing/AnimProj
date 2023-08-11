@@ -211,7 +211,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Animation\Skeleton.cpp" />
-    <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="Rendering\StickMesh.cpp" />
     <ClCompile Include="Component\SceneComponent.cpp" />
     <ClCompile Include="Component\SkeletonRenderingSystem.cpp" />
