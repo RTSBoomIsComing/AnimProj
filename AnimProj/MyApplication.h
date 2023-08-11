@@ -41,16 +41,16 @@ namespace pa
 		ComPtr<ID3D11RasterizerState>		_rasterizerState;
 
 	private:
-		std::unique_ptr<ImGuiManager>		_imguiManager;
-		std::unique_ptr<SkeletonRenderingSystem> _skeletonRenderingSystem;
+		std::unique_ptr<ImGuiManager>				_imguiManager;
+		std::unique_ptr<SkeletonRenderingSystem>	_skeletonRenderingSystem;
 
 	private:
 		Timer	_timer;
 		float	_clearColor[4]			= { 0.2f, 0.4f, 0.6f, 1.0f };
 		
-		const Mesh*						_boneMesh	= nullptr;
+		const Mesh*						_boneMesh		= nullptr;
 		const Mesh*						_boneToBoneMesh	= nullptr;
-		Camera*							_camera		= nullptr;
+		Camera*							_camera			= nullptr;
 		std::vector<Character>			_characters;
 
 

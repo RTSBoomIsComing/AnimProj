@@ -54,8 +54,9 @@ bool pa::CharacterBehaviorTree::FindTarget::onUpdate(World& world, std::weak_ptr
 		const float distance = XMVectorGetX(XMVector3Length(Vposition - VotherPosition));
 		if (distance < _radius)
 		{
-			// collision
-			//std::cout << "collision" << std::endl;
+			return true;
+			// Test
+			std::cout << "collision" << std::endl;
 			//std::cout << "distance: " << distance << std::endl;
 			//std::cout << "radius: " << _radius << std::endl;
 			//std::cout << "position: " << position.x << ", " << position.y << ", " << position.z << std::endl;
@@ -63,5 +64,10 @@ bool pa::CharacterBehaviorTree::FindTarget::onUpdate(World& world, std::weak_ptr
 			//std::cout << std::endl;
 		}
 	}
+	return false;
+}
+
+bool pa::CharacterBehaviorTree::MoveToTarget::onUpdate(World& world, std::weak_ptr<Actor> owner)
+{
 	return false;
 }

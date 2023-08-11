@@ -11,7 +11,12 @@ namespace pa
 		{
 		public:
 			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
-			std::weak_ptr<Actor> _target;
+		};
+
+		class MoveToTarget : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
 		};
 
 	public:
