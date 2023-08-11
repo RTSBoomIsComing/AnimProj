@@ -4,27 +4,20 @@
 
 pa::SkeletonRenderingSystem::SkeletonRenderingSystem(ID3D11Device* device)
 {
-	createStructureBuffer(device, &_boneWorldSBuffer, sizeof(DirectX::XMFLOAT4X4));
+	createDynamicSBuffer(device, &_boneWorldSBuffer, sizeof(DirectX::XMFLOAT4X4));
 	createBufferSRV(device, _boneWorldSBuffer.Get(), &_SRVBoneWorld);
 
-	createStructureBuffer(device, &_boneToBoneWorldSBuffer, sizeof(DirectX::XMFLOAT4X4));
+	createDynamicSBuffer(device, &_boneToBoneWorldSBuffer, sizeof(DirectX::XMFLOAT4X4));
 	createBufferSRV(device, _boneToBoneWorldSBuffer.Get(), &_SRVBoneToBoneWorld);
 }
-pa::SkeletonRenderingSystem::~SkeletonRenderingSystem() = default;
-
-//void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
-//{
-//	uploadDynamicCBuffer(deviceContext, _boneWorldSBuffer.Get(), SkeletonComponent::_s_boneMatrixPool.data(), SkeletonComponent::_s_boneMatrixPool.size());
-//	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), SkeletonComponent::_s_boneToBoneMatrixPool.data(), SkeletonComponent::_s_boneToBoneMatrixPool.size());
-//}
 
 void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& boneGTs, std::vector<DirectX::XMFLOAT4X4> const& boneToBoneGTs)
 {
 	_boneCount = boneGTs.size();
-	uploadDynamicCBuffer(deviceContext, _boneWorldSBuffer.Get(), boneGTs.data(), _boneCount);
+	uploadDynamicBuffer(deviceContext, _boneWorldSBuffer.Get(), boneGTs.data(), _boneCount);
 
 	_boneToBoneCount = boneToBoneGTs.size();
-	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), boneToBoneGTs.data(), _boneToBoneCount);
+	uploadDynamicBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), boneToBoneGTs.data(), _boneToBoneCount);
 }
 
 void pa::SkeletonRenderingSystem::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)

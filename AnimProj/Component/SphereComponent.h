@@ -20,7 +20,6 @@ namespace pa
 
 	private:
 		float _radius = 20.0f;
-		
 	};
 }
 

@@ -27,7 +27,7 @@ void pa::createDynamicCBuffer(ID3D11Device* device, ID3D11Buffer** ppBuffer, UIN
 	checkResult(device->CreateBuffer(&bufferDesc, nullptr, ppBuffer));
 }
 
-void pa::uploadDynamicCBuffer(ID3D11DeviceContext* deviceContext, ID3D11Buffer* pBuffer, const DirectX::XMFLOAT4X4* matrices, UINT count)
+void pa::uploadDynamicBuffer(ID3D11DeviceContext* deviceContext, ID3D11Buffer* pBuffer, const DirectX::XMFLOAT4X4* matrices, UINT count)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	deviceContext->Map(pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -35,7 +35,7 @@ void pa::uploadDynamicCBuffer(ID3D11DeviceContext* deviceContext, ID3D11Buffer* 
 	deviceContext->Unmap(pBuffer, 0);
 }
 
-void pa::createStructureBuffer(ID3D11Device* device, ID3D11Buffer** ppBuffer, UINT structSize, UINT count)
+void pa::createDynamicSBuffer(ID3D11Device* device, ID3D11Buffer** ppBuffer, UINT structSize, UINT count)
 {
 	HRESULT hr;
 	D3D11_BUFFER_DESC desc;
