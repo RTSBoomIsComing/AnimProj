@@ -19,18 +19,18 @@ namespace pa
 
 		inline static std::vector<EntityID>& getOwners()
 		{
-			std::vector<EntityID> owners;
+			static std::vector<EntityID> owners;
 			return owners;
 		}
 
 		inline static std::vector<ComponentID>& getEntities()
 		{
-			std::vector<ComponentID> entities;
+			static std::vector<ComponentID> entities;
 			return entities;
 		}
 
 	public:
-		inline static size_t createComponent(EntityID owner)
+		inline static size_t createComponent(EntityID ownerID)
 		{
 			std::vector<T>&			  container = getComponentContainer();
 			std::vector<EntityID>&	  owners	= getOwners();
@@ -38,57 +38,57 @@ namespace pa
 
 			const ComponentID component = container.size();
 			container.emplace_back();
-			owners.push_back(owner);
+			owners.push_back(ownerID);
 
-			if (entities.size() <= owner)
-				entities.resize(owner + 1);
+			if (entities.size() <= ownerID)
+				entities.resize(ownerID + 1);
 
-			entities[owner] = component;
+			entities[ownerID] = component;
 
 			return component;
 		}
 
-		inline static void destroyComponent(ComponentID component)
+		inline static void destroyComponent(ComponentID componentID)
 		{
 			std::vector<T>&			  container = getComponentContainer();
 			std::vector<EntityID>&	  owners	= getOwners();
 			std::vector<ComponentID>& entities	= getEntities();
 
-			entities[owners.back()] = component;
+			entities[owners.back()] = componentID;
 
-			std::iter_swap(container.begin() + component, container.end() - 1);
-			std::iter_swap(owners.begin() + component, owners.end() - 1);
+			std::iter_swap(container.begin() + componentID, container.end() - 1);
+			std::iter_swap(owners.begin() + componentID, owners.end() - 1);
 
 			container.pop_back();
 			owners.pop_back();
 		}
 
-		inline static T* get(ComponentID component)
+		inline static T* get(ComponentID componentID)
 		{
-			if (std::numeric_limits<size_t>::max() == component)
+			if (std::numeric_limits<size_t>::max() == componentID)
 				return nullptr;
 
-			return getComponentContainer()[component];
+			return getComponentContainer()[componentID];
 		}
 
-		inline static EntityID getOwner(ComponentID component)
+		inline static EntityID getOwner(ComponentID componentID)
 		{
 			std::vector<EntityID>& owners = getOwners();
-			return owners[component];
+			return owners[componentID];
 		}
 
 	public:
 		inline ComponentID getComponentID() const
 		{
-			std::vector<T>&	  container = getComponentContainer();
-			const ComponentID component = std::distance(container.begin(), this);
-			return component;
+			std::vector<T>&	  container	  = getComponentContainer();
+			const ComponentID componentID = std::distance(container.begin(), this);
+			return componentID;
 		}
 		inline EntityID getOwnerID() const
 		{
-			std::vector<EntityID>& owners	 = getOwners();
-			const ComponentID	   component = getComponentID();
-			return owners[component];
+			std::vector<EntityID>& owners	   = getOwners();
+			const ComponentID	   componentID = getComponentID();
+			return owners[componentID];
 		}
 
 		void onUpdate(World& world, float deltaTime)
