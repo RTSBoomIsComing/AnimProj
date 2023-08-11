@@ -3,7 +3,6 @@
 #include "MyApplication.h"
 #include "Rendering/Camera.h"
 #include "Rendering/Mesh.h"
-#include "Component/SkeletonComponent.h"
 #include "Component/SkeletonRenderingSystem.h"
 #include "Rendering/MeshManager.h"
 

@@ -24,16 +24,21 @@ namespace pa
 	void SkeletalMeshComponent::onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime)
 	{
 		using namespace DirectX;
+		//const XMVECTOR S = XMLoadFloat4(&pose[boneID].scale);
+		//const XMVECTOR R = XMLoadFloat4(&pose[boneID].rotation);
+		//const XMVECTOR T = XMLoadFloat4(&pose[boneID].translation);
+
+		//const XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
 		for (const size_t boneID : _skeleton->getHierarchy())
 		{
-			const size_t	parentID = _skeleton->getParentBoneID(boneID);
+			const size_t parentID = _skeleton->getParentBoneID(boneID);
 
 			XMMATRIX parentWorldTransform = {};
 			if (boneID == 0)
 			{
 				XMVECTOR V = XMLoadFloat3(&owner.lock()->getComponent<SceneComponent>(world).position);
-				
+
 				parentWorldTransform = XMMatrixTranslationFromVector(V);
 			}
 			else
@@ -50,11 +55,10 @@ namespace pa
 			const size_t parentID = _skeleton->getParentBoneID(boneID);
 
 			const XMMATRIX boneToBoneLT = _skeleton->getBoneToBoneLT(boneID);
-			const XMMATRIX parentGT = (boneID != 0) ?
-				XMLoadFloat4x4(&_boneGTs[parentID]) : XMMatrixIdentity();
+			const XMMATRIX parentGT		= (boneID != 0) ? XMLoadFloat4x4(&_boneGTs[parentID]) : XMMatrixIdentity();
 
 			XMStoreFloat4x4(&_boneToBoneGTs[boneID],
-				boneToBoneLT * parentGT);
+							boneToBoneLT * parentGT);
 		}
 		world.boneMatrixPool.insert(world.boneMatrixPool.end(), _boneGTs.begin(), _boneGTs.end());
 		world.boneToBoneMatrixPool.insert(world.boneToBoneMatrixPool.end(), _boneToBoneGTs.begin(), _boneToBoneGTs.end());

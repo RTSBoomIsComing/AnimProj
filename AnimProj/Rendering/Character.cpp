@@ -3,7 +3,6 @@
 #include "../Animation/AnimationManager.h"
 
 #include "../Component/SceneComponent.h"
-#include "../Component/SkeletonComponent.h"
 #include "../Component/AnimationComponent.h"
 
 #include <DirectXTK/Keyboard.h>
@@ -13,7 +12,6 @@ pa::Character::Character(ID3D11Device* device)
 {
 	const Skeleton& skeleton = AnimationManager::get().getDefaultSkeleton();
 
-	SkeletonComponent::create(&_skeletonComp, skeleton);
 
 	_sceneComp		= std::make_shared<SceneComponent>();
 	_animationComp	= std::make_shared<AnimationComponent>(device, skeleton);
@@ -37,7 +35,6 @@ pa::Character::Character(Character&& other) noexcept
 
 pa::Character::~Character()
 {
-	SkeletonComponent::destroy(&_skeletonComp);
 }
 
 pa::Character& pa::Character::operator=(Character&& other) noexcept
@@ -62,9 +59,6 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
 	using namespace DirectX;
 	_animationComp->update(*this, deltaTime);
-	_skeletonComp->update(_animationComp->getResultPose().data(),
-		XMLoadFloat3(&_sceneComp->position),
-		XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&_sceneComp->eulerAngle)));
 }
 
 void pa::Character::processInput(float deltaTime)

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "SkeletonRenderingSystem.h"
-#include "SkeletonComponent.h"
 #include "../Rendering/Mesh.h"
 
 pa::SkeletonRenderingSystem::SkeletonRenderingSystem(ID3D11Device* device)

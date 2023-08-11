@@ -8,10 +8,11 @@
 
 pa::CharacterBehaviorTree::CharacterBehaviorTree()
 {
-	std::shared_ptr<Behavior::Sequence> rootSequence = std::make_shared<Behavior::Sequence>();
+	std::shared_ptr<Behavior::Selector> rootSequence = std::make_shared<Behavior::Selector>();
 	_root = rootSequence;
 
 	rootSequence->addChild(std::make_shared<FindTarget>());
+	rootSequence->addChild(std::make_shared<MoveToTarget>());
 	//rootSequence->addChild(std::make_shared<PrintID>(actor));
 	//rootSequence->addChild(std::make_shared<PrintID>(actor));
 }
@@ -67,5 +68,7 @@ bool pa::CharacterBehaviorTree::FindTarget::onUpdate(World& world, std::weak_ptr
 
 bool pa::CharacterBehaviorTree::MoveToTarget::onUpdate(World& world, std::weak_ptr<Actor> owner)
 {
-	return false;
+	//MovementComponent& movementComp = ownerLocked->getComponent<MovementComponent>(world);
+
+	return true;
 }

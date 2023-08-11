@@ -117,9 +117,6 @@
     <ClInclude Include="Rendering\MeshRenderer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Component\SkeletonComponent.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Component\AnimationComponent.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -284,9 +281,6 @@
     <ClCompile Include="Rendering\MeshRenderer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Component\SkeletonComponent.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Component\AnimationComponent.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -359,6 +353,7 @@
     <None Include="Animation\Animation.cpp">
       <Filter>소스 파일</Filter>
     </None>
+    <None Include=".clang-format" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicVertexShader.hlsl" />
