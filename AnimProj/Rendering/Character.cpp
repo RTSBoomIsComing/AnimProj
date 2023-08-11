@@ -64,7 +64,7 @@ void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 	_animationComp->update(*this, deltaTime);
 	_skeletonComp->update(_animationComp->getResultPose().data(),
 		XMLoadFloat3(&_sceneComp->position),
-		XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&_sceneComp->euler)));
+		XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&_sceneComp->eulerAngle)));
 }
 
 void pa::Character::processInput(float deltaTime)

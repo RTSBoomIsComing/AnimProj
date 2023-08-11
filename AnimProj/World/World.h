@@ -8,6 +8,8 @@ namespace pa
 	class Actor;
 	class SceneComponent;
 	class BehaviorTreeComponent;
+	class MovementComponent;
+
 	class World final
 	{
 	public:
@@ -22,7 +24,7 @@ namespace pa
 
 	public:
 		template<typename ActorType>
-		void createActor(Transform const& transform);
+		void createActor(DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle);
 
 		template<typename ComponentType>
 		std::shared_ptr<ComponentManager<ComponentType>>& getComponentManager();
@@ -41,7 +43,11 @@ namespace pa
 
 		template<typename ComponentType>
 		ComponentType& getComponent(ComponentHandle<ComponentType> handle);
-		
+	private:
+		template<typename ComponentType>
+		void updateComponents(float deltaTime);
+		void initializeActorComponents(std::shared_ptr<Actor>& actor);
+		void setActorTransform(std::shared_ptr<Actor>& actor, DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle);
 
 	private:
 		std::shared_ptr<GridMap>					_map;
@@ -49,21 +55,22 @@ namespace pa
 
 		std::tuple<
 			std::shared_ptr<ComponentManager<SceneComponent>>,
-			std::shared_ptr<ComponentManager<BehaviorTreeComponent>>> _componentManagers;
+			std::shared_ptr<ComponentManager<BehaviorTreeComponent>>,
+			std::shared_ptr<ComponentManager<MovementComponent>>> _componentManagers;
 	};
 
 	template<typename ActorType>
-	inline void World::createActor(Transform const& transform)
+	inline void World::createActor(DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle)
 	{
-		std::shared_ptr<ActorType> actor = std::make_shared<ActorType>();
-		actor->initializeComponents(*this);
+		std::shared_ptr<Actor> actor = std::make_shared<ActorType>();
+		this->initializeActorComponents(actor);
+		this->setActorTransform(actor, position, eulerAngle);
 		_actors.push_back(std::move(actor));
 	}
 
 	template<typename ComponentType>
 	inline std::shared_ptr<ComponentManager<ComponentType>>& World::getComponentManager()
 	{
-		
 		return std::get<std::shared_ptr<ComponentManager<ComponentType>>>(_componentManagers);
 	}
 
@@ -117,6 +124,19 @@ namespace pa
 	{
 		std::vector<ComponentType>& components = this->getComponents<ComponentType>();
 		return components[handle.id];
+	}
+
+	template<typename ComponentType>
+	inline void World::updateComponents(float deltaTime)
+	{
+		std::vector<ComponentType>& behaviorTreeComponents = this->getComponents<ComponentType>();
+		std::vector<std::weak_ptr<Actor>>& owners = this->getOwners<ComponentType>();
+		for (size_t i = 0; i < behaviorTreeComponents.size(); i++)
+		{
+			auto& behaviorTreeComp = behaviorTreeComponents[i];
+			auto& owner = owners[i];
+			behaviorTreeComp.onUpdate(*this, owner, deltaTime);
+		}
 	}
 }
 

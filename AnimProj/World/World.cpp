@@ -5,12 +5,14 @@
 #include "../Actor/Actor.h"
 #include "../Component/SceneComponent.h"
 #include "../Component/BehaviorTreeComponent.h"
+#include "../Component/MovementComponent.h"
 pa::World::World()
 {
 	getComponentManager<SceneComponent>() = std::make_shared<ComponentManager<SceneComponent>>();
 	getComponentManager<BehaviorTreeComponent>() = std::make_shared<ComponentManager<BehaviorTreeComponent>>();
+	getComponentManager<MovementComponent>() = std::make_shared<ComponentManager<MovementComponent>>();
 
-	_map = std::make_shared<GridMap>(5.0f);
+	_map = std::make_shared<GridMap>(20.0f);
 }
 
 pa::World::~World()
@@ -32,19 +34,26 @@ void pa::World::update(float deltaTime)
 		actor->onUpdate(*this, deltaTime);
 	}
 
+	this->updateComponents<MovementComponent>(deltaTime);
+
 	_map->clearMap();
 	for (auto& actor : _actors)
 	{
 		_map->placeActor(*this, actor);
 	}
 
-	std::vector<BehaviorTreeComponent>&	behaviorTreeComponents = this->getComponents<BehaviorTreeComponent>();
-	std::vector<std::weak_ptr<Actor>>&	owners = this->getOwners<BehaviorTreeComponent>();
-	for (size_t i = 0; i < behaviorTreeComponents.size(); i++)
-	{
-		auto& behaviorTreeComp = behaviorTreeComponents[i];
-		auto& owner = owners[i];
-		behaviorTreeComp.onUpdate(*this, owner, deltaTime);
-	}
-
+	this->updateComponents<BehaviorTreeComponent>(deltaTime);
 }
+
+void pa::World::initializeActorComponents(std::shared_ptr<Actor>& actor)
+{
+	actor->initializeComponents(*this);
+}
+
+void pa::World::setActorTransform(std::shared_ptr<Actor>& actor, DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle)
+{
+	auto& sceneComp = actor->getComponent<SceneComponent>(*this);
+	sceneComp.position = position;
+	sceneComp.eulerAngle = eulerAngle;
+}
+

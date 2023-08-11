@@ -11,5 +11,8 @@ namespace pa
 
 	public:
 		void onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime);
+
+	private:
+		std::weak_ptr<Actor> _targetToAttack;
 	};
 }

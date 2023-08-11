@@ -11,7 +11,6 @@ namespace pa
 		virtual void initializeComponents(World& world)			override;
 		virtual void onStartGame(World& world)					override;
 		virtual void onUpdate(World& world, float deltaTime)	override;
-	private:
 	};
 }
 

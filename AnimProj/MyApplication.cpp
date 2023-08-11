@@ -48,9 +48,12 @@ pa::MyApplication::MyApplication()
 
 	_world = std::make_unique<World>();
 
-	_world->createActor<MyActor>(Transform());
-	_world->createActor<MyActor>(Transform());
-	_world->createActor<MyActor>(Transform());
+
+	for (int i = 0; i < 100; i++)
+	{
+		_world->createActor<MyActor>({ 5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20) }, {});
+	}
+
 	_world->startGame();
 }
 
