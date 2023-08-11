@@ -13,17 +13,26 @@ pa::SkeletonRenderingSystem::SkeletonRenderingSystem(ID3D11Device* device)
 }
 pa::SkeletonRenderingSystem::~SkeletonRenderingSystem() = default;
 
-void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+//void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+//{
+//	uploadDynamicCBuffer(deviceContext, _boneWorldSBuffer.Get(), SkeletonComponent::_s_boneMatrixPool.data(), SkeletonComponent::_s_boneMatrixPool.size());
+//	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), SkeletonComponent::_s_boneToBoneMatrixPool.data(), SkeletonComponent::_s_boneToBoneMatrixPool.size());
+//}
+
+void pa::SkeletonRenderingSystem::update(ID3D11Device* device, ID3D11DeviceContext* deviceContext, std::vector<DirectX::XMFLOAT4X4> const& boneGTs, std::vector<DirectX::XMFLOAT4X4> const& boneToBoneGTs)
 {
-	uploadDynamicCBuffer(deviceContext, _boneWorldSBuffer.Get(), SkeletonComponent::_s_boneMatrixPool.data(), SkeletonComponent::_s_boneMatrixPool.size());
-	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), SkeletonComponent::_s_boneToBoneMatrixPool.data(), SkeletonComponent::_s_boneToBoneMatrixPool.size());
+	_boneCount = boneGTs.size();
+	uploadDynamicCBuffer(deviceContext, _boneWorldSBuffer.Get(), boneGTs.data(), _boneCount);
+
+	_boneToBoneCount = boneToBoneGTs.size();
+	uploadDynamicCBuffer(deviceContext, _boneToBoneWorldSBuffer.Get(), boneToBoneGTs.data(), _boneToBoneCount);
 }
 
 void pa::SkeletonRenderingSystem::render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh)
 {
 	deviceContext->VSSetShaderResources(0, 1, _SRVBoneWorld.GetAddressOf());
-	boneMesh->drawInstanced(deviceContext, SkeletonComponent::_s_boneMatrixPool.size(), 0);
+	boneMesh->drawInstanced(deviceContext, _boneCount, 0);
 
 	deviceContext->VSSetShaderResources(0, 1, _SRVBoneToBoneWorld.GetAddressOf());
-	boneToBoneMesh->drawInstanced(deviceContext, SkeletonComponent::_s_boneToBoneMatrixPool.size(), 0);
+	boneToBoneMesh->drawInstanced(deviceContext, _boneToBoneCount, 0);
 }

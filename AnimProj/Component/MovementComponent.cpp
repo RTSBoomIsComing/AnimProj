@@ -25,7 +25,7 @@ namespace pa
 		XMVECTOR V1 = XMLoadFloat3(&targetPosition);
 
 		float t = speed * deltaTime / XMVectorGetX(XMVector3Length(V1 - V0));
-		t = std::max(1.0f, speed * deltaTime);
+		t = std::min(1.0f, t);
 
 		XMVECTOR V = XMVectorLerp(V0, V1, t);
 		XMStoreFloat3(&sceneComp.position, V);

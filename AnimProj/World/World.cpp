@@ -45,6 +45,10 @@ void pa::World::update(float deltaTime)
 	}
 
 	this->updateComponents<BehaviorTreeComponent>(deltaTime);
+
+	this->boneMatrixPool.clear();
+	this->boneToBoneMatrixPool.clear();
+	this->updateComponents<SkeletalMeshComponent>(deltaTime);
 }
 
 void pa::World::initializeActorComponents(std::shared_ptr<Actor>& actor)

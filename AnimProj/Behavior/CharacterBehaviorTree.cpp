@@ -50,12 +50,15 @@ bool pa::CharacterBehaviorTree::FindTarget::onUpdate(World& world, std::weak_ptr
 
 		const SceneComponent& otherSceneComp = actorLocked->getComponent<SceneComponent>(world);
 		XMVECTOR VotherPosition = XMLoadFloat3(&otherSceneComp.position);
-
 		const float distance = XMVectorGetX(XMVector3Length(Vposition - VotherPosition));
+
+
+		MovementComponent& movementComp = ownerLocked->getComponent<MovementComponent>(world);
+		movementComp.speed = 0.0f;
 		if (distance < _radius)
 		{
-			XMStoreFloat3(&ownerLocked->getComponent<MovementComponent>(world).targetPosition, VotherPosition);
-
+			XMStoreFloat3(&movementComp.targetPosition, VotherPosition);
+			movementComp.speed = 1.0f;
 			return true;
 		}
 	}

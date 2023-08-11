@@ -22,6 +22,8 @@ namespace pa
 
 	public:
 		inline std::shared_ptr<GridMap> getDefaultMap() { return _map; }
+		std::vector<DirectX::XMFLOAT4X4> boneMatrixPool;
+		std::vector<DirectX::XMFLOAT4X4> boneToBoneMatrixPool;
 
 	public:
 		template<typename ActorType>
@@ -45,10 +47,13 @@ namespace pa
 		template<typename ComponentType>
 		ComponentType& getComponent(ComponentHandle<ComponentType> handle);
 	private:
+		void initializeActorComponents(std::shared_ptr<Actor>& actor);
+
+		void setActorTransform(std::shared_ptr<Actor>& actor, DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle);
+
 		template<typename ComponentType>
 		void updateComponents(float deltaTime);
-		void initializeActorComponents(std::shared_ptr<Actor>& actor);
-		void setActorTransform(std::shared_ptr<Actor>& actor, DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle);
+
 
 	private:
 		std::shared_ptr<GridMap>					_map;

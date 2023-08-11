@@ -27,29 +27,15 @@ pa::MyApplication::MyApplication()
 
 	_boneToBoneMesh	= &MeshManager::get().getDefaultStick();
 	_boneMesh		= &MeshManager::get().getDefaultCube();
-
 	_camera			= new Camera(_device.Get());
 
-	//for (int i = 0; i < 200; i++)
-	//{
-	//	_characters.emplace_back(_device.Get());
-	//	_characters.back().setPosition(5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20));
-	//}
-
-	//for (int i = 0; i < _characters.size(); i++)
-	//{
-	//	if (i % 2 == 0)
-	//		continue;
-
-	//	_characters.erase(_characters.begin() + i);
-	//}
 
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
 
 	_world = std::make_unique<World>();
 
 
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 300; i++)
 	{
 		_world->createActor<MyActor>({ 5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20) }, {});
 	}
@@ -83,8 +69,9 @@ void pa::MyApplication::onUpdate()
 	{
 		character.update(_timer.getDeltaTime(), _deviceContext.Get());
 	}
-
-	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get());
+	// TODO
+	//_world->get
+	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get(), _world->boneMatrixPool, _world->boneToBoneMatrixPool);
 }
 
 void pa::MyApplication::onRender()
@@ -104,6 +91,8 @@ void pa::MyApplication::onRender()
 	_deviceContext->RSSetState(_rasterizerState.Get());
 
 	_skeletonRenderingSystem->render(_deviceContext.Get(), _boneMesh, _boneToBoneMesh);
+
+
 	this->renderImGui();
 
 	// renderer

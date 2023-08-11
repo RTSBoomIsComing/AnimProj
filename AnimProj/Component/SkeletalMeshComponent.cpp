@@ -1,6 +1,9 @@
 // author: Changwan Yu
 #include "pch.h"
 #include "SkeletalMeshComponent.h"
+#include "SceneComponent.h"
+#include "../World/World.h"
+#include "../Actor/Actor.h"
 #include "../Animation/Skeleton.h"
 namespace pa
 {
@@ -29,7 +32,9 @@ namespace pa
 			XMMATRIX parentWorldTransform = {};
 			if (boneID == 0)
 			{
-				parentWorldTransform = XMMatrixIdentity();
+				XMVECTOR V = XMLoadFloat3(&owner.lock()->getComponent<SceneComponent>(world).position);
+				
+				parentWorldTransform = XMMatrixTranslationFromVector(V);
 			}
 			else
 			{
@@ -51,5 +56,7 @@ namespace pa
 			XMStoreFloat4x4(&_boneToBoneGTs[boneID],
 				boneToBoneLT * parentGT);
 		}
+		world.boneMatrixPool.insert(world.boneMatrixPool.end(), _boneGTs.begin(), _boneGTs.end());
+		world.boneToBoneMatrixPool.insert(world.boneToBoneMatrixPool.end(), _boneToBoneGTs.begin(), _boneToBoneGTs.end());
 	}
 }
