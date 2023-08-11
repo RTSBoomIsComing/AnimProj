@@ -6,11 +6,13 @@
 #include "../Component/SceneComponent.h"
 #include "../Component/BehaviorTreeComponent.h"
 #include "../Component/MovementComponent.h"
+#include "../Component/SkeletalMeshComponent.h"
 pa::World::World()
 {
 	getComponentManager<SceneComponent>() = std::make_shared<ComponentManager<SceneComponent>>();
 	getComponentManager<BehaviorTreeComponent>() = std::make_shared<ComponentManager<BehaviorTreeComponent>>();
 	getComponentManager<MovementComponent>() = std::make_shared<ComponentManager<MovementComponent>>();
+	getComponentManager<SkeletalMeshComponent>() = std::make_shared<ComponentManager<SkeletalMeshComponent>>();
 
 	_map = std::make_shared<GridMap>(20.0f);
 }

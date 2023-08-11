@@ -6,6 +6,7 @@ namespace pa
 	class SceneComponent;
 	class BehaviorTreeComponent;
 	class MovementComponent;
+	class SkeletalMeshComponent;
 	class Actor abstract :  public std::enable_shared_from_this<Actor>
 	{
 	public:
@@ -44,7 +45,8 @@ namespace pa
 		std::tuple<
 			ComponentHandle<SceneComponent>,
 			ComponentHandle<BehaviorTreeComponent>,
-			ComponentHandle<MovementComponent>> _componentHandles;
+			ComponentHandle<MovementComponent>,
+			ComponentHandle<SkeletalMeshComponent>> _componentHandles;
 	};
 
 	template<typename ComponentType>

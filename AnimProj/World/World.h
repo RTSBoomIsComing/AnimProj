@@ -9,6 +9,7 @@ namespace pa
 	class SceneComponent;
 	class BehaviorTreeComponent;
 	class MovementComponent;
+	class SkeletalMeshComponent;
 
 	class World final
 	{
@@ -56,7 +57,8 @@ namespace pa
 		std::tuple<
 			std::shared_ptr<ComponentManager<SceneComponent>>,
 			std::shared_ptr<ComponentManager<BehaviorTreeComponent>>,
-			std::shared_ptr<ComponentManager<MovementComponent>>> _componentManagers;
+			std::shared_ptr<ComponentManager<MovementComponent>>,
+			std::shared_ptr<ComponentManager<SkeletalMeshComponent>>> _componentManagers;
 	};
 
 	template<typename ActorType>

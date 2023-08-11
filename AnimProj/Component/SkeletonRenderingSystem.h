@@ -18,9 +18,6 @@ namespace pa
 		void render(ID3D11DeviceContext* deviceContext, const Mesh* boneMesh, const Mesh* boneToBoneMesh);
 
 	private:
-		//std::vector<ComPtr<ID3D11Buffer>>	_boneWorldCBuffers;
-		//std::vector<ComPtr<ID3D11Buffer>>	_boneToBoneWorldCBuffers;
-
 		ComPtr<ID3D11Buffer> _boneWorldSBuffer;
 		ComPtr<ID3D11ShaderResourceView> _SRVBoneWorld;
 
