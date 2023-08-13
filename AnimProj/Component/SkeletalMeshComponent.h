@@ -12,7 +12,7 @@ namespace pa
 		SkeletalMeshComponent(const Skeleton& skeleton);
 	public:
 		void setSkeleton(const Skeleton& skeleton);
-		void onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime);
+		void onUpdate(World& world, Actor& owner, float deltaTime);
 
 	public:
 		const Skeleton*						_skeleton		= nullptr;

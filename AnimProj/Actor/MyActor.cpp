@@ -10,23 +10,28 @@
 #include "../Behavior/CharacterBehaviorTree.h"
 #include "../Animation/AnimationManager.h"
 
-void pa::MyActor::initializeComponents(World& world)
+pa::MyActor::MyActor()
 {
-	initializeComponent<SceneComponent>(world);
-	initializeComponent<MovementComponent>(world);
+	_sceneComponent = this->createDefaultComponent<SceneComponent>();
+	_movementComponent = this->createDefaultComponent<MovementComponent>();
 
-	initializeComponent<BehaviorTreeComponent>(world);
-	std::shared_ptr<BehaviorTree> behaviorTree = std::make_shared<CharacterBehaviorTree>();
-	getComponent<BehaviorTreeComponent>(world).setBehaviorTree(behaviorTree);
+	_behaviorTreeComponent = this->createDefaultComponent<BehaviorTreeComponent>();
+	_behaviorTreeComponent->setBehaviorTree(std::make_shared<CharacterBehaviorTree>());
 
-	initializeComponent<SkeletalMeshComponent>(world);
-	getComponent<SkeletalMeshComponent>(world).setSkeleton(AnimationManager::get().getDefaultSkeleton());
+	_skeletalMeshComponent = this->createDefaultComponent<SkeletalMeshComponent>();
+	_skeletalMeshComponent->setSkeleton(AnimationManager::get().getDefaultSkeleton());
 }
 
 void pa::MyActor::onStartGame(World& world)
 {
+	Actor::onStartGame(world);
 }
 
 void pa::MyActor::onUpdate(World& world, float deltaTime)
 {
+	Actor::onUpdate(world, deltaTime);
+
+	_behaviorTreeComponent->onUpdate(world, *this, deltaTime);
+	_movementComponent->onUpdate(world, *this, deltaTime);
+	_skeletalMeshComponent->onUpdate(world, *this, deltaTime);
 }

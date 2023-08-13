@@ -2,21 +2,22 @@
 #include "pch.h"
 #include "World.h"
 #include "../Map/GridMap.h"
-#include "../Actor/Actor.h"
-#include "../Component/SceneComponent.h"
-#include "../Component/BehaviorTreeComponent.h"
-#include "../Component/MovementComponent.h"
-#include "../Component/SkeletalMeshComponent.h"
+#include "../Actor/MyActor.h"
+
 pa::World::World()
 {
-	getComponentManager<SceneComponent>() = std::make_shared<ComponentManager<SceneComponent>>();
-	getComponentManager<BehaviorTreeComponent>() = std::make_shared<ComponentManager<BehaviorTreeComponent>>();
-	getComponentManager<MovementComponent>() = std::make_shared<ComponentManager<MovementComponent>>();
-	getComponentManager<SkeletalMeshComponent>() = std::make_shared<ComponentManager<SkeletalMeshComponent>>();
-
 	_map = std::make_shared<GridMap>(20.0f);
-	int a, b;
-	size_t diff = std::distance(&a, &b);
+	
+	for (int i = 0; i < 300; i++)
+	{
+		std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
+		_actors.push_back(actor);
+
+		if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
+		{
+			sceneComp->position = {5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20)};
+		}
+	}
 }
 
 pa::World::~World()
@@ -33,35 +34,17 @@ void pa::World::startGame()
 
 void pa::World::update(float deltaTime)
 {
+	_map->clearMap();
+	for (auto& actor : _actors)
+	{
+		_map->placeActor(*this, *actor);
+	}
+
+	this->boneMatrixPool.clear();
+	this->boneToBoneMatrixPool.clear();
+
 	for (auto& actor : _actors)
 	{
 		actor->onUpdate(*this, deltaTime);
 	}
-
-	this->updateComponents<MovementComponent>(deltaTime);
-
-	_map->clearMap();
-	for (auto& actor : _actors)
-	{
-		_map->placeActor(*this, actor);
-	}
-
-	this->updateComponents<BehaviorTreeComponent>(deltaTime);
-
-	this->boneMatrixPool.clear();
-	this->boneToBoneMatrixPool.clear();
-	this->updateComponents<SkeletalMeshComponent>(deltaTime);
 }
-
-void pa::World::initializeActorComponents(std::shared_ptr<Actor>& actor)
-{
-	actor->initializeComponents(*this);
-}
-
-void pa::World::setActorTransform(std::shared_ptr<Actor>& actor, DirectX::XMFLOAT3 const& position, DirectX::XMFLOAT3 const& eulerAngle)
-{
-	auto& sceneComp = actor->getComponent<SceneComponent>(*this);
-	sceneComp.position = position;
-	sceneComp.eulerAngle = eulerAngle;
-}
-

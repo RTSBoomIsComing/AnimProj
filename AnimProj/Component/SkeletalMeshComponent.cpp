@@ -21,7 +21,7 @@ namespace pa
 		_boneToBoneGTs.resize(_skeleton->getBoneCount());
 	}
 
-	void SkeletalMeshComponent::onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime)
+	void SkeletalMeshComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
 		using namespace DirectX;
 		//const XMVECTOR S = XMLoadFloat4(&pose[boneID].scale);
@@ -37,8 +37,7 @@ namespace pa
 			XMMATRIX parentWorldTransform = {};
 			if (boneID == 0)
 			{
-				XMVECTOR V = XMLoadFloat3(&owner.lock()->getComponent<SceneComponent>(world).position);
-
+				XMVECTOR V = XMLoadFloat3(&owner.getComponent<SceneComponent>()->position);
 				parentWorldTransform = XMMatrixTranslationFromVector(V);
 			}
 			else

@@ -11,7 +11,7 @@ namespace pa
 		virtual ~Map()	= default;
 
 	public:
-		virtual bool placeActor(World& world, std::weak_ptr<Actor> actor) { return false; }
+		virtual bool placeActor(World& world, Actor& actor) { return false; }
 		virtual void clearMap() abstract;
 	};
 }

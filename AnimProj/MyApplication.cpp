@@ -32,13 +32,6 @@ pa::MyApplication::MyApplication()
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
 
 	_world = std::make_unique<World>();
-
-
-	for (int i = 0; i < 300; i++)
-	{
-		_world->createActor<MyActor>({ 5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20) }, {});
-	}
-
 	_world->startGame();
 }
 

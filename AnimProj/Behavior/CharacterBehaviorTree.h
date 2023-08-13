@@ -10,13 +10,13 @@ namespace pa
 		class FindTarget : public Behavior::Node
 		{
 		public:
-			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
+			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
 		class MoveToTarget : public Behavior::Node
 		{
 		public:
-			virtual bool onUpdate(World& world, std::weak_ptr<Actor> owner) override;
+			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
 	public:

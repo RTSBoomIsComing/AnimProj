@@ -17,56 +17,40 @@ namespace pa
 		rootSequence->addChild(std::make_shared<MoveToTarget>());
 	}
 
-	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, std::weak_ptr<Actor> owner)
+	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
 	{
 		using namespace DirectX;
 
 		constexpr float _radius = 20.0f;
 
-		if (owner.expired())
-			DebugBreak();
-
-		auto ownerLocked = owner.lock();
-		if (!ownerLocked)
-			DebugBreak();
-
-		auto&					 sceneComponent = ownerLocked->getComponent<SceneComponent>(world);
+		SceneComponent*			 sceneComp = owner.getComponent<SceneComponent>();
 		std::shared_ptr<GridMap> map			= world.getDefaultMap();
 
-		auto  cellCoordinate = map->getCellCoordinate(world, ownerLocked);
+		auto  cellCoordinate = map->getCellCoordinate(world, owner);
 		auto& actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
 
-		XMVECTOR Vposition = XMLoadFloat3(&sceneComponent.position);
-		for (auto& actor : actors)
+		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
+		for (const Actor* other : actors)
 		{
-			if (actor.expired())
-				DebugBreak();
+			assert(other);
 
-			auto actorLocked = actor.lock();
-			if (!actorLocked)
-				DebugBreak();
+			const SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
+			XMVECTOR			  V1 = XMLoadFloat3(&otherSceneComp->position);
+			const float			  distance		 = XMVectorGetX(XMVector3Length(V1 - V0));
 
-			if (actorLocked == ownerLocked)
-				continue;
-
-			const SceneComponent& otherSceneComp = actorLocked->getComponent<SceneComponent>(world);
-			XMVECTOR			  VotherPosition = XMLoadFloat3(&otherSceneComp.position);
-			const float			  distance		 = XMVectorGetX(XMVector3Length(Vposition - VotherPosition));
-
-
-			MovementComponent& movementComp = ownerLocked->getComponent<MovementComponent>(world);
-			movementComp.speed				= 0.0f;
+			MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+			movementComp->speed				= 0.0f;
 			if (distance < _radius)
 			{
-				XMStoreFloat3(&movementComp.targetPosition, VotherPosition);
-				movementComp.speed = 1.0f;
+				XMStoreFloat3(&movementComp->targetPosition, V1);
+				movementComp->speed = 1.0f;
 				return true;
 			}
 		}
 		return false;
 	}
 
-	bool CharacterBehaviorTree::MoveToTarget::onUpdate(World& world, std::weak_ptr<Actor> owner)
+	bool CharacterBehaviorTree::MoveToTarget::onUpdate(World& world, Actor& owner)
 	{
 		//MovementComponent& movementComp = ownerLocked->getComponent<MovementComponent>(world);
 

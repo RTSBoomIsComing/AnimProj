@@ -7,7 +7,7 @@ void pa::Behavior::Composite::addChild(std::shared_ptr<Node> child)
 	_children.push_back(std::move(child));
 }
 
-bool pa::Behavior::Sequence::onUpdate(World& world, std::weak_ptr<Actor> owner)
+bool pa::Behavior::Sequence::onUpdate(World& world, Actor& owner)
 {
 	for (std::shared_ptr<Node> child : _children)
 	{
@@ -19,7 +19,7 @@ bool pa::Behavior::Sequence::onUpdate(World& world, std::weak_ptr<Actor> owner)
 	return true;
 }
 
-bool pa::Behavior::Selector::onUpdate(World& world, std::weak_ptr<Actor> owner)
+bool pa::Behavior::Selector::onUpdate(World& world, Actor& owner)
 {
 	for (std::shared_ptr<Node> child : _children)
 	{

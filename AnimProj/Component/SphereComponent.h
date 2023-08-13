@@ -11,7 +11,7 @@ namespace pa
 		SphereComponent() = default;
 
 	public:
-		void onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime);
+		void onUpdate(World& world, Actor& owner, float deltaTime);
 
 
 	public:

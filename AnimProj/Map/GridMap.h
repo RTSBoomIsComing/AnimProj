@@ -13,16 +13,16 @@ namespace pa
 		~GridMap()	= default;
 
 	public:
-		virtual bool placeActor(World& world, std::weak_ptr<Actor> actor) override;
+		virtual bool placeActor(World& world, Actor& actor) override;
 		virtual void clearMap() override;
 
-		std::pair<size_t, size_t> getCellCoordinate(World& world, std::weak_ptr<Actor> actor) const;
-		std::vector<std::weak_ptr<Actor>>& getCell(size_t x, size_t y);
+		std::pair<size_t, size_t> getCellCoordinate(World& world, Actor& actor) const;
+		std::vector<Actor*>& getCell(size_t x, size_t y);
 
 	private:
 		static constexpr size_t	_mapSize	= 40;
 		float					_cellSize	= 1.0f;
-		std::array<std::array<std::vector<std::weak_ptr<Actor>>, _mapSize>, _mapSize> _cells;
+		std::array<std::array<std::vector<Actor*>, _mapSize>, _mapSize> _cells;
 	};
 }
 
