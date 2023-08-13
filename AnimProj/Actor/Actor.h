@@ -20,9 +20,8 @@ namespace pa
 		template <typename T>
 		T* createDefaultComponent()
 		{
-			auto component							  = std::make_shared<T>();
-			std::get<std::shared_ptr<T>>(_components) = component;
-			return component.get();
+			std::get<std::shared_ptr<T>>(_components) = std::make_shared<T>();
+			return std::get<std::shared_ptr<T>>(_components).get();
 		}
 
 		template <typename T>

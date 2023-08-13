@@ -16,7 +16,7 @@ pa::MyActor::MyActor()
 	_movementComponent = this->createDefaultComponent<MovementComponent>();
 
 	_behaviorTreeComponent = this->createDefaultComponent<BehaviorTreeComponent>();
-	_behaviorTreeComponent->setBehaviorTree(std::make_shared<CharacterBehaviorTree>());
+	//_behaviorTreeComponent->setBehaviorTree(std::make_shared<CharacterBehaviorTree>());
 
 	_skeletalMeshComponent = this->createDefaultComponent<SkeletalMeshComponent>();
 	_skeletalMeshComponent->setSkeleton(AnimationManager::get().getDefaultSkeleton());

@@ -5,16 +5,15 @@
 #include "../Map/GridMap.h"
 #include "../Component/SceneComponent.h"
 #include "../Component/MovementComponent.h"
-
+#include "../Component/AnimationComponent.h"
 namespace pa
 {
 	CharacterBehaviorTree::CharacterBehaviorTree()
 	{
-		std::shared_ptr<Behavior::Selector> rootSequence = std::make_shared<Behavior::Selector>();
-		_root											 = rootSequence;
+		std::shared_ptr<Behavior::Composite> rootSequence = std::make_shared<Behavior::Sequence>();
+		_root											  = rootSequence;
 
 		rootSequence->addChild(std::make_shared<FindTarget>());
-		rootSequence->addChild(std::make_shared<MoveToTarget>());
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
@@ -24,7 +23,7 @@ namespace pa
 		constexpr float _radius = 20.0f;
 
 		SceneComponent*			 sceneComp = owner.getComponent<SceneComponent>();
-		std::shared_ptr<GridMap> map			= world.getDefaultMap();
+		std::shared_ptr<GridMap> map	   = world.getDefaultMap();
 
 		auto  cellCoordinate = map->getCellCoordinate(world, owner);
 		auto& actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
@@ -35,7 +34,7 @@ namespace pa
 			assert(other);
 
 			const SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
-			XMVECTOR			  V1 = XMLoadFloat3(&otherSceneComp->position);
+			XMVECTOR			  V1			 = XMLoadFloat3(&otherSceneComp->position);
 			const float			  distance		 = XMVectorGetX(XMVector3Length(V1 - V0));
 
 			MovementComponent* movementComp = owner.getComponent<MovementComponent>();
@@ -50,11 +49,16 @@ namespace pa
 		return false;
 	}
 
-	bool CharacterBehaviorTree::MoveToTarget::onUpdate(World& world, Actor& owner)
+	bool CharacterBehaviorTree::PlayAnimation::onUpdate(World& world, Actor& owner)
 	{
-		//MovementComponent& movementComp = ownerLocked->getComponent<MovementComponent>(world);
+		// AnimationComponent* animationComp = owner.getComponent<AnimationComponent>();
+		// animationComp->setAnimation("Idle");
+		// animationComp->playAnimation("Idle");
+		SkeletalMeshComponent* skeletalMeshComp = owner.getComponent<SkeletalMeshComponent>();
+		//skeletalMeshComp->playAnimation("Idle");
 
-		return true;
+
+		return false;
 	}
 
 }

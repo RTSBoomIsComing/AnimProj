@@ -3,48 +3,60 @@
 #include "World.h"
 #include "../Map/GridMap.h"
 #include "../Actor/MyActor.h"
+#include "../Behavior/CharacterBehaviorTree.h"
+#include "../Component/SceneComponent.h"
+#include "../Component/BehaviorTreeComponent.h"
 
-pa::World::World()
+namespace pa
 {
-	_map = std::make_shared<GridMap>(20.0f);
-	
-	for (int i = 0; i < 300; i++)
+	World::World()
 	{
-		std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
-		_actors.push_back(actor);
+		_map					 = std::make_shared<GridMap>(20.0f);
+		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>();
 
-		if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
+		for (int i = 0; i < 300; i++)
 		{
-			sceneComp->position = {5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20)};
+			std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
+			_actors.push_back(actor);
+
+			if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
+			{
+				sceneComp->position = {5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20)};
+			}
+
+			if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
+			{
+				behaviorTreeComp->setBehaviorTree(behaviorTree);
+			}
 		}
 	}
-}
 
-pa::World::~World()
-{
-}
-
-void pa::World::startGame()
-{
-	for (auto& actor : _actors)
+	World::~World()
 	{
-		actor->onStartGame(*this);
-	}
-}
-
-void pa::World::update(float deltaTime)
-{
-	_map->clearMap();
-	for (auto& actor : _actors)
-	{
-		_map->placeActor(*this, *actor);
 	}
 
-	this->boneMatrixPool.clear();
-	this->boneToBoneMatrixPool.clear();
-
-	for (auto& actor : _actors)
+	void World::startGame()
 	{
-		actor->onUpdate(*this, deltaTime);
+		for (auto& actor : _actors)
+		{
+			actor->onStartGame(*this);
+		}
+	}
+
+	void World::update(float deltaTime)
+	{
+		_map->clearMap();
+		for (auto& actor : _actors)
+		{
+			_map->placeActor(*this, *actor);
+		}
+
+		this->boneMatrixPool.clear();
+		this->boneToBoneMatrixPool.clear();
+
+		for (auto& actor : _actors)
+		{
+			actor->onUpdate(*this, deltaTime);
+		}
 	}
 }

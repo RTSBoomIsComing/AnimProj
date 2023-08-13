@@ -11,13 +11,25 @@ namespace pa
 		SkeletalMeshComponent() = default;
 		SkeletalMeshComponent(const Skeleton& skeleton);
 	public:
-		void setSkeleton(const Skeleton& skeleton);
 		void onUpdate(World& world, Actor& owner, float deltaTime);
+
+	public:
+		void setSkeleton(const Skeleton& skeleton);
+		void playAnimationIdle();
+		//void playAnimationWalk();
+		void playAnimationRun();
+		void playAnimationAttack();
+		void playAnimationDie();
+		void playAnimationHit();
 
 	public:
 		const Skeleton*						_skeleton		= nullptr;
 		std::vector<DirectX::XMFLOAT4X4>	_boneGTs;
 		std::vector<DirectX::XMFLOAT4X4>	_boneToBoneGTs;
+
+		std::vector<Transform>	_pose;
+
+		bool _isCulled = false;
 	};
 }
 
