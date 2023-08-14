@@ -101,7 +101,6 @@
     <ClInclude Include="Component\BehaviorTreeComponent.h" />
     <ClInclude Include="Behavior\BehaviorTree.h" />
     <ClInclude Include="Common\CommonTypes.h" />
-    <ClInclude Include="Component\AnimationComponent.h" />
     <ClInclude Include="Animation\AcclaimImporter.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimMotion.h" />
     <ClInclude Include="AcclaimMotionCapture\AcclaimSkeleton.h" />
@@ -124,7 +123,6 @@
     <ClInclude Include="Component\MovementComponent.h" />
     <ClInclude Include="Rendering\MeshRenderer.h" />
     <ClInclude Include="Rendering\MeshManager.h" />
-    <ClInclude Include="Rendering\Character.h" />
     <ClInclude Include="Rendering\CubeMesh.h" />
     <ClInclude Include="Rendering\Rendering.h" />
     <ClInclude Include="App\Win32Application.h" />
@@ -152,7 +150,6 @@
     <ClCompile Include="Behavior\CharacterBehaviorTree.cpp" />
     <ClCompile Include="Component\BehaviorTreeComponent.cpp" />
     <ClCompile Include="Behavior\BehaviorTree.cpp" />
-    <ClCompile Include="Component\AnimationComponent.cpp" />
     <ClCompile Include="Animation\AcclaimImporter.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimMotion.cpp" />
     <ClCompile Include="AcclaimMotionCapture\AcclaimSkeleton.cpp" />
@@ -194,7 +191,6 @@
     <ClCompile Include="Component\MovementComponent.cpp" />
     <ClCompile Include="Rendering\MeshRenderer.cpp" />
     <ClCompile Include="Rendering\MeshManager.cpp" />
-    <ClCompile Include="Rendering\Character.cpp" />
     <ClCompile Include="Rendering\CubeMesh.cpp" />
     <ClCompile Include="Rendering\Rendering.cpp" />
     <ClCompile Include="App\Win32Application.cpp" />

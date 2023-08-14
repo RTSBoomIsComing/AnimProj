@@ -57,12 +57,6 @@ void pa::MyApplication::onUpdate()
 
 	_world->update(_timer.getDeltaTime());
 
-	for (Character& character : _characters)
-	{
-		character.update(_timer.getDeltaTime(), _deviceContext.Get());
-	}
-	// TODO
-	//_world->get
 	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get(), _world->boneMatrixPool, _world->boneToBoneMatrixPool);
 }
 
@@ -168,12 +162,6 @@ void pa::MyApplication::processInput(float deltaTime)
 {
 	using namespace DirectX;
 	float cameraDistance = 10.f;
-
-
-	for (Character& character : _characters)
-	{
-		character.processInput(deltaTime);
-	}
 
 	_camera->processInput(deltaTime);
 }

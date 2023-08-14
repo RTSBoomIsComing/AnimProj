@@ -2,7 +2,6 @@
 #pragma once
 #include "App/Win32Application.h"
 #include "Timer.h"
-#include "Rendering/Character.h"
 namespace pa
 {
 	class Camera;
@@ -51,7 +50,6 @@ namespace pa
 		const Mesh*						_boneMesh		= nullptr;
 		const Mesh*						_boneToBoneMesh	= nullptr;
 		Camera*							_camera			= nullptr;
-		std::vector<Character>			_characters;
 
 
 		std::unique_ptr<class World>	_world;
