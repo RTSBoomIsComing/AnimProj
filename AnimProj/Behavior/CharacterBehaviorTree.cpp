@@ -21,7 +21,7 @@ namespace pa
 			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
 
 		rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
-			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_up)));
+			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
