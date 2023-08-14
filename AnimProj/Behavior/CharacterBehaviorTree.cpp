@@ -5,7 +5,9 @@
 #include "../Map/GridMap.h"
 #include "../Component/SceneComponent.h"
 #include "../Component/MovementComponent.h"
-#include "../Component/AnimationComponent.h"
+#include "../Component/AnimationComponent2.h"
+
+#include "../Animation/AnimationManager.h"
 namespace pa
 {
 	CharacterBehaviorTree::CharacterBehaviorTree()
@@ -14,6 +16,12 @@ namespace pa
 		_root											  = rootSequence;
 
 		rootSequence->addChild(std::make_shared<FindTarget>());
+
+		rootSequence->addChild(std::make_shared<PlayAnimationLowerBody>(
+			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
+
+		rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
+			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Punch_up)));
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
@@ -43,7 +51,7 @@ namespace pa
 			assert(movementComp);
 
 			movementComp->speed = 0.0f;
-			if (distance < _radius)
+			if (distance < _radius && 0 < distance)
 			{
 				XMStoreFloat3(&movementComp->targetPosition, V1);
 				movementComp->speed = 1.0f;
@@ -67,16 +75,32 @@ namespace pa
 		return false;
 	}
 
-	bool CharacterBehaviorTree::PlayAnimation::onUpdate(World& world, Actor& owner)
+	bool CharacterBehaviorTree::PlayAnimationLowerBody::onUpdate(World& world, Actor& owner)
 	{
-		// AnimationComponent* animationComp = owner.getComponent<AnimationComponent>();
-		// animationComp->setAnimation("Idle");
-		// animationComp->playAnimation("Idle");
-		SkeletalMeshComponent* skeletalMeshComp = owner.getComponent<SkeletalMeshComponent>();
-		//skeletalMeshComp->playAnimation("Idle");
+		AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
+		assert(animationComp);
 
 
-		return false;
+		if (animationComp->getCurrentAnimationLowerBody() == _animation)
+			return false;
+
+		animationComp->transitAnimationLowerBody(*_animation);
+
+		return true;
+	}
+
+	bool CharacterBehaviorTree::PlayAnimationUpperBody::onUpdate(World& world, Actor& owner)
+	{
+		AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
+		assert(animationComp);
+
+
+		if (animationComp->getCurrentAnimationUpperBody() == _animation)
+			return false;
+
+		animationComp->transitAnimationUpperBody(*_animation);
+
+		return true;
 	}
 
 }

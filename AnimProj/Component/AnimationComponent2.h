@@ -31,14 +31,17 @@ namespace pa
 		};
 
 	public:
+		void onUpdate(World& world, Actor& owner, float deltaTime);
+
+	public:
 		void transitAnimationUpperBody(const Animation& animation, float transitionTime = 1.0f);
 		void transitAnimationLowerBody(const Animation& animation, float transitionTime = 1.0f);
-		void onUpdate(World& world, Actor& owner, float deltaTime);
+
+		inline const Animation* getCurrentAnimationUpperBody() { return _upperBody.animation; }
+		inline const Animation* getCurrentAnimationLowerBody() { return _lowerBody.animation; }
 
 	private:
 		Layer _upperBody{};
 		Layer _lowerBody{};
-
-		//std::vector<Transform> _resultPose;
 	};
 }

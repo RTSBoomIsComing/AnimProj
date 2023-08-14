@@ -13,14 +13,30 @@ namespace pa
 			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
-		class PlayAnimation : public Behavior::Node
+		class PlayAnimationLowerBody : public Behavior::Node
 		{
 		public:
+			PlayAnimationLowerBody(class Animation const& animation)
+				: _animation(&animation) {}
 			virtual bool onUpdate(World& world, Actor& owner) override;
+
+		private:
+			const Animation* _animation = nullptr;
 		};
+
+		class PlayAnimationUpperBody : public Behavior::Node
+		{
+		public:
+			PlayAnimationUpperBody(class Animation const& animation)
+				: _animation(&animation) {}
+			virtual bool onUpdate(World& world, Actor& owner) override;
+
+		private:
+			const Animation* _animation = nullptr;
+		};
+
 	public:
 		CharacterBehaviorTree();
 	};
 
 }
-

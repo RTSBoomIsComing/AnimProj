@@ -14,23 +14,30 @@ namespace pa
 		_lowerBody.onUpdate(deltaTime);
 
 		// Blend animation layer
+		// TODO: Make this logic as function
 		SkeletalMeshComponent* skeletalMeshComp = owner.getComponent<SkeletalMeshComponent>();
 
-		for (int trackID = 0; trackID < _lowerBody.activeKeys.size(); trackID++)
+		if (_lowerBody.animation)
 		{
-			const uint16_t boneID = _lowerBody.animation->getTrackHeaders()[trackID].boneID;
-			if (AnimationTrackType::Rotation == _lowerBody.animation->getTrackHeaders()[trackID].type)
+			for (int trackID = 0; trackID < _lowerBody.activeKeys.size(); trackID++)
 			{
-				skeletalMeshComp->_pose[boneID] = _lowerBody.currentPose[boneID];
+				const uint16_t boneID = _lowerBody.animation->getTrackHeaders()[trackID].boneID;
+				if (AnimationTrackType::Rotation == _lowerBody.animation->getTrackHeaders()[trackID].type)
+				{
+					skeletalMeshComp->_pose[boneID] = _lowerBody.currentPose[boneID];
+				}
 			}
 		}
 
-		for (int trackID = 0; trackID < _upperBody.activeKeys.size(); trackID++)
+		if (_upperBody.animation)
 		{
-			const uint16_t boneID = _upperBody.animation->getTrackHeaders()[trackID].boneID;
-			if (AnimationTrackType::Rotation == _upperBody.animation->getTrackHeaders()[trackID].type)
+			for (int trackID = 0; trackID < _upperBody.activeKeys.size(); trackID++)
 			{
-				skeletalMeshComp->_pose[boneID] = _upperBody.currentPose[boneID];
+				const uint16_t boneID = _upperBody.animation->getTrackHeaders()[trackID].boneID;
+				if (AnimationTrackType::Rotation == _upperBody.animation->getTrackHeaders()[trackID].type)
+				{
+					skeletalMeshComp->_pose[boneID] = _upperBody.currentPose[boneID];
+				}
 			}
 		}
 	}
@@ -42,7 +49,7 @@ namespace pa
 
 	void AnimationComponent2::transitAnimationLowerBody(const Animation& animation, float transitionTime)
 	{
-		_lowerBody.activeKeys.resize(animation.getTrackHeaders().size());
+		_lowerBody.transitAnimation(animation, transitionTime);
 	}
 
 	void AnimationComponent2::Layer::transitAnimation(const Animation& animation, float transitionTime)
@@ -101,9 +108,8 @@ namespace pa
 		}
 
 		//cache pose
-
-		float weight = playTime / transitionTime;
-		weight		 = std::min(weight, 1.0f);
+		float transitionBlendWeight = playTime / transitionTime;
+		transitionBlendWeight		= std::min(transitionBlendWeight, 1.0f);
 
 		for (int trackID = 0; trackID < activeKeys.size(); trackID++)
 		{
@@ -126,30 +132,27 @@ namespace pa
 					controlPoints[1].decompressAsQuaternion(),
 					controlPoints[2].decompressAsQuaternion(), t);
 
-				if (1.0f == weight)
+				if (1.0f == transitionBlendWeight)
 				{
 					XMStoreFloat4(&currentPose[boneID].rotation, Q1);
-					//XMStoreFloat4(&skeletalMeshComp->_pose[boneID].rotation, Q1);
 				}
 				else
 				{
 					XMVECTOR Q0		 = XMLoadFloat4(&lastPose[boneID].rotation);
-					XMVECTOR Qresult = XMQuaternionSlerp(Q0, Q1, weight);
+					XMVECTOR Qresult = XMQuaternionSlerp(Q0, Q1, transitionBlendWeight);
 					XMStoreFloat4(&currentPose[boneID].rotation, Qresult);
-					//XMStoreFloat4(&basePose[boneID].rotation, Qresult);
-					//XMStoreFloat4(&basePose[boneID].rotation, Qresult);
 				}
 
 				//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
 
 				//_rotations[_animation->_trackDescriptors[i]] =
-				//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), weight);
+				//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), transitionBlendWeight);
 
 				//_rotations[boneID] = XMQuaternionNormalize(XMVectorCatmullRom(
 				//	controlPoints[0].decompressAsQuaternion(),
 				//	controlPoints[1].decompressAsQuaternion(),
 				//	controlPoints[2].decompressAsQuaternion(),
-				//	controlPoints[3].decompressAsQuaternion(), weight));
+				//	controlPoints[3].decompressAsQuaternion(), transitionBlendWeight));
 			}
 		}
 	}

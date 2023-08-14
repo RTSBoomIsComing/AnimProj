@@ -7,7 +7,7 @@ namespace pa
 	class MovementComponent;
 	class BehaviorTreeComponent;
 	class SkeletalMeshComponent;
-	class AnimationComponent;
+	class AnimationComponent2;
 
 	template <typename... Ts>
 	class IActor abstract
@@ -40,7 +40,7 @@ namespace pa
 		std::tuple<std::shared_ptr<Ts>...> _components;
 	};
 
-	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent, AnimationComponent>
+	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent, AnimationComponent2>
 	{
 	};
 }
