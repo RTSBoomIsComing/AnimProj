@@ -6,6 +6,7 @@
 #include "../Component/BehaviorTreeComponent.h"
 #include "../Component/MovementComponent.h"
 #include "../Component/SkeletalMeshComponent.h"
+#include "../Component/AnimationComponent.h"
 
 #include "../Behavior/CharacterBehaviorTree.h"
 #include "../Animation/AnimationManager.h"
@@ -20,6 +21,9 @@ pa::MyActor::MyActor()
 
 	_skeletalMeshComponent = this->createDefaultComponent<SkeletalMeshComponent>();
 	_skeletalMeshComponent->setSkeleton(AnimationManager::get().getDefaultSkeleton());
+
+	_animationComponent = this->createDefaultComponent<AnimationComponent>();
+	_animationComponent->setSkeleton(AnimationManager::get().getDefaultSkeleton());
 }
 
 void pa::MyActor::onStartGame(World& world)
@@ -34,4 +38,5 @@ void pa::MyActor::onUpdate(World& world, float deltaTime)
 	_behaviorTreeComponent->onUpdate(world, *this, deltaTime);
 	_movementComponent->onUpdate(world, *this, deltaTime);
 	_skeletalMeshComponent->onUpdate(world, *this, deltaTime);
+	//_animationComponent->onUpdate(world, *this, deltaTime);
 }

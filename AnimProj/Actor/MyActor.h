@@ -1,14 +1,8 @@
 // author: Changwan Yu
 #pragma once
 #include "Actor.h"
-#include "../Component/Component.h"
 namespace pa
 {
-	class SceneComponent;
-	class MovementComponent;
-	class BehaviorTreeComponent;
-	class SkeletalMeshComponent;
-
 	class MyActor : public Actor
 	{
 	public:
@@ -22,5 +16,6 @@ namespace pa
 		MovementComponent*	   _movementComponent;
 		BehaviorTreeComponent* _behaviorTreeComponent;
 		SkeletalMeshComponent* _skeletalMeshComponent;
+		AnimationComponent*	   _animationComponent;
 	};
 }

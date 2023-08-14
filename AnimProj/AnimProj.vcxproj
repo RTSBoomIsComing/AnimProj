@@ -95,9 +95,9 @@
   <ItemGroup>
     <ClInclude Include="Actor\Actor.h" />
     <ClInclude Include="AnimationBlender.h" />
+    <ClInclude Include="Component\AnimationComponent2.h" />
     <ClInclude Include="Behavior\Behavior.h" />
     <ClInclude Include="Behavior\CharacterBehaviorTree.h" />
-    <ClInclude Include="Component\Component.h" />
     <ClInclude Include="Component\BehaviorTreeComponent.h" />
     <ClInclude Include="Behavior\BehaviorTree.h" />
     <ClInclude Include="Common\CommonTypes.h" />
@@ -147,9 +147,9 @@
   <ItemGroup>
     <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="AnimationBlender.cpp" />
+    <ClCompile Include="Component\AnimationComponent2.cpp" />
     <ClCompile Include="Behavior\Behavior.cpp" />
     <ClCompile Include="Behavior\CharacterBehaviorTree.cpp" />
-    <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="Component\BehaviorTreeComponent.cpp" />
     <ClCompile Include="Behavior\BehaviorTree.cpp" />
     <ClCompile Include="Component\AnimationComponent.cpp" />

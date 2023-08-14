@@ -34,15 +34,33 @@ namespace pa
 			assert(other);
 
 			const SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
-			XMVECTOR			  V1			 = XMLoadFloat3(&otherSceneComp->position);
-			const float			  distance		 = XMVectorGetX(XMVector3Length(V1 - V0));
+			assert(otherSceneComp);
+
+			XMVECTOR	V1		 = XMLoadFloat3(&otherSceneComp->position);
+			const float distance = XMVectorGetX(XMVector3Length(V1 - V0));
 
 			MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-			movementComp->speed				= 0.0f;
+			assert(movementComp);
+
+			movementComp->speed = 0.0f;
 			if (distance < _radius)
 			{
 				XMStoreFloat3(&movementComp->targetPosition, V1);
 				movementComp->speed = 1.0f;
+
+				{
+					const XMVECTOR Vdir	   = XMVector3Normalize(V1 - V0);
+					const XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+					const XMVECTOR Axis	   = XMVector3Cross(Forward, Vdir);
+					const float	   dot	   = XMVectorGetX(XMVector3Dot(Forward, Vdir));
+					float		   angle   = std::acosf(dot);
+
+					if (XMVectorGetY(Axis) < 0.0f)
+						angle = -1.0f * angle;
+
+					movementComp->targetEulerAngle.y = angle;
+				}
+
 				return true;
 			}
 		}

@@ -3,24 +3,36 @@
 #include "../Animation/AnimationPlayer.h"
 namespace pa
 {
+	class Actor;
+	class World;
 	class Skeleton;
 	class Animation;
-	class Character;
 	class AnimationComponent
 	{
 	public:
-		AnimationComponent(ID3D11Device* device, const Skeleton& skeleton);
-		~AnimationComponent();
+		AnimationComponent() = default;
+		AnimationComponent(const Skeleton& skeleton);
 
 	public:
-		void update(Character& owner, float deltaTime);
+		//void onUpdate(World& world, Actor& owner, float deltaTime);
 
+		void								 setSkeleton(const Skeleton& skeleton);
 		inline std::vector<Transform> const& getResultPose() const { return _resultPose; }
 
 	private:
 		enum class AnimPlayerIndex
 		{
-			Walk_up, Walk_lo, Run_up, Run_lo, Punch_up, Punch_lo, Jump_up, Jump_lo, Dance_up, Dance_lo
+			Walk_up,
+			Walk_lo,
+			Run_up,
+			Run_lo,
+			Punch_up,
+			Punch_lo,
+			Jump_up,
+			Jump_lo,
+			Dance_up,
+			Dance_lo,
+			None
 		};
 
 		AnimationPlayer& getAnimationPlayer(AnimPlayerIndex index);
@@ -28,8 +40,7 @@ namespace pa
 	private:
 		const Skeleton* _skeleton = nullptr;
 
-		std::vector<AnimationPlayer>	_animationPlayers;
-		std::vector<Transform>			_resultPose;
+		std::vector<AnimationPlayer> _animationPlayers;
+		std::vector<Transform>		 _resultPose;
 	};
 }
-

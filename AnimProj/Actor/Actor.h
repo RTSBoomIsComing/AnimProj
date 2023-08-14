@@ -1,13 +1,13 @@
 // author: Changwan Yu
 #pragma once
 #include "../World/World.h"
-#include "../Component/Component.h"
 namespace pa
 {
 	class SceneComponent;
-	class BehaviorTreeComponent;
 	class MovementComponent;
+	class BehaviorTreeComponent;
 	class SkeletalMeshComponent;
+	class AnimationComponent;
 
 	template <typename... Ts>
 	class IActor abstract
@@ -40,7 +40,7 @@ namespace pa
 		std::tuple<std::shared_ptr<Ts>...> _components;
 	};
 
-	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent>
+	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent, AnimationComponent>
 	{
 	};
 }

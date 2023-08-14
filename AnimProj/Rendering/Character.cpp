@@ -14,7 +14,7 @@ pa::Character::Character(ID3D11Device* device)
 
 
 	_sceneComp		= std::make_shared<SceneComponent>();
-	_animationComp	= std::make_shared<AnimationComponent>(device, skeleton);
+	_animationComp	= std::make_shared<AnimationComponent>(skeleton);
 }
 
 pa::Character::Character(Character&& other) noexcept
@@ -58,7 +58,7 @@ pa::Character& pa::Character::operator=(Character&& other) noexcept
 void pa::Character::update(float deltaTime, ID3D11DeviceContext* deviceContext)
 {
 	using namespace DirectX;
-	_animationComp->update(*this, deltaTime);
+	//_animationComp->update(*this, deltaTime);
 }
 
 void pa::Character::processInput(float deltaTime)

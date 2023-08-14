@@ -29,6 +29,8 @@ namespace pa
 		if (_isCulled)
 			return;
 
+		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+
 		for (const size_t boneID : _skeleton->getHierarchy())
 		{
 			const size_t parentID = _skeleton->getParentBoneID(boneID);
@@ -36,8 +38,9 @@ namespace pa
 			XMMATRIX parentWorldTransform = {};
 			if (boneID == 0)
 			{
-				XMVECTOR V			 = XMLoadFloat3(&owner.getComponent<SceneComponent>()->position);
-				parentWorldTransform = XMMatrixTranslationFromVector(V);
+				parentWorldTransform = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&sceneComp->eulerAngle));
+				const XMVECTOR V	= XMLoadFloat3(&sceneComp->position);
+				parentWorldTransform *= XMMatrixTranslationFromVector(V);
 			}
 			else
 			{

@@ -1,7 +1,6 @@
 // author: Changwan Yu
 #pragma once
 #include "Map.h"
-#include "../Component/Component.h"
 #include "../Component/SceneComponent.h"
 namespace pa
 {

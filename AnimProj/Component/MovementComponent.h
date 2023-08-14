@@ -13,7 +13,7 @@ namespace pa
 		DirectX::XMFLOAT3	targetPosition		= {};
 		DirectX::XMFLOAT3	targetEulerAngle	= {};
 		float			 	speed				= 0.0f;
-		float				angleSpeed			= 0.0f;
+		float				rotateSpeed			= 0.5f;
 	};
 }
 
