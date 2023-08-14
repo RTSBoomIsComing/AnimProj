@@ -27,7 +27,7 @@ void pa::AnimationManager::initialize()
 	amcDirectory += LR"(Assets\ASFAMC\integrate\)";
 
 	{
-		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(walk.amc)");
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(soldier_march1.amc)");
 		RawAnimation rawAnimation = {};
 		AcclaimImporter::createRawAnimation(acclaimMotion, this->getDefaultSkeleton(), &rawAnimation);
 		AnimationBuilder animationBuilder(this->getDefaultSkeleton(), rawAnimation);
@@ -67,7 +67,7 @@ void pa::AnimationManager::initialize()
 	}
 
 	{
-		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(dance.amc)");
+		Acclaim::Motion acclaimMotion(&acclaimSkeleton, amcDirectory + LR"(shooting_gun.amc)");
 		RawAnimation rawAnimation = {};
 		AcclaimImporter::createRawAnimation(acclaimMotion, this->getDefaultSkeleton(), &rawAnimation);
 		AnimationBuilder animationBuilder(this->getDefaultSkeleton(), rawAnimation);

@@ -38,6 +38,6 @@ namespace pa
 		t					 = std::min(1.0f, t);
 
 		XMVECTOR V = XMVectorLerp(V0, V1, t);
-		XMStoreFloat3(&sceneComp->position, V);
+		//XMStoreFloat3(&sceneComp->position, V);
 	}
 }

@@ -14,7 +14,7 @@ namespace pa
 		_map					 = std::make_shared<GridMap>(20.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>();
 
-		for (int i = 0; i < 300; i++)
+		for (int i = 0; i < 100; i++)
 		{
 			std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
 			_actors.push_back(actor);

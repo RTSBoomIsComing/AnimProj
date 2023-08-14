@@ -29,8 +29,8 @@ namespace pa
 			Punch_lo,
 			Jump_up,
 			Jump_lo,
-			Dance_up,
-			Dance_lo
+			ShootingGun_up,
+			ShootingGun_lo
 		};
 
 	public:

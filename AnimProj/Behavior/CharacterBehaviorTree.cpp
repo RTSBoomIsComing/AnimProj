@@ -21,7 +21,7 @@ namespace pa
 			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
 
 		rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
-			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Punch_up)));
+			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_up)));
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
@@ -84,7 +84,7 @@ namespace pa
 		if (animationComp->getCurrentAnimationLowerBody() == _animation)
 			return false;
 
-		animationComp->transitAnimationLowerBody(*_animation);
+		animationComp->transitAnimationLowerBody(*_animation, 0.1f);
 
 		return true;
 	}
@@ -98,7 +98,7 @@ namespace pa
 		if (animationComp->getCurrentAnimationUpperBody() == _animation)
 			return false;
 
-		animationComp->transitAnimationUpperBody(*_animation);
+		animationComp->transitAnimationUpperBody(*_animation, 0.1f);
 
 		return true;
 	}
