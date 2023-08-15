@@ -3,46 +3,65 @@
 #include "../World/World.h"
 #include "../Actor/Actor.h"
 #include "../Map/GridMap.h"
+#include "../Animation/AnimationManager.h"
+
 #include "../Component/SceneComponent.h"
 #include "../Component/MovementComponent.h"
 #include "../Component/AnimationComponent2.h"
+#include "../Component/CombatComponent.h"
 
-#include "../Animation/AnimationManager.h"
 namespace pa
 {
-	CharacterBehaviorTree::CharacterBehaviorTree()
+	CharacterBehaviorTree::CharacterBehaviorTree(World& world)
 	{
-		auto rootSequence = std::make_shared<Behavior::Sequence>();
-		_root			  = rootSequence;
+		auto findTargetOnSight		 = std::make_shared<FindTarget>(100.0f);
+
+		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
+		DirectX::XMFLOAT3		mapCenterPosition(mapCenterXZ.first, 0.0f, mapCenterXZ.second);
+		auto moveToCenter = std::make_shared<MoveTo>(mapCenterPosition);
 
 
-		auto findTarget = std::make_shared<FindTarget>();
-		auto Attack		= std::make_shared<Behavior::Sequence>();
-		//Attack->addChild(std::make_shared<PlayAnimationUpperBody>(
-		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
+		auto mainSelector = std::make_shared<Behavior::Selector>();
+		mainSelector->addChild(findTargetOnSight);
+		mainSelector->addChild(moveToCenter);
 
-		//Attack->addChild(std::make_shared<PlayAnimationLowerBody>(
-		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_lo)));
-
-		rootSequence->addChild(findTarget);
-		rootSequence->addChild(Attack);
-
-		// findTarget->addChild(Attack);
-
-		// rootSequence->addChild(findTarget);
-
-		// rootSequence->addChild(std::make_shared<PlayAnimationLowerBody>(
-		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
-
-		// rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
-		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
+		_root = mainSelector;
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
 	{
 		using namespace DirectX;
 
-		constexpr float _radius = 100.0f;
+		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
+		assert(combatComp);
+
+		std::shared_ptr<GridMap> map   = world.getDefaultMap();
+		Actor*					 other = map->findNearestActor(world, owner, _radius);
+
+		if (nullptr == other)
+			return false;
+
+		combatComp->setTargetToAttack(other);
+
+		return true;
+	}
+
+	bool CharacterBehaviorTree::MoveTo::onUpdate(World& world, Actor& owner)
+	{
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
+		movementComp->targetPosition = _position;
+
+		return true;
+	}
+
+	bool CharacterBehaviorTree::CheckAttackRange::onUpdate(World& world, Actor& owner)
+	{
+		using namespace DirectX;
 
 		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 		assert(sceneComp);
@@ -50,30 +69,6 @@ namespace pa
 		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
 		assert(movementComp);
 
-		std::shared_ptr<GridMap> map   = world.getDefaultMap();
-		Actor*					 other = map->findNearestActor(world, owner, _radius);
-
-		movementComp->speed = 0.0f;
-		if (nullptr == other)
-			return false;
-
-		SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
-		assert(otherSceneComp);
-
-		XMVECTOR V1 = XMLoadFloat3(&otherSceneComp->position);
-
-		XMStoreFloat3(&movementComp->targetPosition, V1);
-		movementComp->speed = 3.0f;
-
-		return true;
-	}
-
-	bool CharacterBehaviorTree::MoveToCenter::onUpdate(World& world, Actor& owner)
-	{
-		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-		assert(movementComp);
-
-		movementComp->targetPosition = {0.0f, 0.0f, 0.0f};
 
 		return false;
 	}

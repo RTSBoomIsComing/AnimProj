@@ -14,7 +14,7 @@ namespace pa
 	public:
 		DirectX::XMFLOAT3 targetPosition = {};
 		float			  speed			 = 1.0f;
-		float			  rotateSpeed	 = DirectX::XM_PIDIV4;
+		float			  rotateSpeed	 = DirectX::XM_PIDIV2;
 
 	private:
 		bool _isMoving = false;

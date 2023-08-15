@@ -44,6 +44,7 @@ namespace pa
 			_movementComponent->onUpdate(world, *this, deltaTime);
 			_skeletalMeshComponent->onUpdate(world, *this, deltaTime);
 			_animationComponent->onUpdate(world, *this, deltaTime);
+			_combatComponent->onUpdate(world, *this, deltaTime);
 		}
 	}
 }

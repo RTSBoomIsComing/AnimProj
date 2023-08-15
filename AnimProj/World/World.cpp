@@ -11,40 +11,34 @@ namespace pa
 {
 	World::World()
 	{
-		_map					 = std::make_shared<GridMap>(10.0f);
-		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>();
+		_map					 = std::make_shared<GridMap>(20.0f);
+		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>(*this);
 
 		// place two actors on sector
 		//std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
 		//_actors.push_back(actor);
-
 		//if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
 		//{
 		//	std::pair<float, float> positionXZ = _map->getCellCenter(0, 0);
 		//	sceneComp->position				   = {positionXZ.first, 0.0f, positionXZ.second};
 		//}
-
 		//if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
 		//{
 		//	behaviorTreeComp->setBehaviorTree(behaviorTree);
 		//}
-
 		//actor = std::make_shared<MyActor>();
 		//_actors.push_back(actor);
-
 		//if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
 		//{
 		//	std::pair<float, float> positionXZ = _map->getCellCenter(4, 4);
 		//	sceneComp->position				   = {positionXZ.first, 0.0f, positionXZ.second};
 		//}
-
 		//if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
 		//{
 		//	behaviorTreeComp->setBehaviorTree(behaviorTree);
 		//}
 
 		// place actors on center of sectors
-
 		for (size_t x = 0; x < _map->getMapWidth(); x++)
 		{
 			for (size_t z = 0; z < _map->getMapHeight(); z++)

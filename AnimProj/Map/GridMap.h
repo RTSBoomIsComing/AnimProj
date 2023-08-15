@@ -20,14 +20,16 @@ namespace pa
 		std::vector<Actor*>&	  getCell(size_t x, size_t z);
 		std::pair<float, float>	  getCellCenter(size_t x, size_t z) const;
 
-		size_t getMapWidth() const { return _mapWidth; }
-		size_t getMapHeight() const { return _mapHeight; }
+		inline size_t				   getMapWidth() const { return _mapWidth; }
+		inline size_t				   getMapHeight() const { return _mapHeight; }
+		inline float				   getCellSize() const { return _cellSize; }
+		inline std::pair<float, float> getMapCenter() const { return std::make_pair(_mapWidth * _cellSize / 2.0f, _mapHeight * _cellSize / 2.0f); }
 
 		Actor* findNearestActor(World& world, Actor& actor, float radius) const;
 
 	private:
-		static constexpr size_t _mapWidth  = 10;
-		static constexpr size_t _mapHeight = 10;
+		static constexpr size_t _mapWidth  = 5;
+		static constexpr size_t _mapHeight = 5;
 		float					_cellSize  = 1.0f;
 
 		std::array<std::array<std::vector<Actor*>, _mapWidth>, _mapHeight> _cells;

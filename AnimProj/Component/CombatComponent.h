@@ -11,9 +11,22 @@ namespace pa
 
 	public:
 		void onUpdate(World& world, Actor& owner, float deltaTime);
-		bool isAttacking() const { return false; }
+		void onEndAttack();
+
+
+		inline bool isAttacking() const { return _targetToAttack; }
+		inline void setTargetToAttack(Actor* target);
 
 	private:
-		std::weak_ptr<Actor> _targetToAttack;
+		void applyDamage(World& world, Actor& owner);
+
+	private:
+		Actor*		_targetToAttack;
+		bool 		_isAttacking		   = false;
+		const float _attackPreparationTime = 2.7f;
+		float		_attackTimer		   = 0.0f;
+		const float _attackRange		   = 50.0f;
+		const int	_attackDamage		   = 10;
+		int			_health				   = 30;
 	};
 }

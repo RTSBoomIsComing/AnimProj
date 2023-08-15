@@ -43,7 +43,7 @@ namespace pa
 		float deltaMove = XMVectorGetX(XMVector3Length(V1 - V0));
 
 		// TODO: Move this logic to SphereComponent or Attack Behavior
-		_isMoving = deltaMove >= 5.0f;
+		_isMoving = deltaMove >= 0.0f;
 
 		if (!_isMoving)
 		{
