@@ -17,17 +17,19 @@ namespace pa
 		if (0.0f == speed)
 			return;
 
-		const XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
-		const XMVECTOR V1 = XMLoadFloat3(&targetPosition);
+		const XMVECTOR V0	= XMLoadFloat3(&sceneComp->position);
+		const XMVECTOR V1	= XMLoadFloat3(&targetPosition);
 		const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
 
 		{
 			XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
 			Forward			 = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
-			const XMVECTOR Axis		  = XMVector3Cross(Forward, Vdir);
-			const float	   dot		  = XMVectorGetX(XMVector3Dot(Forward, Vdir));
-			float		   deltaAngle = std::acosf(dot);
+			const XMVECTOR Axis = XMVector3Cross(Forward, Vdir);
+			float		   dot	= XMVectorGetX(XMVector3Dot(Forward, Vdir));
+			dot					= std::min(dot, 1.0f);
+			dot					= std::max(dot, -1.0f);
+			float deltaAngle	= std::acosf(dot);
 
 			deltaAngle = std::min(deltaAngle, rotateSpeed * deltaTime);
 			if (XMVectorGetY(Axis) < 0.0f)
