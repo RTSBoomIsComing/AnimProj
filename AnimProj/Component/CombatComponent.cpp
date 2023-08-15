@@ -8,6 +8,9 @@
 
 void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 {
+	if (!owner.isAlive())
+		return;
+
 	if (nullptr == _targetToAttack)
 	{
 		_isAttacking = false;

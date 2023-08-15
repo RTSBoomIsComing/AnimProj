@@ -21,7 +21,7 @@ namespace pa
 		void applyDamage(World& world, Actor& owner);
 
 	private:
-		Actor*		_targetToAttack;
+		Actor*		_targetToAttack        = nullptr;
 		bool 		_isAttacking		   = false;
 		const float _attackPreparationTime = 2.7f;
 		float		_attackTimer		   = 0.0f;

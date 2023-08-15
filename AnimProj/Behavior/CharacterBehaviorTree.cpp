@@ -55,6 +55,7 @@ namespace pa
 		assert(movementComp);
 
 		movementComp->targetPosition = _position;
+		movementComp->speed			 = 3.0f;
 
 		return true;
 	}
