@@ -18,29 +18,18 @@ namespace pa
 			float _radius;
 		};
 
-		class CheckAttackRange : public Behavior::Node
+		class MoveTo : public Behavior::Node
 		{
 		public:
-			CheckAttackRange(float radius)
-				: _radius(radius) {}
+			MoveTo(const DirectX::XMFLOAT3& position)
+				: _position(position) {}
 			virtual bool onUpdate(World& world, Actor& owner) override;
 
 		private:
-			float _radius;
+			DirectX::XMFLOAT3 _position;
 		};
 
-	class MoveTo : public Behavior::Node
-	{
 	public:
-		MoveTo(const DirectX::XMFLOAT3& position)
-			: _position(position) {}
-		virtual bool onUpdate(World& world, Actor& owner) override;
-
-	private:
-		DirectX::XMFLOAT3 _position;
+		CharacterBehaviorTree(World& world);
 	};
-
-public:
-	CharacterBehaviorTree(World& world);
-};
 }

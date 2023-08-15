@@ -77,6 +77,9 @@ namespace pa
 		_map->clearMap();
 		for (auto& actor : _actors)
 		{
+			if (!actor->isAlive())
+				continue;
+
 			_map->placeActor(*this, *actor);
 		}
 

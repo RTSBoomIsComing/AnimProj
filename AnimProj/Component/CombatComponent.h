@@ -15,7 +15,7 @@ namespace pa
 
 
 		inline bool isAttacking() const { return _targetToAttack; }
-		inline void setTargetToAttack(Actor* target);
+		void setTargetToAttack(Actor* target);
 
 	private:
 		void applyDamage(World& world, Actor& owner);

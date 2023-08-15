@@ -182,6 +182,7 @@ namespace pa
 				// when ending animation then looping
 				if (this->getCurrentAnimationUpperBody() == nullptr)
 				{
+					combatComp->onEndAttack();
 					transitAnimationLowerBody(manager.getAnimation(AnimIndex::ShootingGun_lo), 0.2f);
 					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
 				}
@@ -226,7 +227,10 @@ namespace pa
 				if (this->getCurrentAnimationLowerBody() == nullptr)
 					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Walk_lo), 0.1f);
 				if (this->getCurrentAnimationUpperBody() == nullptr)
+				{
+					combatComp->onEndAttack();
 					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
+				}
 
 				break;
 			}

@@ -58,19 +58,4 @@ namespace pa
 
 		return true;
 	}
-
-	bool CharacterBehaviorTree::CheckAttackRange::onUpdate(World& world, Actor& owner)
-	{
-		using namespace DirectX;
-
-		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
-		assert(sceneComp);
-
-		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-		assert(movementComp);
-
-
-		return false;
-	}
-
 }

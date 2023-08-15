@@ -12,11 +12,11 @@ namespace pa
 		virtual void onUpdate(World& world, float deltaTime) override;
 
 	private:
+		BehaviorTreeComponent* _behaviorTreeComponent;
 		SceneComponent*		   _sceneComponent;
 		MovementComponent*	   _movementComponent;
-		BehaviorTreeComponent* _behaviorTreeComponent;
-		SkeletalMeshComponent* _skeletalMeshComponent;
-		AnimationComponent2*   _animationComponent;
 		CombatComponent*	   _combatComponent;
+		AnimationComponent2*   _animationComponent;
+		SkeletalMeshComponent* _skeletalMeshComponent;
 	};
 }

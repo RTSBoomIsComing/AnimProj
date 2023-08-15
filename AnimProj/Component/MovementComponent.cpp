@@ -46,10 +46,7 @@ namespace pa
 		_isMoving = deltaMove >= 0.0f;
 
 		if (!_isMoving)
-		{
-			owner.setAlive(false);
 			return;
-		}
 
 		deltaMove = std::min(deltaMove, speed * deltaTime);
 
