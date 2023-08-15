@@ -2,14 +2,19 @@
 #include "pch.h"
 #include "AnimationComponent2.h"
 #include "../Animation/Animation.h"
+#include "../Animation/AnimationManager.h"
 #include "../World/World.h"
 #include "../Actor/Actor.h"
 #include "../Component/SkeletalMeshComponent.h"
+#include "../Component/MovementComponent.h"
+#include "../Component/CombatComponent.h"
 
 namespace pa
 {
 	void AnimationComponent2::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
+		this->updateState(world, owner, deltaTime);
+
 		_upperBody.onUpdate(deltaTime);
 		_lowerBody.onUpdate(deltaTime);
 
@@ -52,6 +57,120 @@ namespace pa
 		_lowerBody.transitAnimation(animation, transitionTime);
 	}
 
+	void AnimationComponent2::updateState(World& world, Actor& owner, float deltaTime)
+	{
+		const AnimationManager& manager = AnimationManager::get();
+		using AnimIndex					= AnimationManager::AnimationIndex;
+
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
+		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
+		assert(combatComp);
+
+		switch (_currentState)
+		{
+			case State::Start: {
+				_currentState = State::Idle;
+				transitAnimationLowerBody(manager.getAnimation(AnimIndex::Idle_lo), 0.0f);
+				transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.0f);
+				break;
+			}
+
+			case State::Idle: {
+				if (movementComp->isMoving() || movementComp->isRotating())
+				{
+					_currentState = State::Move;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Walk_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Walk_up), 0.2f);
+				}
+
+				if (combatComp->isAttacking())
+				{
+					_currentState = State::Attack;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::ShootingGun_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
+				}
+
+				// when ending animation then looping
+				if (this->getCurrentAnimationLowerBody() == nullptr)
+				{
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Idle_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.2f);
+				}
+				break;
+			}
+
+			case State::Move: {
+				// To Idle
+				if (!movementComp->isMoving() && !movementComp->isRotating())
+				{
+					_currentState = State::Idle;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Idle_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.2f);
+				}
+
+				// To MoveAttack
+				if (combatComp->isAttacking())
+				{
+					_currentState = State::MoveAttack;
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
+				}
+
+				// when ending animation then looping
+				if (this->getCurrentAnimationLowerBody() == nullptr)
+				{
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Walk_lo), 0.1f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Walk_up), 0.1f);
+				}
+				break;
+			}
+
+			case State::Attack: {
+				// To Idle
+				if (!combatComp->isAttacking())
+				{
+					_currentState = State::Idle;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Idle_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.2f);
+				}
+
+				// To MoveAttack
+				if (movementComp->isMoving() || movementComp->isRotating())
+				{
+					_currentState = State::MoveAttack;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::ShootingGun_lo), 0.2f);
+				}
+
+				// when ending animation then looping
+				if (this->getCurrentAnimationLowerBody() == nullptr)
+				{
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::ShootingGun_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
+				}
+				break;
+			}
+
+			case State::MoveAttack: {
+				// To Attack
+				if (!movementComp->isMoving() && !movementComp->isRotating())
+				{
+					_currentState = State::Attack;
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::ShootingGun_up), 0.2f);
+				}
+
+				// To Move
+				if (!combatComp->isAttacking())
+				{
+					_currentState = State::Move;
+					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Walk_lo), 0.2f);
+					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Walk_up), 0.2f);
+				}
+				break;
+			}
+		}
+	}
+
 	void AnimationComponent2::Layer::transitAnimation(const Animation& animation, float transitionTime)
 	{
 		this->animation		 = &animation;
@@ -86,7 +205,7 @@ namespace pa
 		if (duration < runningFrame)
 		{
 			animation = nullptr;
-			//runningFrame = duration;
+			// runningFrame = duration;
 			return;
 		}
 
@@ -107,7 +226,7 @@ namespace pa
 				break;
 		}
 
-		//cache pose
+		// cache pose
 		float transitionBlendWeight = playTime / transitionTime;
 		transitionBlendWeight		= std::min(transitionBlendWeight, 1.0f);
 

@@ -25,10 +25,10 @@ namespace pa
 			Walk_lo,
 			Run_up,
 			Run_lo,
-			Punch_up,
-			Punch_lo,
-			Jump_up,
-			Jump_lo,
+			Idle_up,
+			Idle_lo,
+			Die_up,
+			Die_lo,
 			ShootingGun_up,
 			ShootingGun_lo
 		};

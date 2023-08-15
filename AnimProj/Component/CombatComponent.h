@@ -10,7 +10,8 @@ namespace pa
 		CombatComponent() = default;
 
 	public:
-		void onUpdate(World& world, std::weak_ptr<Actor> owner, float deltaTime);
+		void onUpdate(World& world, Actor& owner, float deltaTime);
+		bool isAttacking() const { return false; }
 
 	private:
 		std::weak_ptr<Actor> _targetToAttack;

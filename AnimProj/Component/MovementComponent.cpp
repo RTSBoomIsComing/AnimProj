@@ -21,27 +21,31 @@ namespace pa
 		const XMVECTOR V1	= XMLoadFloat3(&targetPosition);
 		const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
 
-		{
-			XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-			Forward			 = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
-			const XMVECTOR Axis = XMVector3Cross(Forward, Vdir);
-			float		   dot	= XMVectorGetX(XMVector3Dot(Forward, Vdir));
-			dot					= std::min(dot, 1.0f);
-			dot					= std::max(dot, -1.0f);
-			float deltaAngle	= std::acosf(dot);
+		XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		Forward			 = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
-			deltaAngle = std::min(deltaAngle, rotateSpeed * deltaTime);
-			if (XMVectorGetY(Axis) < 0.0f)
-				deltaAngle = -1.0f * deltaAngle;
+		const XMVECTOR Axis = XMVector3Cross(Forward, Vdir);
+		float		   dot	= XMVectorGetX(XMVector3Dot(Forward, Vdir));
+		dot					= std::min(dot, 1.0f);
+		dot					= std::max(dot, -1.0f);
+		_isRotating			= (dot != 1.0f);
 
-			sceneComp->eulerAngle.y = sceneComp->eulerAngle.y + deltaAngle;
-		}
+		float deltaAngle = std::acosf(dot);
+
+		deltaAngle = std::min(deltaAngle, rotateSpeed * deltaTime);
+		if (XMVectorGetY(Axis) < 0.0f)
+			deltaAngle = -1.0f * deltaAngle;
+
+		sceneComp->eulerAngle.y = sceneComp->eulerAngle.y + deltaAngle;
+
 
 		float deltaMove = XMVectorGetX(XMVector3Length(V1 - V0));
 
 		// TODO: Move this logic to SphereComponent or Attack Behavior
-		if (deltaMove < 5.0f)
+		_isMoving = deltaMove >= 5.0f;
+
+		if (!_isMoving)
 			return;
 
 		deltaMove = std::min(deltaMove, speed * deltaTime);

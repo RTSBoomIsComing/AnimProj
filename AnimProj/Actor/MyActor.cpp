@@ -2,14 +2,15 @@
 #include "pch.h"
 #include "MyActor.h"
 #include "../World/World.h"
+#include "../Animation/AnimationManager.h"
+#include "../Behavior/CharacterBehaviorTree.h"
+
 #include "../Component/SceneComponent.h"
 #include "../Component/BehaviorTreeComponent.h"
 #include "../Component/MovementComponent.h"
 #include "../Component/SkeletalMeshComponent.h"
 #include "../Component/AnimationComponent2.h"
-
-#include "../Behavior/CharacterBehaviorTree.h"
-#include "../Animation/AnimationManager.h"
+#include "../Component/CombatComponent.h"
 
 namespace pa
 {
@@ -25,6 +26,8 @@ namespace pa
 		_skeletalMeshComponent->setSkeleton(AnimationManager::get().getDefaultSkeleton());
 
 		_animationComponent = this->createDefaultComponent<AnimationComponent2>();
+
+		_combatComponent = this->createDefaultComponent<CombatComponent>();
 	}
 
 	void MyActor::onStartGame(World& world)

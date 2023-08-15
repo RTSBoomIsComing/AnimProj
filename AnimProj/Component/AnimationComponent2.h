@@ -33,9 +33,10 @@ namespace pa
 	public:
 		void onUpdate(World& world, Actor& owner, float deltaTime);
 
-	public:
+	private:
 		void transitAnimationUpperBody(const Animation& animation, float transitionTime = 1.0f);
 		void transitAnimationLowerBody(const Animation& animation, float transitionTime = 1.0f);
+		void updateState(World& world, Actor& owner, float deltaTime);
 
 		inline const Animation* getCurrentAnimationUpperBody() { return _upperBody.animation; }
 		inline const Animation* getCurrentAnimationLowerBody() { return _lowerBody.animation; }
@@ -43,5 +44,17 @@ namespace pa
 	private:
 		Layer _upperBody{};
 		Layer _lowerBody{};
+
+		enum class State
+		{
+			Idle,
+			Move,
+			Attack,
+			MoveAttack,
+			Dead,
+			Start,
+		};
+
+		State _currentState = State::Start;
 	};
 }

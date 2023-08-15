@@ -15,13 +15,14 @@ namespace pa
 		auto rootSequence = std::make_shared<Behavior::Sequence>();
 		_root			  = rootSequence;
 
+
 		auto findTarget = std::make_shared<FindTarget>();
 		auto Attack		= std::make_shared<Behavior::Sequence>();
-		Attack->addChild(std::make_shared<PlayAnimationUpperBody>(
-			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
+		//Attack->addChild(std::make_shared<PlayAnimationUpperBody>(
+		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
 
-		Attack->addChild(std::make_shared<PlayAnimationLowerBody>(
-			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_lo)));
+		//Attack->addChild(std::make_shared<PlayAnimationLowerBody>(
+		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_lo)));
 
 		rootSequence->addChild(findTarget);
 		rootSequence->addChild(Attack);
@@ -67,33 +68,33 @@ namespace pa
 		return true;
 	}
 
-	bool CharacterBehaviorTree::PlayAnimationLowerBody::onUpdate(World& world, Actor& owner)
-	{
-		AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
-		assert(animationComp);
+	//bool CharacterBehaviorTree::PlayAnimationLowerBody::onUpdate(World& world, Actor& owner)
+	//{
+	//	AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
+	//	assert(animationComp);
 
 
-		if (animationComp->getCurrentAnimationLowerBody() == _animation)
-			return false;
+	//	if (animationComp->getCurrentAnimationLowerBody() == _animation)
+	//		return false;
 
-		animationComp->transitAnimationLowerBody(*_animation, 0.1f);
+	//	animationComp->transitAnimationLowerBody(*_animation, 0.1f);
 
-		return true;
-	}
+	//	return true;
+	//}
 
-	bool CharacterBehaviorTree::PlayAnimationUpperBody::onUpdate(World& world, Actor& owner)
-	{
-		AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
-		assert(animationComp);
+	//bool CharacterBehaviorTree::PlayAnimationUpperBody::onUpdate(World& world, Actor& owner)
+	//{
+	//	AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
+	//	assert(animationComp);
 
 
-		if (animationComp->getCurrentAnimationUpperBody() == _animation)
-			return false;
+	//	if (animationComp->getCurrentAnimationUpperBody() == _animation)
+	//		return false;
 
-		animationComp->transitAnimationUpperBody(*_animation, 0.1f);
+	//	animationComp->transitAnimationUpperBody(*_animation, 0.1f);
 
-		return true;
-	}
+	//	return true;
+	//}
 
 	bool CharacterBehaviorTree::MoveToCenter::onUpdate(World& world, Actor& owner)
 	{

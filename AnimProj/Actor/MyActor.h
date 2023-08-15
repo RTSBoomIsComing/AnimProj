@@ -17,5 +17,6 @@ namespace pa
 		BehaviorTreeComponent* _behaviorTreeComponent;
 		SkeletalMeshComponent* _skeletalMeshComponent;
 		AnimationComponent2*   _animationComponent;
+		CombatComponent*	   _combatComponent;
 	};
 }
