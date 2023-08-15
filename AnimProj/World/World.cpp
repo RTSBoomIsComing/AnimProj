@@ -11,22 +11,29 @@ namespace pa
 {
 	World::World()
 	{
-		_map					 = std::make_shared<GridMap>(20.0f);
+		_map					 = std::make_shared<GridMap>(10.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>();
 
-		for (int i = 0; i < 100; i++)
+		// place actors on center of sectors
+
+		for (size_t w = 0; w < _map->getMapWidth(); w++)
 		{
-			std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
-			_actors.push_back(actor);
+			for (size_t h = 0; h < _map->getMapHeight(); h++)
 
-			if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
 			{
-				sceneComp->position = {5.0f * (i % 20 - 10), 0.0f, 5.0f * (i / 20)};
-			}
+				std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
+				_actors.push_back(actor);
 
-			if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
-			{
-				behaviorTreeComp->setBehaviorTree(behaviorTree);
+				if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
+				{
+					std::pair<float, float> positionXZ = _map->getCellCenter(w, h);
+					sceneComp->position				   = {positionXZ.first, 0.0f, positionXZ.second};
+				}
+
+				if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
+				{
+					behaviorTreeComp->setBehaviorTree(behaviorTree);
+				}
 			}
 		}
 	}

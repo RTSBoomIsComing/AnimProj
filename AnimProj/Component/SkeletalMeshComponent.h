@@ -15,12 +15,6 @@ namespace pa
 
 	public:
 		void setSkeleton(const Skeleton& skeleton);
-		void playAnimationIdle();
-		//void playAnimationWalk();
-		void playAnimationRun();
-		void playAnimationAttack();
-		void playAnimationDie();
-		void playAnimationHit();
 
 	public:
 		const Skeleton*						_skeleton		= nullptr;

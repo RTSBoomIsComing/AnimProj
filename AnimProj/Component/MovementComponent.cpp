@@ -17,27 +17,34 @@ namespace pa
 		if (0.0f == speed)
 			return;
 
-		const XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
-		const XMVECTOR V1 = XMLoadFloat3(&targetPosition);
+		const XMVECTOR V0	   = XMLoadFloat3(&sceneComp->position);
+		const XMVECTOR V1	   = XMLoadFloat3(&targetPosition);
+		XMVECTOR	   Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+		Forward				   = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
 		{
-			float diff = std::fabsf(targetEulerAngle.y - sceneComp->eulerAngle.y);
-			float t = rotateSpeed * deltaTime / diff;
-			t = std::min(1.0f, t);
+			const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
 
-			sceneComp->eulerAngle.y = sceneComp->eulerAngle.y * (1.0f - t) + targetEulerAngle.y * t;
+			const XMVECTOR Axis		  = XMVector3Cross(Forward, Vdir);
+			const float	   dot		  = XMVectorGetX(XMVector3Dot(Forward, Vdir));
+			float		   deltaAngle = std::acosf(dot);
+
+			deltaAngle = std::min(deltaAngle, rotateSpeed * deltaTime);
+			if (XMVectorGetY(Axis) < 0.0f)
+				deltaAngle = -1.0f * deltaAngle;
+
+			sceneComp->eulerAngle.y = sceneComp->eulerAngle.y + deltaAngle;
 		}
 
-		const float distance = XMVectorGetX(XMVector3Length(V1 - V0));
+		float deltaForward = XMVectorGetX(XMVector3Length(V1 - V0));
 
 		// TODO: Move this logic to SphereComponent
-		if (distance < 5.0f)
+		if (deltaForward < 5.0f)
 			return;
 
-		float		t		 = speed * deltaTime / distance;
-		t					 = std::min(1.0f, t);
+		deltaForward = std::min(deltaForward, speed * deltaTime);
 
-		XMVECTOR V = XMVectorLerp(V0, V1, t);
+		XMVECTOR V = V0 + Forward * deltaForward;
 		XMStoreFloat3(&sceneComp->position, V);
 	}
 }

@@ -57,7 +57,7 @@ void pa::createBufferSRV(ID3D11Device* device, ID3D11Resource* resource, ID3D11S
 	desc.Format = DXGI_FORMAT_UNKNOWN;
 	desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
 	desc.Buffer.FirstElement = 0;
-	desc.Buffer.NumElements = numElement; // default is 16384;
+	desc.Buffer.NumElements = numElement; // default is 32768;
 
 	hr = device->CreateShaderResourceView(resource, &desc, ppView);
 	checkResult(hr);

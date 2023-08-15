@@ -29,17 +29,18 @@ namespace pa
 		void calculateMatrices();
 
 	private:
-		ComPtr<ID3D11Buffer>			_cameraConstantBuffer;
+		ComPtr<ID3D11Buffer> _cameraConstantBuffer;
 
 
-		Matrices						_matrices;
-		DirectX::XMFLOAT3				_eyePosition	= { 0.0f, 0.0f, -10.0f };
-		DirectX::XMFLOAT3				_focusPosition	= { 0.0f, 0.0f,  0.0f };
+		Matrices		  _matrices;
+		DirectX::XMFLOAT3 _eyePosition	  = {0.0f, 10.0f, 0.0f};
+		DirectX::XMFLOAT3 _eyeDirection	  = {0.0f, 0.0f, 1.0f};
+		DirectX::XMFLOAT3 _upDirection	  = {0.0f, 1.0f, 0.0f};
+		DirectX::XMFLOAT3 _rightDirection = {1.0f, 0.0f, 0.0f};
 
-		float							_eyePitch		= 0.0f;
-		float							_eyeYaw			= 0.0f;
-		float							_eyeDistance	= 20.0f;
-		float							_aspectRatio;
+		float _eyePitch	   = DirectX::XM_PIDIV4;
+		float _eyeYaw	   = DirectX::XM_PIDIV4;
+		float _eyeDistance = 30.0f;
+		float _aspectRatio;
 	};
 }
-

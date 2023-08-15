@@ -13,6 +13,12 @@ namespace pa
 			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
+		class MoveToCenter : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
+		};
+
 		class PlayAnimationLowerBody : public Behavior::Node
 		{
 		public:

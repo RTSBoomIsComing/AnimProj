@@ -12,29 +12,43 @@ namespace pa
 {
 	CharacterBehaviorTree::CharacterBehaviorTree()
 	{
-		std::shared_ptr<Behavior::Composite> rootSequence = std::make_shared<Behavior::Sequence>();
-		_root											  = rootSequence;
+		auto rootSequence = std::make_shared<Behavior::Sequence>();
+		_root			  = rootSequence;
 
-		rootSequence->addChild(std::make_shared<FindTarget>());
-
-		rootSequence->addChild(std::make_shared<PlayAnimationLowerBody>(
-			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
-
-		rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
+		auto findTarget = std::make_shared<FindTarget>();
+		auto Attack		= std::make_shared<Behavior::Sequence>();
+		Attack->addChild(std::make_shared<PlayAnimationUpperBody>(
 			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
+
+		Attack->addChild(std::make_shared<PlayAnimationLowerBody>(
+			AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_lo)));
+
+		rootSequence->addChild(findTarget);
+		rootSequence->addChild(Attack);
+
+		// findTarget->addChild(Attack);
+
+		// rootSequence->addChild(findTarget);
+
+		// rootSequence->addChild(std::make_shared<PlayAnimationLowerBody>(
+		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::Walk_lo)));
+
+		// rootSequence->addChild(std::make_shared<PlayAnimationUpperBody>(
+		//	AnimationManager::get().getAnimation(AnimationManager::AnimationIndex::ShootingGun_up)));
 	}
 
 	bool CharacterBehaviorTree::FindTarget::onUpdate(World& world, Actor& owner)
 	{
 		using namespace DirectX;
 
-		constexpr float _radius = 20.0f;
+		constexpr float _radius = 100.0f;
 
 		SceneComponent*			 sceneComp = owner.getComponent<SceneComponent>();
 		std::shared_ptr<GridMap> map	   = world.getDefaultMap();
 
-		auto  cellCoordinate = map->getCellCoordinate(world, owner);
-		auto& actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
+		std::pair<size_t, size_t> cellCoordinate = map->getCellCoordinate(world, owner);
+		std::vector<Actor*>&	  actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
+
 
 		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
 		for (const Actor* other : actors)
@@ -55,19 +69,6 @@ namespace pa
 			{
 				XMStoreFloat3(&movementComp->targetPosition, V1);
 				movementComp->speed = 1.0f;
-
-				{
-					const XMVECTOR Vdir	   = XMVector3Normalize(V1 - V0);
-					const XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-					const XMVECTOR Axis	   = XMVector3Cross(Forward, Vdir);
-					const float	   dot	   = XMVectorGetX(XMVector3Dot(Forward, Vdir));
-					float		   angle   = std::acosf(dot);
-
-					if (XMVectorGetY(Axis) < 0.0f)
-						angle = -1.0f * angle;
-
-					movementComp->targetEulerAngle.y = angle;
-				}
 
 				return true;
 			}
@@ -101,6 +102,16 @@ namespace pa
 		animationComp->transitAnimationUpperBody(*_animation, 0.1f);
 
 		return true;
+	}
+
+	bool CharacterBehaviorTree::MoveToCenter::onUpdate(World& world, Actor& owner)
+	{
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
+		movementComp->targetPosition = {0.0f, 0.0f, 0.0f};
+
+		return false;
 	}
 
 }

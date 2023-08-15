@@ -10,7 +10,7 @@ namespace pa
 	bool GridMap::placeActor(World& world, Actor& actor)
 	{
 		std::pair<size_t, size_t> cellXZ = getCellCoordinate(world, actor);
-		if (cellXZ.first < 0 || cellXZ.second < 0 || cellXZ.first >= _mapSize || cellXZ.second >= _mapSize)
+		if (cellXZ.first < 0 || cellXZ.second < 0 || cellXZ.first >= _mapWidth || cellXZ.second >= _mapHeight)
 			return false;
 
 		getCell(cellXZ.first, cellXZ.second).push_back(&actor);
@@ -31,17 +31,31 @@ namespace pa
 	std::pair<size_t, size_t> GridMap::getCellCoordinate(World& world, Actor& actor) const
 	{
 		const SceneComponent* sceneComp = actor.getComponent<SceneComponent>();
-		size_t				  cellX		= static_cast<size_t>(sceneComp->position.x / _cellSize + _mapSize * 0.5);
-		size_t				  cellZ		= static_cast<size_t>(sceneComp->position.z / _cellSize + _mapSize * 0.5);
 
-		assert(cellX < _mapSize && cellZ < _mapSize);
+		size_t cellX = static_cast<size_t>(sceneComp->position.x / _cellSize);
+		size_t cellZ = static_cast<size_t>(sceneComp->position.z / _cellSize);
+
+		assert(0 <= cellX && 0 <= cellZ && cellX < _mapWidth && cellZ < _mapHeight);
 		return std::pair<size_t, size_t>(cellX, cellZ);
 	}
 
-	std::vector<Actor*>& GridMap::getCell(size_t x, size_t y)
+	std::vector<Actor*>& GridMap::getCell(size_t x, size_t z)
 	{
-		assert(x < _mapSize && y < _mapSize);
-		return _cells[x][y];
+		assert(x < _mapWidth && z < _mapHeight);
+		return _cells[x][z];
+	}
+
+	std::pair<float, float> GridMap::getCellCenter(size_t x, size_t z) const
+	{
+		if (x < _mapWidth && z < _mapHeight)
+		{
+			return std::pair<float, float>(
+				(x + 0.5f) * _cellSize,
+				(z + 0.5f) * _cellSize);
+		}
+		
+		DebugBreak();
+		return std::pair<float, float>(-1.0f, -1.0f);
 	}
 
 }
