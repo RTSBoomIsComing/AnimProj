@@ -19,7 +19,6 @@ namespace pa
 		void initialize();
 		void setAspectRatio(float aspectRatio);
 		void setEyePosition(const DirectX::XMVECTOR& eyePosition);
-		void setFocusPosition(const DirectX::XMVECTOR& focusPosition);
 		void update(ID3D11DeviceContext* deviceContext);
 		void processInput(float deltaTime);
 

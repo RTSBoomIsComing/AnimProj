@@ -38,10 +38,6 @@ void pa::Camera::setEyePosition(const DirectX::XMVECTOR& eyePosition)
 	DirectX::XMStoreFloat3(&_eyePosition, eyePosition);
 }
 
-void pa::Camera::setFocusPosition(const DirectX::XMVECTOR& focusPosition)
-{
-	// DirectX::XMStoreFloat3(&_focusPosition, focusPosition);
-}
 
 void pa::Camera::update(ID3D11DeviceContext* deviceContext)
 {
@@ -86,6 +82,7 @@ void pa::Camera::processInput(float deltaTime)
 	XMVECTOR V		 = XMLoadFloat3(&_eyePosition);
 	XMVECTOR Forward = XMLoadFloat3(&_eyeDirection);
 	Forward			 = XMVectorSetY(Forward, 0.0f);
+	Forward			 = XMVector3Normalize(Forward);
 	XMVECTOR Right	 = XMLoadFloat3(&_rightDirection);
 
 	V = V + Forward * deltaMoveForward * 15.0f;
