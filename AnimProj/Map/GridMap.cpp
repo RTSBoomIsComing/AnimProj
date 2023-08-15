@@ -31,6 +31,7 @@ namespace pa
 	std::pair<size_t, size_t> GridMap::getCellCoordinate(World& world, Actor& actor) const
 	{
 		const SceneComponent* sceneComp = actor.getComponent<SceneComponent>();
+		assert(sceneComp);
 
 		size_t cellX = static_cast<size_t>(sceneComp->position.x / _cellSize);
 		size_t cellZ = static_cast<size_t>(sceneComp->position.z / _cellSize);
@@ -53,9 +54,57 @@ namespace pa
 				(x + 0.5f) * _cellSize,
 				(z + 0.5f) * _cellSize);
 		}
-		
+
 		DebugBreak();
 		return std::pair<float, float>(-1.0f, -1.0f);
+	}
+
+	Actor* GridMap::findNearestActor(World& world, Actor& actor, float radius) const
+	{
+		using namespace DirectX;
+
+		const SceneComponent* sceneComp = actor.getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		size_t startX = static_cast<size_t>((sceneComp->position.x - radius) / _cellSize);
+		size_t startZ = static_cast<size_t>((sceneComp->position.z - radius) / _cellSize);
+		size_t endX	  = static_cast<size_t>((sceneComp->position.x + radius) / _cellSize);
+		size_t endZ	  = static_cast<size_t>((sceneComp->position.z + radius) / _cellSize);
+
+		startX = startX > 0 ? startX : 0;
+		startZ = startZ > 0 ? startZ : 0;
+		endX   = endX < _mapWidth ? endX : _mapWidth - 1;
+		endZ   = endZ < _mapHeight ? endZ : _mapHeight - 1;
+
+		float  minDistance	= std::numeric_limits<float>::max();
+		Actor* nearestActor = nullptr;
+
+		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
+		for (size_t x = startX; x <= endX; ++x)
+		{
+			for (size_t z = startZ; z <= endZ; ++z)
+			{
+				for (Actor* actor : _cells[x][z])
+				{
+					if (actor == actor)
+						continue;
+
+					const SceneComponent* otherSceneComp = actor->getComponent<SceneComponent>();
+					assert(otherSceneComp);
+
+					XMVECTOR V1 = XMLoadFloat3(&otherSceneComp->position);
+					float distance = XMVectorGetX(XMVector3Length(V1 - V0));
+
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+						nearestActor = actor;
+					}
+				}
+			}
+		}
+
+		return nearestActor;
 	}
 
 }

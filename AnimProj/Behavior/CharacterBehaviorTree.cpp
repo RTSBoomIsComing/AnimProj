@@ -44,11 +44,12 @@ namespace pa
 		constexpr float _radius = 100.0f;
 
 		SceneComponent*			 sceneComp = owner.getComponent<SceneComponent>();
+		assert(sceneComp);
+
 		std::shared_ptr<GridMap> map	   = world.getDefaultMap();
 
 		std::pair<size_t, size_t> cellCoordinate = map->getCellCoordinate(world, owner);
 		std::vector<Actor*>&	  actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
-
 
 		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
 		for (const Actor* other : actors)
