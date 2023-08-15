@@ -43,5 +43,11 @@ namespace pa
 
 	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent, AnimationComponent2, CombatComponent>
 	{
+	public:
+		inline void setAlive(bool isAlive) { _isAlive = isAlive; }
+		inline bool isAlive() const { return _isAlive; }
+
+	private:
+		bool _isAlive = true;
 	};
 }

@@ -63,38 +63,10 @@ namespace pa
 		XMVECTOR V1 = XMLoadFloat3(&otherSceneComp->position);
 
 		XMStoreFloat3(&movementComp->targetPosition, V1);
-		movementComp->speed = 1.0f;
+		movementComp->speed = 3.0f;
 
 		return true;
 	}
-
-	//bool CharacterBehaviorTree::PlayAnimationLowerBody::onUpdate(World& world, Actor& owner)
-	//{
-	//	AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
-	//	assert(animationComp);
-
-
-	//	if (animationComp->getCurrentAnimationLowerBody() == _animation)
-	//		return false;
-
-	//	animationComp->transitAnimationLowerBody(*_animation, 0.1f);
-
-	//	return true;
-	//}
-
-	//bool CharacterBehaviorTree::PlayAnimationUpperBody::onUpdate(World& world, Actor& owner)
-	//{
-	//	AnimationComponent2* animationComp = owner.getComponent<AnimationComponent2>();
-	//	assert(animationComp);
-
-
-	//	if (animationComp->getCurrentAnimationUpperBody() == _animation)
-	//		return false;
-
-	//	animationComp->transitAnimationUpperBody(*_animation, 0.1f);
-
-	//	return true;
-	//}
 
 	bool CharacterBehaviorTree::MoveToCenter::onUpdate(World& world, Actor& owner)
 	{

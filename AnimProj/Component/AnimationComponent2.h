@@ -47,12 +47,12 @@ namespace pa
 
 		enum class State
 		{
+			Start,
 			Idle,
 			Move,
 			Attack,
 			MoveAttack,
 			Dead,
-			Start,
 		};
 
 		State _currentState = State::Start;
