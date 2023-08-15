@@ -17,13 +17,13 @@ namespace pa
 		if (0.0f == speed)
 			return;
 
-		const XMVECTOR V0	   = XMLoadFloat3(&sceneComp->position);
-		const XMVECTOR V1	   = XMLoadFloat3(&targetPosition);
-		XMVECTOR	   Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-		Forward				   = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
+		const XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
+		const XMVECTOR V1 = XMLoadFloat3(&targetPosition);
+		const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
 
 		{
-			const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
+			XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+			Forward			 = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
 			const XMVECTOR Axis		  = XMVector3Cross(Forward, Vdir);
 			const float	   dot		  = XMVectorGetX(XMVector3Dot(Forward, Vdir));
@@ -36,15 +36,15 @@ namespace pa
 			sceneComp->eulerAngle.y = sceneComp->eulerAngle.y + deltaAngle;
 		}
 
-		float deltaForward = XMVectorGetX(XMVector3Length(V1 - V0));
+		float deltaMove = XMVectorGetX(XMVector3Length(V1 - V0));
 
-		// TODO: Move this logic to SphereComponent
-		if (deltaForward < 5.0f)
+		// TODO: Move this logic to SphereComponent or Attack Behavior
+		if (deltaMove < 5.0f)
 			return;
 
-		deltaForward = std::min(deltaForward, speed * deltaTime);
+		deltaMove = std::min(deltaMove, speed * deltaTime);
 
-		XMVECTOR V = V0 + Forward * deltaForward;
+		XMVECTOR V = V0 + Vdir * deltaMove;
 		XMStoreFloat3(&sceneComp->position, V);
 	}
 }

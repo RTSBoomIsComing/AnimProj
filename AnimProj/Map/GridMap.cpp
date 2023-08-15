@@ -66,10 +66,10 @@ namespace pa
 		const SceneComponent* sceneComp = actor.getComponent<SceneComponent>();
 		assert(sceneComp);
 
-		size_t startX = static_cast<size_t>((sceneComp->position.x - radius) / _cellSize);
-		size_t startZ = static_cast<size_t>((sceneComp->position.z - radius) / _cellSize);
-		size_t endX	  = static_cast<size_t>((sceneComp->position.x + radius) / _cellSize);
-		size_t endZ	  = static_cast<size_t>((sceneComp->position.z + radius) / _cellSize);
+		int startX = static_cast<int>((sceneComp->position.x - radius) / _cellSize);
+		int startZ = static_cast<int>((sceneComp->position.z - radius) / _cellSize);
+		int endX   = static_cast<int>((sceneComp->position.x + radius) / _cellSize);
+		int endZ   = static_cast<int>((sceneComp->position.z + radius) / _cellSize);
 
 		startX = startX > 0 ? startX : 0;
 		startZ = startZ > 0 ? startZ : 0;
@@ -84,21 +84,21 @@ namespace pa
 		{
 			for (size_t z = startZ; z <= endZ; ++z)
 			{
-				for (Actor* actor : _cells[x][z])
+				for (Actor* other : _cells[x][z])
 				{
-					if (actor == actor)
+					if (&actor == other)
 						continue;
 
-					const SceneComponent* otherSceneComp = actor->getComponent<SceneComponent>();
+					const SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
 					assert(otherSceneComp);
 
-					XMVECTOR V1 = XMLoadFloat3(&otherSceneComp->position);
-					float distance = XMVectorGetX(XMVector3Length(V1 - V0));
+					XMVECTOR V1		  = XMLoadFloat3(&otherSceneComp->position);
+					float	 distance = XMVectorGetX(XMVector3Length(V1 - V0));
 
 					if (distance < minDistance)
 					{
-						minDistance = distance;
-						nearestActor = actor;
+						minDistance	 = distance;
+						nearestActor = other;
 					}
 				}
 			}

@@ -43,38 +43,28 @@ namespace pa
 
 		constexpr float _radius = 100.0f;
 
-		SceneComponent*			 sceneComp = owner.getComponent<SceneComponent>();
+		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 		assert(sceneComp);
 
-		std::shared_ptr<GridMap> map	   = world.getDefaultMap();
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
 
-		std::pair<size_t, size_t> cellCoordinate = map->getCellCoordinate(world, owner);
-		std::vector<Actor*>&	  actors		 = map->getCell(cellCoordinate.first, cellCoordinate.second);
+		std::shared_ptr<GridMap> map   = world.getDefaultMap();
+		Actor*					 other = map->findNearestActor(world, owner, _radius);
 
-		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
-		for (const Actor* other : actors)
-		{
-			assert(other);
+		movementComp->speed = 0.0f;
+		if (nullptr == other)
+			return false;
 
-			const SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
-			assert(otherSceneComp);
+		SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
+		assert(otherSceneComp);
 
-			XMVECTOR	V1		 = XMLoadFloat3(&otherSceneComp->position);
-			const float distance = XMVectorGetX(XMVector3Length(V1 - V0));
+		XMVECTOR V1 = XMLoadFloat3(&otherSceneComp->position);
 
-			MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-			assert(movementComp);
+		XMStoreFloat3(&movementComp->targetPosition, V1);
+		movementComp->speed = 1.0f;
 
-			movementComp->speed = 0.0f;
-			if (distance < _radius && 0 < distance)
-			{
-				XMStoreFloat3(&movementComp->targetPosition, V1);
-				movementComp->speed = 1.0f;
-
-				return true;
-			}
-		}
-		return false;
+		return true;
 	}
 
 	bool CharacterBehaviorTree::PlayAnimationLowerBody::onUpdate(World& world, Actor& owner)
