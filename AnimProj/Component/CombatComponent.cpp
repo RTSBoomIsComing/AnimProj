@@ -16,10 +16,6 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 	assert(sceneComp);
 
-	MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-	assert(movementComp);
-
-
 	if (nullptr == _targetToAttack)
 	{
 		_isAttacking = false;
@@ -32,19 +28,15 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 		_isAttacking	= false;
 		return;
 	}
+}
 
+bool pa::CombatComponent::startAttack()
+{
+	if (nullptr == _targetToAttack || _targetToAttack->isAlive())
+		_isAttacking = false;
 
-	SceneComponent* targetSceneComp = _targetToAttack->getComponent<SceneComponent>();
-	assert(targetSceneComp);
-
-	const XMVECTOR V0				= XMLoadFloat3(&sceneComp->position);
-	const XMVECTOR V1				= XMLoadFloat3(&targetSceneComp->position);
-	float		   distanceToTarget = XMVectorGetX(XMVector3Length(V1 - V0));
-
-	if (!_isAttacking && distanceToTarget <= _attackRange)
-	{
-		_isAttacking = true;
-	}
+	_isAttacking = true;
+	return _isAttacking;
 }
 
 void pa::CombatComponent::onEndAttack()
@@ -67,8 +59,18 @@ void pa::CombatComponent::onAttack()
 	}
 }
 
+bool pa::CombatComponent::isTargetValid() const
+{
+	if (nullptr == _targetToAttack)
+		return false;
+
+	if (!_targetToAttack->isAlive())
+		return false;
+
+	return true;
+}
+
 void pa::CombatComponent::setTargetToAttack(Actor* target)
 {
 	_targetToAttack = target;
 }
-

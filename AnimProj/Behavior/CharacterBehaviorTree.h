@@ -19,6 +19,24 @@ namespace pa
 			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
+		class IsAttacking : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
+		};
+
+		class IsTargetInAttackRange : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
+		};
+
+		class Attack : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
+		};
+
 		class MoveTo : public Behavior::Node
 		{
 		public:

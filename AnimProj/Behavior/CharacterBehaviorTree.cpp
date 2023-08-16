@@ -15,13 +15,29 @@ namespace pa
 	CharacterBehaviorTree::CharacterBehaviorTree(World& world)
 	{
 		auto findTargetInAttackRange = std::make_shared<FindTargetInAttackRange>();
+		auto findTargetInSight		 = std::make_shared<FindTargetInSight>();
+		auto isAttacking			 = std::make_shared<IsAttacking>();
+		auto isTargetInAttackRange	 = std::make_shared<IsTargetInAttackRange>();
+		auto attack					 = std::make_shared<Attack>();
 
 		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
 		DirectX::XMFLOAT3		mapCenterPosition(mapCenterXZ.first, 0.0f, mapCenterXZ.second);
-		auto moveToCenter = std::make_shared<MoveTo>(mapCenterPosition);
+		auto					moveToCenter = std::make_shared<MoveTo>(mapCenterPosition);
 
-		auto mainSelector = std::make_shared<Behavior::Selector>();
-		mainSelector->addChild(findTargetInAttackRange);
+		auto mainSelector	= std::make_shared<Behavior::Selector>();
+		mainSelector->addChild(isAttacking);
+
+		auto attackSequence = std::make_shared<Behavior::Sequence>();
+
+		auto setTargetToAttack = std::make_shared<Behavior::Selector>();
+		setTargetToAttack->addChild(isTargetInAttackRange);
+		setTargetToAttack->addChild(findTargetInAttackRange);
+
+		mainSelector->addChild(attackSequence);
+		attackSequence->addChild(setTargetToAttack);
+		attackSequence->addChild(attack);
+
+		mainSelector->addChild(findTargetInSight);
 		mainSelector->addChild(moveToCenter);
 
 		_root = mainSelector;
@@ -43,14 +59,8 @@ namespace pa
 		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 		assert(sceneComp);
 
-		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-		assert(movementComp);
-
 		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
 		assert(combatComp);
-
-		if (combatComp->hasTarget())
-			return true;
 
 		std::shared_ptr<GridMap> map   = world.getDefaultMap();
 		Actor*					 other = map->findNearestActor(world, owner, combatComp->getAttackRange());
@@ -62,7 +72,11 @@ namespace pa
 		}
 		combatComp->setTargetToAttack(other);
 
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
 		SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
+		assert(otherSceneComp);
 		movementComp->targetPosition = otherSceneComp->position;
 
 		return true;
@@ -77,7 +91,7 @@ namespace pa
 		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
 		assert(combatComp);
 
-		if (combatComp->hasTarget())
+		if (combatComp->isTargetValid())
 			return true;
 
 		std::shared_ptr<GridMap> map   = world.getDefaultMap();
@@ -91,6 +105,59 @@ namespace pa
 
 		combatComp->setTargetToAttack(other);
 
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
+		SceneComponent* otherSceneComp = other->getComponent<SceneComponent>();
+		assert(otherSceneComp);
+		movementComp->targetPosition = otherSceneComp->position;
+
+
 		return true;
+	}
+
+	bool CharacterBehaviorTree::Attack::onUpdate(World& world, Actor& owner)
+	{
+		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
+		assert(combatComp);
+
+		if (false == combatComp->isTargetValid())
+			return false;
+
+		return combatComp->startAttack();
+	}
+	bool CharacterBehaviorTree::IsTargetInAttackRange::onUpdate(World& world, Actor& owner)
+	{
+		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
+		assert(combatComp);
+
+		if (false == combatComp->isTargetValid())
+			return false;
+
+		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		SceneComponent* otherSceneComp = combatComp->getTargetToAttack()->getComponent<SceneComponent>();
+		assert(otherSceneComp);
+
+		using namespace DirectX;
+		const XMVECTOR V0		= XMLoadFloat3(&sceneComp->position);
+		const XMVECTOR V1		= XMLoadFloat3(&otherSceneComp->position);
+		const float	   distance = XMVectorGetX(XMVector3Length(V1 - V0));
+
+		if (distance <= combatComp->getAttackRange())
+			return true;
+
+		return false;
+	}
+	bool CharacterBehaviorTree::IsAttacking::onUpdate(World& world, Actor& owner)
+	{
+		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
+		assert(combatComp);
+
+		if (combatComp->isAttacking())
+			return true;
+
+		return false;
 	}
 }
