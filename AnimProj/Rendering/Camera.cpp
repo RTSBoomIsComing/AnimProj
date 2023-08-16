@@ -25,6 +25,7 @@ void pa::Camera::initialize()
 	_aspectRatio				= aspectRatio;
 
 	calculateMatrices();
+	constructFrustum();
 }
 
 

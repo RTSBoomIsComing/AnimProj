@@ -6,6 +6,7 @@
 #include "../Behavior/CharacterBehaviorTree.h"
 #include "../Component/SceneComponent.h"
 #include "../Component/BehaviorTreeComponent.h"
+#include "../Rendering/Camera.h"
 
 namespace pa
 {
@@ -14,30 +15,6 @@ namespace pa
 		_map					 = std::make_shared<GridMap>(50.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>(*this);
 
-		// place two actors on sector
-		//std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
-		//_actors.push_back(actor);
-		//if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
-		//{
-		//	std::pair<float, float> positionXZ = _map->getCellCenter(0, 0);
-		//	sceneComp->position				   = {positionXZ.first, 0.0f, positionXZ.second};
-		//}
-		//if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
-		//{
-		//	behaviorTreeComp->setBehaviorTree(behaviorTree);
-		//}
-		//actor = std::make_shared<MyActor>();
-		//_actors.push_back(actor);
-		//if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
-		//{
-		//	std::pair<float, float> positionXZ = _map->getCellCenter(4, 4);
-		//	sceneComp->position				   = {positionXZ.first, 0.0f, positionXZ.second};
-		//}
-		//if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
-		//{
-		//	behaviorTreeComp->setBehaviorTree(behaviorTree);
-		//}
-
 		// place actors on center of sectors
 		for (size_t x = 0; x < _map->getMapWidth(); x++)
 		{
@@ -45,6 +22,7 @@ namespace pa
 			{
 				std::pair<float, float> positionXZ = _map->getCellCenter(x, z);
 
+				// create MyActor
 				{
 					std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
 					_actors.push_back(actor);
@@ -53,15 +31,6 @@ namespace pa
 					if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
 						sceneComp->position = { positionXZ.first, 0.0f, positionXZ.second };
 				}
-
-				//{
-				//	std::shared_ptr<MyActor> actor = std::make_shared<MyActor>();
-				//	_actors.push_back(actor);
-				//	if (BehaviorTreeComponent* behaviorTreeComp = actor->getComponent<BehaviorTreeComponent>())
-				//		behaviorTreeComp->setBehaviorTree(behaviorTree);
-				//	if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
-				//		sceneComp->position = {positionXZ.first + _map->getCellSize() / 4, 0.0f, positionXZ.second + _map->getCellSize() / 4};
-				//}
 			}
 		}
 	}
@@ -94,7 +63,19 @@ namespace pa
 
 		for (auto& actor : _actors)
 		{
+			cullActor(actor.get());
 			actor->onUpdate(*this, deltaTime);
 		}
+	}
+
+	void World::cullActor(Actor* actor)
+	{
+		constexpr float boundingShpereRadius = 5.0f;
+		SceneComponent* sceneComp = actor->getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		using namespace DirectX;
+		const bool isCulled = _camera->checkFrustumWithSphere(XMLoadFloat3(&sceneComp->position), boundingShpereRadius);
+		sceneComp->setIsCulled(isCulled);
 	}
 }

@@ -33,11 +33,13 @@ pa::MyApplication::MyApplication()
 	_skeletonRenderingSystem = std::make_unique<SkeletonRenderingSystem>(_device.Get());
 
 	_world = std::make_unique<World>();
-	_world->startGame();
+	_world->setDefaultCamera(_camera);
 
 	std::pair<float, float> centerXZ = _world->getDefaultMap()->getMapCenter();
-	DirectX::XMVECTOR		V		 = {centerXZ.first, 10.0f, centerXZ.second, 0.0f };
+	DirectX::XMVECTOR		V		 = {centerXZ.first, 10.0f, centerXZ.second, 0.0f};
 	_camera->setEyePosition(V);
+
+	_world->startGame();
 }
 
 pa::MyApplication::~MyApplication()
