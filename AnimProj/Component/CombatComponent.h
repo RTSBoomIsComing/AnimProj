@@ -12,8 +12,8 @@ namespace pa
 	public:
 		void onUpdate(World& world, Actor& owner, float deltaTime);
 		bool startAttack();
-		void onEndAttack();
 		void onAttack();
+		void onEndAttack();
 
 		inline bool	  isAttacking() const { return _isAttacking; }
 		bool		  isTargetValid() const;
