@@ -28,6 +28,6 @@ namespace pa
 		float		_attackTimer		   = 0.0f;
 		const float _attackRange		   = 20.0f;
 		const int	_attackDamage		   = 10;
-		int			_health				   = 30;
+		int			_health				   = 10;
 	};
 }
