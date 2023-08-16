@@ -12,7 +12,7 @@ namespace pa
 {
 	World::World()
 	{
-		_map					 = std::make_shared<GridMap>(50.0f);
+		_map					 = std::make_shared<GridMap>(100.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>(*this);
 
 		// place actors on center of sectors
@@ -75,7 +75,7 @@ namespace pa
 		assert(sceneComp);
 
 		using namespace DirectX;
-		const bool isCulled = _camera->checkFrustumWithSphere(XMLoadFloat3(&sceneComp->position), boundingShpereRadius);
-		sceneComp->setIsCulled(isCulled);
+		const bool isInFrustum = _camera->checkFrustumWithSphere(XMLoadFloat3(&sceneComp->position), boundingShpereRadius);
+		sceneComp->setIsCulled(!isInFrustum);
 	}
 }

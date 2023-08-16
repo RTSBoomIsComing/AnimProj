@@ -23,7 +23,13 @@ namespace pa
 
 		std::vector<Transform>	_pose;
 
-		bool _isCulled = false;
+		struct Socket
+		{
+			uint16_t  boneID = std::numeric_limits<uint16_t>::max();
+			Transform offset = {};
+		};
+
+		static Socket weaponSocket;
 	};
 }
 

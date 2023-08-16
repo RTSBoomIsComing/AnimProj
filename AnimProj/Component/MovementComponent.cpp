@@ -52,8 +52,6 @@ namespace pa
 			{
 				float deltaAngle = std::acosf(dot);
 				deltaAngle		 = std::min(deltaAngle, rotateSpeed * deltaTime);
-				if (deltaAngle == 0.0f)
-					::DebugBreak();
 
 				if (axisY < 0.0f)
 					deltaAngle = -1.0f * deltaAngle;

@@ -7,6 +7,8 @@
 #include "../Animation/Skeleton.h"
 namespace pa
 {
+	SkeletalMeshComponent::Socket SkeletalMeshComponent::weaponSocket = {};
+
 	SkeletalMeshComponent::SkeletalMeshComponent(const Skeleton& skeleton)
 		: _skeleton(&skeleton)
 	{
@@ -26,10 +28,13 @@ namespace pa
 	void SkeletalMeshComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
 		using namespace DirectX;
-		if (_isCulled)
-			return;
 
 		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		if (sceneComp->isCulled())
+			return;
+
 
 		for (const size_t boneID : _skeleton->getHierarchy())
 		{
@@ -39,7 +44,7 @@ namespace pa
 			if (boneID == 0)
 			{
 				parentWorldTransform = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&sceneComp->eulerAngle));
-				const XMVECTOR V	= XMLoadFloat3(&sceneComp->position);
+				const XMVECTOR V	 = XMLoadFloat3(&sceneComp->position);
 				parentWorldTransform *= XMMatrixTranslationFromVector(V);
 			}
 			else
@@ -49,9 +54,9 @@ namespace pa
 
 			const XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
 
-			const XMVECTOR S = XMLoadFloat4(&_pose[boneID].scale);
-			const XMVECTOR R = XMLoadFloat4(&_pose[boneID].rotation);
-			const XMVECTOR T = XMLoadFloat4(&_pose[boneID].translation);
+			const XMVECTOR S			   = XMLoadFloat4(&_pose[boneID].scale);
+			const XMVECTOR R			   = XMLoadFloat4(&_pose[boneID].rotation);
+			const XMVECTOR T			   = XMLoadFloat4(&_pose[boneID].translation);
 			const XMMATRIX animationMatrix = XMMatrixAffineTransformation(S, XMVectorZero(), R, T);
 
 			XMStoreFloat4x4(&_boneGTs[boneID], animationMatrix * boneMatrix * parentWorldTransform);
@@ -69,5 +74,12 @@ namespace pa
 		}
 		world.boneMatrixPool.insert(world.boneMatrixPool.end(), _boneGTs.begin(), _boneGTs.end());
 		world.boneToBoneMatrixPool.insert(world.boneToBoneMatrixPool.end(), _boneToBoneGTs.begin(), _boneToBoneGTs.end());
+
+		if (weaponSocket.boneID < _skeleton->getBoneCount())
+		{
+			XMFLOAT4X4 weaponGT;
+			XMStoreFloat4x4(&weaponGT, weaponSocket.offset.getMatrix() * XMLoadFloat4x4(&_boneGTs[weaponSocket.boneID]));
+			world.boneToBoneMatrixPool.push_back(weaponGT);
+		}
 	}
 }

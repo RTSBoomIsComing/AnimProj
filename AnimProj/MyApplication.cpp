@@ -13,6 +13,9 @@
 #include "Actor/MyActor.h"
 #include "Map/GridMap.h"
 
+#include "Component/SkeletalMeshComponent.h"
+#include <DirectXTK/Keyboard.h>
+
 pa::MyApplication::MyApplication()
 {
 	using namespace DirectX;
@@ -25,7 +28,7 @@ pa::MyApplication::MyApplication()
 	AnimationManager::get().initialize();
 	MeshManager::get().initialize(_device.Get());
 
-	_boneToBoneMesh	= &MeshManager::get().getDefaultStick();
+	_boneToBoneMesh = &MeshManager::get().getDefaultStick();
 	_boneMesh		= &MeshManager::get().getDefaultCube();
 	_camera			= new Camera(_device.Get());
 
@@ -38,6 +41,11 @@ pa::MyApplication::MyApplication()
 	std::pair<float, float> centerXZ = _world->getDefaultMap()->getMapCenter();
 	DirectX::XMVECTOR		V		 = {centerXZ.first, 10.0f, centerXZ.second, 0.0f};
 	_camera->setEyePosition(V);
+
+	SkeletalMeshComponent::weaponSocket.boneID = 28;
+	SkeletalMeshComponent::weaponSocket.offset.scale = {0.15f, 5.0f, 0.15f, 0.0f};
+	XMStoreFloat4(&SkeletalMeshComponent::weaponSocket.offset.rotation,
+				  XMQuaternionRotationRollPitchYaw(0.7f, 0.236f, -2.1f));
 
 	_world->startGame();
 }
@@ -57,19 +65,32 @@ void pa::MyApplication::onUpdate()
 
 	this->onPostResize();
 
+
+
 	_timer.update();
+
 	processInput(_timer.getDeltaTime());
 
 	_camera->update(_deviceContext.Get());
 
-	_world->update(_timer.getDeltaTime());
+	// For test;
+	auto kb = DirectX::Keyboard::Get().GetState();
+
+	static bool timerToggle = true;
+	if (kb.Back)
+		timerToggle = !timerToggle;
+
+	if (timerToggle)
+		_world->update(_timer.getDeltaTime());
+	else
+		_world->update(0.0f);
 
 	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get(), _world->boneMatrixPool, _world->boneToBoneMatrixPool);
 }
 
 void pa::MyApplication::onRender()
 {
-	// rendering screen 
+	// rendering screen
 	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), _depthStencilView.Get());
 	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
 	_deviceContext->ClearDepthStencilView(_depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -97,14 +118,14 @@ void pa::MyApplication::onPostResize(void)
 	if (0 == _resizeWidth && 0 == _resizeHeight)
 		return;
 
-	if (_renderTargetView) 
+	if (_renderTargetView)
 		_renderTargetView = nullptr;
 
 	_swapChain->ResizeBuffers(0, _resizeWidth, _resizeHeight, DXGI_FORMAT_UNKNOWN, 0);
-	_width = _resizeWidth;
-	_height = _resizeHeight;
+	_width		 = _resizeWidth;
+	_height		 = _resizeHeight;
 	_resizeWidth = _resizeHeight = 0;
-	createRenderTarget();	
+	createRenderTarget();
 
 	_camera->setAspectRatio(static_cast<float>(_width) / _height);
 }
@@ -119,9 +140,9 @@ void pa::MyApplication::renderImGui(void)
 
 	ImGui::Begin("Hello, world!");
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-		1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-	ImGui::End();
+				1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
+	ImGui::End();
 	_imguiManager->endFrame();
 }
 
@@ -138,8 +159,8 @@ void pa::MyApplication::initializeGraphicsPipeline()
 
 
 		D3D11_INPUT_ELEMENT_DESC inputElementDescs[2] = {
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 		checkResult(_device->CreateInputLayout(
 			inputElementDescs, ARRAYSIZE(inputElementDescs),
@@ -158,8 +179,8 @@ void pa::MyApplication::initializeGraphicsPipeline()
 
 	{
 		D3D11_RASTERIZER_DESC rasterizerDesc = {};
-		rasterizerDesc.FillMode = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME D3D11_FILL_SOLID
-		rasterizerDesc.CullMode = D3D11_CULL_BACK; //D3D11_CULL_NONE D3D11_CULL_BACK
+		rasterizerDesc.FillMode				 = D3D11_FILL_SOLID; //D3D11_FILL_WIREFRAME D3D11_FILL_SOLID
+		rasterizerDesc.CullMode				 = D3D11_CULL_BACK;	 //D3D11_CULL_NONE D3D11_CULL_BACK
 		rasterizerDesc.FrontCounterClockwise = FALSE;
 		checkResult(_device->CreateRasterizerState(&rasterizerDesc, &_rasterizerState));
 	}
@@ -175,20 +196,20 @@ void pa::MyApplication::processInput(float deltaTime)
 
 void pa::MyApplication::initializeD3dDevices(HWND hWnd)
 {
-	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	swapChainDesc.BufferCount = 2;
-	swapChainDesc.BufferDesc.Width = 0;
-	swapChainDesc.BufferDesc.Height = 0;
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+	DXGI_SWAP_CHAIN_DESC swapChainDesc				 = {};
+	swapChainDesc.BufferCount						 = 2;
+	swapChainDesc.BufferDesc.Width					 = 0;
+	swapChainDesc.BufferDesc.Height					 = 0;
+	swapChainDesc.BufferDesc.Format					 = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator	 = 0;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
-	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	swapChainDesc.OutputWindow = hWnd;
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.SampleDesc.Quality = 0;
-	swapChainDesc.Windowed = TRUE;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	swapChainDesc.Flags								 = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	swapChainDesc.BufferUsage						 = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	swapChainDesc.OutputWindow						 = hWnd;
+	swapChainDesc.SampleDesc.Count					 = 1;
+	swapChainDesc.SampleDesc.Quality				 = 0;
+	swapChainDesc.Windowed							 = TRUE;
+	swapChainDesc.SwapEffect						 = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	const D3D_FEATURE_LEVEL featureLevels[] = {
 		D3D_FEATURE_LEVEL_11_0,
