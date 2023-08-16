@@ -68,7 +68,7 @@ namespace pa
 		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
 		assert(combatComp);
 
-		const bool isMoving = movementComp->isMovable() && movementComp->isMoving();
+		const bool isMoving = movementComp->isMoving();
 		const bool isDead	= !owner.isAlive();
 
 		switch (_currentState)
@@ -156,6 +156,9 @@ namespace pa
 					transitAnimationLowerBody(manager.getAnimation(AnimIndex::Idle_lo), 0.2f);
 					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.2f);
 				}
+
+				if (_upperBody.playTime > 2.7f)
+					combatComp->onAttack();
 
 				// when ending animation then looping
 				if (this->getCurrentAnimationUpperBody() == nullptr)

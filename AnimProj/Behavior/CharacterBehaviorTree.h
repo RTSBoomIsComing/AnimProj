@@ -7,15 +7,16 @@ namespace pa
 	class Actor;
 	class CharacterBehaviorTree : public BehaviorTree
 	{
-		class FindTarget : public Behavior::Node
+		class FindTargetInAttackRange : public Behavior::Node
 		{
 		public:
-			FindTarget(float radius)
-				: _radius(radius) {}
 			virtual bool onUpdate(World& world, Actor& owner) override;
+		};
 
-		private:
-			float _radius;
+		class FindTargetInSight : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
 		class MoveTo : public Behavior::Node

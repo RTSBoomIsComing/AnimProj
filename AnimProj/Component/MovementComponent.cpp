@@ -4,6 +4,7 @@
 #include "../World/World.h"
 #include "../Actor/Actor.h"
 #include "../Component/SceneComponent.h"
+#include "../Component/CombatComponent.h"
 
 namespace pa
 {
@@ -36,7 +37,6 @@ namespace pa
 		{
 			_isRotating = true;
 			sceneComp->eulerAngle.y += rotateSpeed * deltaTime;
-			//sceneComp->eulerAngle.y += XM_PI;
 		}
 		else
 		{
@@ -60,12 +60,18 @@ namespace pa
 			}
 		}
 
-		if (_isMovable)
+		if (CombatComponent* combatComp = owner.getComponent<CombatComponent>())
 		{
-			distance = std::min(distance, speed * deltaTime);
-
-			XMVECTOR V = V0 + Vdir * distance;
-			XMStoreFloat3(&sceneComp->position, V);
+			if (combatComp->isAttacking())
+			{
+				_isMoving = false;
+				return;
+			}
 		}
+
+		distance = std::min(distance, speed * deltaTime);
+
+		XMVECTOR V = V0 + Vdir * distance;
+		XMStoreFloat3(&sceneComp->position, V);
 	}
 }

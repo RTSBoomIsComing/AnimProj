@@ -10,20 +10,19 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 {
 	using namespace DirectX;
 
+	if (!owner.isAlive())
+		return;
+
 	SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 	assert(sceneComp);
 
 	MovementComponent* movementComp = owner.getComponent<MovementComponent>();
 	assert(movementComp);
 
-	if (!owner.isAlive())
-		return;
 
 	if (nullptr == _targetToAttack)
 	{
 		_isAttacking = false;
-		_attackTimer = _attackPreparationTime;
-		movementComp->setMovable(true);
 		return;
 	}
 
@@ -31,10 +30,9 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
 		_targetToAttack = nullptr;
 		_isAttacking	= false;
-		_attackTimer	= _attackPreparationTime;
-		movementComp->setMovable(true);
 		return;
 	}
+
 
 	SceneComponent* targetSceneComp = _targetToAttack->getComponent<SceneComponent>();
 	assert(targetSceneComp);
@@ -43,45 +41,22 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	const XMVECTOR V1				= XMLoadFloat3(&targetSceneComp->position);
 	float		   distanceToTarget = XMVectorGetX(XMVector3Length(V1 - V0));
 
-	if (distanceToTarget > _attackRange)
+	if (!_isAttacking && distanceToTarget <= _attackRange)
 	{
-		_targetToAttack = nullptr;
-		_isAttacking	= false;
-		_attackTimer	= _attackPreparationTime;
-		movementComp->setMovable(true);
-		return;
-	}
-
-	// start attacking
-	// orientate to target to attack
-	movementComp->targetPosition = targetSceneComp->position;
-
-	// disable movement, just enable rotation
-	movementComp->setMovable(false);
-	_isAttacking = true;
-
-	if (_attackTimer > 0.0f)
-	{
-		_attackTimer -= deltaTime;
-		if (_attackTimer <= 0.0f)
-		{
-			applyDamage(world, owner);
-		}
+		_isAttacking = true;
 	}
 }
 
 void pa::CombatComponent::onEndAttack()
 {
-	_attackTimer = _attackPreparationTime;
+	_isAttacking = false;
 }
 
-void pa::CombatComponent::setTargetToAttack(Actor* target)
+void pa::CombatComponent::onAttack()
 {
-	_targetToAttack = target;
-}
+	if (nullptr == _targetToAttack)
+		return;
 
-void pa::CombatComponent::applyDamage(World& world, Actor& owner)
-{
 	CombatComponent* targetCombatComp = _targetToAttack->getComponent<CombatComponent>();
 	assert(targetCombatComp);
 
@@ -91,3 +66,9 @@ void pa::CombatComponent::applyDamage(World& world, Actor& owner)
 		_targetToAttack->setAlive(false);
 	}
 }
+
+void pa::CombatComponent::setTargetToAttack(Actor* target)
+{
+	_targetToAttack = target;
+}
+
