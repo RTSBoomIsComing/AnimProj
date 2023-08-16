@@ -42,19 +42,20 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 
 	if (distanceToTarget > _attackRange)
 	{
+		_targetToAttack = nullptr;
+		_isAttacking	= false;
+		_attackTimer	= _attackPreparationTime;
 
-		movementComp->targetPosition = targetSceneComp->position;
-		movementComp->setMovable(true);
-
-		_isAttacking				 = false;
-		_attackTimer				 = _attackPreparationTime;
 		return;
 	}
 
 	// start attacking
-	// disable movement
+	// orientate to target to attack
+	movementComp->targetPosition = targetSceneComp->position;	
+	
+	// disable movement, just enable rotation
 	movementComp->setMovable(false);
-	_isAttacking		= true;
+	_isAttacking = true;
 
 	if (_attackTimer > 0.0f)
 	{

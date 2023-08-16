@@ -14,7 +14,7 @@ namespace pa
 {
 	CharacterBehaviorTree::CharacterBehaviorTree(World& world)
 	{
-		auto findTargetOnSight		 = std::make_shared<FindTarget>(100.0f);
+		auto findTargetOnSight		 = std::make_shared<FindTarget>(30.0f);
 
 		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
 		DirectX::XMFLOAT3		mapCenterPosition(mapCenterXZ.first, 0.0f, mapCenterXZ.second);

@@ -15,12 +15,12 @@ namespace pa
 
 	public:
 		DirectX::XMFLOAT3 targetPosition = {};
-		float			  speed			 = 5.0f;
-		float			  rotateSpeed	 = DirectX::XM_PIDIV2;
 
 	private:
-		bool _isMovable	 = false;
-		bool _isMoving	 = false;
-		bool _isRotating = false;
+		float speed		  = 5.0f;
+		float rotateSpeed = DirectX::XM_PIDIV2;
+		bool  _isMovable  = false;
+		bool  _isMoving	  = false;
+		bool  _isRotating = false;
 	};
 }
