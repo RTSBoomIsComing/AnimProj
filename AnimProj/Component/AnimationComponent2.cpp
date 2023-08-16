@@ -257,17 +257,25 @@ namespace pa
 					XMVECTOR Qresult = XMQuaternionSlerp(Q0, Q1, transitionBlendWeight);
 					XMStoreFloat4(&currentPose[boneID].rotation, Qresult);
 				}
+			}
+			else if (AnimationTrackType::Translation == animation->getTrackHeaders()[trackID].type)
+			{
+				XMVECTOR V1 = XMQuaternionNormalize(XMVectorCatmullRom(
+					controlPoints[0].decompressAsVector(),
+					controlPoints[1].decompressAsVector(),
+					controlPoints[2].decompressAsVector(),
+					controlPoints[3].decompressAsVector(), transitionBlendWeight));
 
-				//_rotations[_animation->_trackDescriptors[i]] = cp[1].decompressAsQuaternion();
-
-				//_rotations[_animation->_trackDescriptors[i]] =
-				//	XMVectorLerp(cp[1].decompressAsQuaternion(), cp[2].decompressAsQuaternion(), transitionBlendWeight);
-
-				//_rotations[boneID] = XMQuaternionNormalize(XMVectorCatmullRom(
-				//	controlPoints[0].decompressAsQuaternion(),
-				//	controlPoints[1].decompressAsQuaternion(),
-				//	controlPoints[2].decompressAsQuaternion(),
-				//	controlPoints[3].decompressAsQuaternion(), transitionBlendWeight));
+				if (1.0f == transitionBlendWeight)
+				{
+					XMStoreFloat4(&currentPose[boneID].translation, V1);
+				}
+				else
+				{
+					XMVECTOR V0		 = XMLoadFloat4(&lastPose[boneID].translation);
+					XMVECTOR Vresult = XMQuaternionSlerp(V0, V1, transitionBlendWeight);
+					XMStoreFloat4(&currentPose[boneID].translation, Vresult);
+				}
 			}
 		}
 	}

@@ -40,6 +40,7 @@ namespace pa
 		Actor::onUpdate(world, deltaTime);
 		{
 			// TODO: Move these to Actor::onUpdate()
+			_sceneComponent->onUpdate(world, *this, deltaTime);
 			_behaviorTreeComponent->onUpdate(world, *this, deltaTime);
 			_combatComponent->onUpdate(world, *this, deltaTime);
 			_movementComponent->onUpdate(world, *this, deltaTime);

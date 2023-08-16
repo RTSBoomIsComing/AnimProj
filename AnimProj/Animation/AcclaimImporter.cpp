@@ -57,6 +57,7 @@ void pa::AcclaimImporter::createRawAnimation(Acclaim::Motion const& acclaimMotio
 				V = V * XMVectorSet(1.0f, 1.0f, -1.0f, 0.0f);
 
 				XMFLOAT4 translation = {};
+				//XMStoreFloat4(&translation, V);
 				translations.push_back(translation);
 			}
 

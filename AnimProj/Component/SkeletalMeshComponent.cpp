@@ -47,7 +47,7 @@ namespace pa
 				parentWorldTransform = XMLoadFloat4x4(&_boneGTs[parentID]);
 			}
 
-			XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
+			const XMMATRIX boneMatrix = _skeleton->getBoneMatrix(boneID);
 
 			const XMVECTOR S = XMLoadFloat4(&_pose[boneID].scale);
 			const XMVECTOR R = XMLoadFloat4(&_pose[boneID].rotation);
