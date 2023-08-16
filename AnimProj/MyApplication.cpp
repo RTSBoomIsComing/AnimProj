@@ -11,6 +11,7 @@
 
 #include "World/World.h"
 #include "Actor/MyActor.h"
+#include "Map/GridMap.h"
 
 pa::MyApplication::MyApplication()
 {
@@ -33,6 +34,10 @@ pa::MyApplication::MyApplication()
 
 	_world = std::make_unique<World>();
 	_world->startGame();
+
+	std::pair<float, float> centerXZ = _world->getDefaultMap()->getMapCenter();
+	DirectX::XMVECTOR		V		 = {centerXZ.first, 10.0f, centerXZ.second, 0.0f };
+	_camera->setEyePosition(V);
 }
 
 pa::MyApplication::~MyApplication()

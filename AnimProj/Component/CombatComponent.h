@@ -26,7 +26,7 @@ namespace pa
 		bool 		_isAttacking		   = false;
 		const float _attackPreparationTime = 2.7f;
 		float		_attackTimer		   = 0.0f;
-		const float _attackRange		   = 30.0f;
+		const float _attackRange		   = 20.0f;
 		const int	_attackDamage		   = 10;
 		int			_health				   = 30;
 	};

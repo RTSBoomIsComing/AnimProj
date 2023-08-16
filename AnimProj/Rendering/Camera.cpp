@@ -42,6 +42,7 @@ void pa::Camera::setEyePosition(const DirectX::XMVECTOR& eyePosition)
 void pa::Camera::update(ID3D11DeviceContext* deviceContext)
 {
 	calculateMatrices();
+	constructFrustum();
 	deviceContext->UpdateSubresource(_cameraConstantBuffer.Get(), 0, nullptr, &_matrices, 0, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, _cameraConstantBuffer.GetAddressOf());
 }
@@ -121,13 +122,102 @@ void pa::Camera::calculateMatrices()
 	// XMStoreFloat4x4(&_matrices.View,
 	//	XMMatrixLookAtLH(XMLoadFloat3(&_eyePosition), XMLoadFloat3(&_focusPosition), upDirection));
 
-	constexpr float nearZ = 0.01f;
-	constexpr float farZ  = 100.0f;
 	XMStoreFloat4x4(&_matrices.Projection,
-					XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, _aspectRatio, nearZ, farZ));
+					XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, _aspectRatio, _nearZ, _farZ));
+}
+
+void pa::Camera::constructFrustum()
+{
+	using namespace DirectX;
+
+	XMFLOAT4X4 newProjMat = _matrices.Projection;
+	float	   zMinimum, r;
+
+	// Calculate the minimum Z distance in the frustum.
+	zMinimum	   = -newProjMat._43 / newProjMat._33;
+	r			   = _farZ / (_farZ - zMinimum);
+	newProjMat._33 = r;
+	newProjMat._43 = -r * zMinimum;
+
+	// Create the frustum matrix from the view matrix and updated projection matrix.
+	XMMATRIX   M = XMLoadFloat4x4(&_matrices.View) * XMLoadFloat4x4(&newProjMat);
+	XMFLOAT4X4 matrix;
+	XMStoreFloat4x4(&matrix, M);
+
+	// Calculate near plane of frustum.
+	_frustum[0].x = matrix._14 + matrix._13;
+	_frustum[0].y = matrix._24 + matrix._23;
+	_frustum[0].z = matrix._34 + matrix._33;
+	_frustum[0].w = matrix._44 + matrix._43;
+	XMVECTOR P	  = XMLoadFloat4(&_frustum[0]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[0], P);
+
+	// Calculate far plane of frustum.
+	_frustum[1].x = matrix._14 - matrix._13;
+	_frustum[1].y = matrix._24 - matrix._23;
+	_frustum[1].z = matrix._34 - matrix._33;
+	_frustum[1].w = matrix._44 - matrix._43;
+	P			  = XMLoadFloat4(&_frustum[1]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[1], P);
+
+	// Calculate left plane of frustum.
+	_frustum[2].x = matrix._14 + matrix._11;
+	_frustum[2].y = matrix._24 + matrix._21;
+	_frustum[2].z = matrix._34 + matrix._31;
+	_frustum[2].w = matrix._44 + matrix._41;
+	P			  = XMLoadFloat4(&_frustum[2]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[2], P);
+
+	// Calculate right plane of frustum.
+	_frustum[3].x = matrix._14 - matrix._11;
+	_frustum[3].y = matrix._24 - matrix._21;
+	_frustum[3].z = matrix._34 - matrix._31;
+	_frustum[3].w = matrix._44 - matrix._41;
+	P			  = XMLoadFloat4(&_frustum[3]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[3], P);
+
+	// Calculate top plane of frustum.
+	_frustum[4].x = matrix._14 - matrix._12;
+	_frustum[4].y = matrix._24 - matrix._22;
+	_frustum[4].z = matrix._34 - matrix._32;
+	_frustum[4].w = matrix._44 - matrix._42;
+	P			  = XMLoadFloat4(&_frustum[4]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[4], P);
+
+	// Calculate bottom plane of frustum.
+	_frustum[5].x = matrix._14 + matrix._12;
+	_frustum[5].y = matrix._24 + matrix._22;
+	_frustum[5].z = matrix._34 + matrix._32;
+	_frustum[5].w = matrix._44 + matrix._42;
+	P			  = XMLoadFloat4(&_frustum[5]);
+	P			  = XMPlaneNormalize(P);
+	XMStoreFloat4(&_frustum[5], P);
+
+	return;
 }
 
 const pa::Camera::Matrices& pa::Camera::getMatrices(void)
 {
 	return _matrices;
+}
+
+bool pa::Camera::checkFrustumWithSphere(DirectX::XMVECTOR center, float radius) const
+{
+	using namespace DirectX;
+
+	// Check if the radius of the sphere is inside the view frustum.
+	for (int i = 0; i < 6; i++)
+	{
+		if (XMVectorGetX(XMPlaneDotCoord(XMLoadFloat4(&_frustum[i]), center)) < -radius)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
