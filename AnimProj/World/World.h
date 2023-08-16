@@ -18,6 +18,7 @@ namespace pa
 
 		inline void						setDefaultCamera(const Camera* camera) { _camera = camera; }
 		inline std::shared_ptr<GridMap> getDefaultMap() { return _map; }
+		inline size_t					getAliveActorCount() const { return _aliveActorCount;  }
 
 	public:
 		std::vector<DirectX::XMFLOAT4X4> boneMatrixPool;
@@ -30,5 +31,7 @@ namespace pa
 		const Camera*						_camera = nullptr;
 		std::shared_ptr<GridMap>			_map;
 		std::vector<std::shared_ptr<Actor>> _actors;
+
+		size_t _aliveActorCount = 0;
 	};
 }

@@ -49,6 +49,7 @@ namespace pa
 
 	void World::update(float deltaTime)
 	{
+		_aliveActorCount = 0;
 		_map->clearMap();
 		for (auto& actor : _actors)
 		{
@@ -56,6 +57,7 @@ namespace pa
 				continue;
 
 			_map->placeActor(*this, *actor);
+			_aliveActorCount++;
 		}
 
 		this->boneMatrixPool.clear();

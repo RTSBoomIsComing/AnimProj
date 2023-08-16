@@ -73,17 +73,8 @@ void pa::MyApplication::onUpdate()
 
 	_camera->update(_deviceContext.Get());
 
-	// For test;
-	auto kb = DirectX::Keyboard::Get().GetState();
-
-	static bool timerToggle = true;
-	if (kb.Back)
-		timerToggle = !timerToggle;
-
-	if (timerToggle)
-		_world->update(_timer.getDeltaTime());
-	else
-		_world->update(0.0f);
+	
+	_world->update(_timer.getDeltaTime() * _gamePlaySpeed);
 
 	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get(), _world->boneMatrixPool, _world->boneToBoneMatrixPool);
 }
@@ -141,6 +132,10 @@ void pa::MyApplication::renderImGui(void)
 	ImGui::Begin("Hello, world!");
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 				1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+	ImGui::Text("Number of Alive Characters: %d", _world->getAliveActorCount());
+
+	ImGui::SliderFloat("Game Speed", &_gamePlaySpeed, 0.0f, 10.f);
 
 	ImGui::End();
 	_imguiManager->endFrame();
