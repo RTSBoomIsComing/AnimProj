@@ -73,16 +73,16 @@ namespace pa
 
 		startX = startX > 0 ? startX : 0;
 		startZ = startZ > 0 ? startZ : 0;
-		endX   = endX < _mapWidth ? endX : _mapWidth;
-		endZ   = endZ < _mapHeight ? endZ : _mapHeight;
+		endX   = endX < _mapWidth ? endX : _mapWidth - 1;
+		endZ   = endZ < _mapHeight ? endZ : _mapHeight - 1;
 
 		float  minDistance	= std::numeric_limits<float>::max();
 		Actor* nearestActor = nullptr;
 
 		XMVECTOR V0 = XMLoadFloat3(&sceneComp->position);
-		for (size_t x = startX; x < endX; ++x)
+		for (size_t x = startX; x <= endX; ++x)
 		{
-			for (size_t z = startZ; z < endZ; ++z)
+			for (size_t z = startZ; z <= endZ; ++z)
 			{
 				for (Actor* other : _cells[x][z])
 				{
@@ -95,7 +95,7 @@ namespace pa
 					XMVECTOR V1		  = XMLoadFloat3(&otherSceneComp->position);
 					float	 distance = XMVectorGetX(XMVector3Length(V1 - V0));
 
-					if (distance < minDistance)
+					if (distance < minDistance && distance <= radius)
 					{
 						minDistance	 = distance;
 						nearestActor = other;

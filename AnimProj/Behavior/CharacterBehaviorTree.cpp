@@ -45,7 +45,10 @@ namespace pa
 		Actor*					 other = map->findNearestActor(world, owner, _radius);
 
 		if (nullptr == other)
+		{
+			combatComp->setTargetToAttack(nullptr);
 			return false;
+		}
 
 		combatComp->setTargetToAttack(other);
 

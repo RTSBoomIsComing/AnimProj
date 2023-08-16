@@ -8,6 +8,14 @@
 
 void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 {
+	using namespace DirectX;
+
+	SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+	assert(sceneComp);
+
+	MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+	assert(movementComp);
+
 	if (!owner.isAlive())
 		return;
 
@@ -15,6 +23,7 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
 		_isAttacking = false;
 		_attackTimer = _attackPreparationTime;
+		movementComp->setMovable(true);
 		return;
 	}
 
@@ -23,18 +32,12 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 		_targetToAttack = nullptr;
 		_isAttacking	= false;
 		_attackTimer	= _attackPreparationTime;
+		movementComp->setMovable(true);
 		return;
 	}
 
-	using namespace DirectX;
-
-	SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
-	assert(sceneComp);
 	SceneComponent* targetSceneComp = _targetToAttack->getComponent<SceneComponent>();
 	assert(targetSceneComp);
-
-	MovementComponent* movementComp = owner.getComponent<MovementComponent>();
-	assert(movementComp);
 
 	const XMVECTOR V0				= XMLoadFloat3(&sceneComp->position);
 	const XMVECTOR V1				= XMLoadFloat3(&targetSceneComp->position);
@@ -45,14 +48,14 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 		_targetToAttack = nullptr;
 		_isAttacking	= false;
 		_attackTimer	= _attackPreparationTime;
-
+		movementComp->setMovable(true);
 		return;
 	}
 
 	// start attacking
 	// orientate to target to attack
-	movementComp->targetPosition = targetSceneComp->position;	
-	
+	movementComp->targetPosition = targetSceneComp->position;
+
 	// disable movement, just enable rotation
 	movementComp->setMovable(false);
 	_isAttacking = true;

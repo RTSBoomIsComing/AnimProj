@@ -11,7 +11,7 @@ namespace pa
 {
 	World::World()
 	{
-		_map					 = std::make_shared<GridMap>(20.0f);
+		_map					 = std::make_shared<GridMap>(40.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>(*this);
 
 		// place two actors on sector
