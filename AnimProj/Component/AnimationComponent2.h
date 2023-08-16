@@ -51,7 +51,6 @@ namespace pa
 			Idle,
 			Move,
 			Attack,
-			MoveAttack,
 			Dead,
 		};
 

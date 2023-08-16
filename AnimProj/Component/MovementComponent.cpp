@@ -20,15 +20,23 @@ namespace pa
 		const XMVECTOR V1	= XMLoadFloat3(&targetPosition);
 		const XMVECTOR Vdir = XMVector3Normalize(V1 - V0);
 
-		float deltaMove = XMVectorGetX(XMVector3Length(V1 - V0));
+		float distance = XMVectorGetX(XMVector3Length(V1 - V0));
+		_isMoving	   = distance > 0.0001f;
+		if (!_isMoving)
+			return;
 
 		XMVECTOR Forward = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
 		Forward			 = XMVector3Transform(Forward, XMMatrixRotationY(sceneComp->eulerAngle.y));
 
-		if (XMVector3Equal(Vdir, -Forward))
+		if (XMVector3Equal(Vdir, Forward))
+		{
+			_isRotating = false;
+		}
+		else if (XMVector3Equal(Vdir, -Forward))
 		{
 			_isRotating = true;
 			sceneComp->eulerAngle.y += rotateSpeed * deltaTime;
+			//sceneComp->eulerAngle.y += XM_PI;
 		}
 		else
 		{
@@ -51,19 +59,12 @@ namespace pa
 			}
 		}
 
-		if (0.0f == speed)
-			return;
+		if (_isMovable)
+		{
+			distance = std::min(distance, speed * deltaTime);
 
-
-		// TODO: Move this logic to SphereComponent or Attack Behavior
-		_isMoving = deltaMove > 0.0001f;
-
-		if (!_isMoving)
-			return;
-
-		deltaMove = std::min(deltaMove, speed * deltaTime);
-
-		XMVECTOR V = V0 + Vdir * deltaMove;
-		XMStoreFloat3(&sceneComp->position, V);
+			XMVECTOR V = V0 + Vdir * distance;
+			XMStoreFloat3(&sceneComp->position, V);
+		}
 	}
 }

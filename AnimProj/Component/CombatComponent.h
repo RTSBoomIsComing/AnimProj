@@ -14,7 +14,8 @@ namespace pa
 		void onEndAttack();
 
 
-		inline bool isAttacking() const { return _targetToAttack; }
+		inline bool isAttacking() const { return _isAttacking; }
+		inline bool hasTarget() const { return (nullptr != _targetToAttack); }
 		void setTargetToAttack(Actor* target);
 
 	private:

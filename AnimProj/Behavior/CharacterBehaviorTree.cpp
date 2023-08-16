@@ -38,6 +38,9 @@ namespace pa
 		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
 		assert(combatComp);
 
+		if (combatComp->hasTarget())
+			return true;
+
 		std::shared_ptr<GridMap> map   = world.getDefaultMap();
 		Actor*					 other = map->findNearestActor(world, owner, _radius);
 
@@ -55,7 +58,7 @@ namespace pa
 		assert(movementComp);
 
 		movementComp->targetPosition = _position;
-		movementComp->speed			 = 3.0f;
+		movementComp->setMovable(true);
 
 		return true;
 	}

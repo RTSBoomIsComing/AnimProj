@@ -44,14 +44,16 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 	{
 
 		movementComp->targetPosition = targetSceneComp->position;
-		movementComp->speed			 = 3.0f;
+		movementComp->setMovable(true);
+
 		_isAttacking				 = false;
 		_attackTimer				 = _attackPreparationTime;
 		return;
 	}
 
+	// start attacking
 	// disable movement
-	movementComp->speed = 0.0f;
+	movementComp->setMovable(false);
 	_isAttacking		= true;
 
 	if (_attackTimer > 0.0f)
