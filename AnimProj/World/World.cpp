@@ -46,21 +46,12 @@ namespace pa
 					if (CombatComponent* combatComp = actor->getComponent<CombatComponent>())
 					{
 						// set attack range randomly
-						//combatComp->setAttackRange(dis(gen));
+						combatComp->setAttackRange(dis(gen));
 						const int teamID = (x < _map->getMapWidth() / 2) ? 1 : 0;
 						combatComp->setTeamID(teamID);
 					}
 				}
 			}
-		}
-
-		// shuffle order of actors
-		for (size_t i = 0; i < _actors.size() / 2; i++)
-		{
-			if (i % 2)
-				continue;
-
-			_actors[i].swap(_actors[_actors.size() / 2 + i]);
 		}
 	}
 
@@ -86,9 +77,6 @@ namespace pa
 		// remove actors pending kill
 		for (size_t i = 0; i < _actors.size(); i++)
 		{
-			if (i == _actors.size() - 1)
-				break;
-
 			std::shared_ptr<Actor>& actor = _actors[i];
 			if (actor->isPendingKill())
 			{
@@ -96,7 +84,11 @@ namespace pa
 					_actors.pop_back();
 
 				actor.swap(_actors.back());
-				_actors.pop_back();
+
+				if (_actors.back()->isPendingKill())
+					_actors.pop_back();
+				else
+					::DebugBreak();
 			}
 		}
 

@@ -10,6 +10,11 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 {
 	using namespace DirectX;
 
+	if (owner.isAlive() && _health <= 0.0f)
+	{
+		owner.killThis();
+	}
+
 	if (nullptr == _targetToAttack)
 	{
 		_isAttacking = false;
@@ -52,10 +57,6 @@ void pa::CombatComponent::onAttack()
 	assert(targetCombatComp);
 
 	targetCombatComp->_health -= _attackDamage;
-	if (targetCombatComp->_health <= 0.0f)
-	{
-		_targetToAttack->killThis();
-	}
 }
 
 bool pa::CombatComponent::isTargetValid() const

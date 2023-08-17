@@ -30,7 +30,7 @@ namespace pa
 
 	private:
 		static constexpr size_t _mapWidth  = 20;
-		static constexpr size_t _mapHeight = 10;
+		static constexpr size_t _mapHeight = 20;
 		float					_cellSize  = 1.0f;
 
 		std::array<std::array<std::vector<Actor*>, _mapHeight>, _mapWidth> _cells;
