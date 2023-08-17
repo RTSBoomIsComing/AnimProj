@@ -54,7 +54,7 @@ void pa::CombatComponent::onAttack()
 	targetCombatComp->_health -= _attackDamage;
 	if (targetCombatComp->_health <= 0.0f)
 	{
-		_targetToAttack->setAlive(false);
+		_targetToAttack->killThis();
 	}
 }
 

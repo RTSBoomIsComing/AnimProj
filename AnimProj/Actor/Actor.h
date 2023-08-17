@@ -44,7 +44,7 @@ namespace pa
 	class Actor : public IActor<SceneComponent, BehaviorTreeComponent, MovementComponent, SkeletalMeshComponent, AnimationComponent2, CombatComponent>
 	{
 	public:
-		inline void setAlive(bool isAlive) { _isAlive = isAlive; }
+		inline void killThis() { _isAlive = false; }
 		inline bool isAlive() const { return _isAlive; }
 		inline bool isPendingKill() const { return _isPendingKill; }
 		inline void onUpdate(World& world, float deltaTime)

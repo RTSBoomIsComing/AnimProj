@@ -73,10 +73,18 @@ namespace pa
 		this->boneToBoneMatrixPool.clear();
 
 		// remove actors pending kill 
-		//for (auto& actor : _actors)
-		//{
-		//	if (actor->is)
-		//}
+		for (size_t i = 0; i < _actors.size(); i++)
+		{
+			std::shared_ptr<Actor>& actor = _actors[i];
+			if (actor->isPendingKill())
+			{
+				while (_actors.back()->isPendingKill())
+					_actors.pop_back();
+
+				actor.swap(_actors.back());
+				_actors.pop_back();
+			}
+		}
 
 		_map->clearMap();
 		for (auto& actor : _actors)
