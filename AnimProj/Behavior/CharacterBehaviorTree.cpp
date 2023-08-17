@@ -28,10 +28,8 @@ namespace pa
 		auto isAttacking			 = std::make_shared<IsAttacking>();
 		auto isTargetInAttackRange	 = std::make_shared<IsTargetInAttackRange>();
 		auto attack					 = std::make_shared<Attack>();
+		auto moveToCenter			 = std::make_shared<MoveToCenter>();
 
-		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
-		DirectX::XMFLOAT3		mapCenterPosition(mapCenterXZ.first, 0.0f, mapCenterXZ.second);
-		auto					moveToCenter = std::make_shared<MoveTo>(mapCenterPosition);
 
 		auto mainSelector = std::make_shared<Behavior::Selector>();
 		mainSelector->addChild(isAttacking);
@@ -52,12 +50,14 @@ namespace pa
 		_root = mainSelector;
 	}
 
-	bool CharacterBehaviorTree::MoveTo::onUpdate(World& world, Actor& owner)
+	bool CharacterBehaviorTree::MoveToCenter::onUpdate(World& world, Actor& owner)
 	{
 		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
 		assert(movementComp);
 
-		movementComp->targetPosition = _position;
+		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
+		movementComp->targetPosition.x		= mapCenterXZ.first;
+		movementComp->targetPosition.z		= mapCenterXZ.second;
 
 		return true;
 	}
@@ -172,5 +172,24 @@ namespace pa
 			return true;
 
 		return false;
+	}
+
+	bool CharacterBehaviorTree::MoveAcrossMap::onUpdate(World& world, Actor& owner)
+	{
+		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
+		assert(sceneComp);
+
+		std::pair<float, float> mapCenterXZ = world.getDefaultMap()->getMapCenter();
+		if (mapCenterXZ.first == sceneComp->position.x)
+			return false;
+
+		MovementComponent* movementComp = owner.getComponent<MovementComponent>();
+		assert(movementComp);
+
+
+		movementComp->targetPosition.x = mapCenterXZ.first;
+		movementComp->targetPosition.z = sceneComp->position.z;
+
+		return true;
 	}
 }

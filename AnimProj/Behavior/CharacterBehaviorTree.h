@@ -37,15 +37,19 @@ namespace pa
 			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
-		class MoveTo : public Behavior::Node
+		class MoveToCenter : public Behavior::Node
 		{
 		public:
-			MoveTo(const DirectX::XMFLOAT3& position)
-				: _position(position) {}
 			virtual bool onUpdate(World& world, Actor& owner) override;
 
 		private:
 			DirectX::XMFLOAT3 _position;
+		};
+
+		class MoveAcrossMap : public Behavior::Node
+		{
+		public:
+			virtual bool onUpdate(World& world, Actor& owner) override;
 		};
 
 	public:

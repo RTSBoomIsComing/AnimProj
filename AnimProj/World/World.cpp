@@ -21,7 +21,7 @@ namespace pa
 		// random generator for attack range
 		std::random_device					  rd;
 		std::mt19937						  gen(rd());
-		std::uniform_real_distribution<float> dis(18.0f, 20.0f);
+		std::uniform_real_distribution<float> dis(15.0f, 20.0f);
 
 		// place actors on center of sectors
 		for (size_t x = 0; x < _map->getMapWidth(); x++)

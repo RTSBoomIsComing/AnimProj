@@ -32,7 +32,7 @@ namespace pa
 		bool	  _hasBeenAttacked = false;
 		float	  _attackRange	   = 20.0f;
 		const int _attackDamage	   = 10;
-		int		  _health		   = 30;
+		int		  _health		   = 10;
 		float	  _sightRange	   = 40.0f;
 		int		  _teamID		   = -1;
 	};

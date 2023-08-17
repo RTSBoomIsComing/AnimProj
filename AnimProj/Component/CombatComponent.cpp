@@ -10,12 +10,6 @@ void pa::CombatComponent::onUpdate(World& world, Actor& owner, float deltaTime)
 {
 	using namespace DirectX;
 
-	if (!owner.isAlive())
-		return;
-
-	SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
-	assert(sceneComp);
-
 	if (nullptr == _targetToAttack)
 	{
 		_isAttacking = false;
