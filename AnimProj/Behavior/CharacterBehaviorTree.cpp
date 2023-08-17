@@ -74,8 +74,7 @@ namespace pa
 		std::shared_ptr<GridMap> map = world.getDefaultMap();
 
 		std::function<bool(const Actor*)> predicate = std::bind(&isEnemy, combatComp->getTeamID(), std::placeholders::_1);
-		Actor*							  other		= map->findNearestActor(world, owner, combatComp->getAttackRange(), predicate);
-		/*Actor*							  other		= map->findNearestActor(world, owner, combatComp->getAttackRange());*/
+		Actor*							  other		= map->findNearestActor(world, owner, combatComp->getAttackRange() - 1.0f, predicate);
 
 		if (nullptr == other)
 		{

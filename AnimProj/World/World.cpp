@@ -15,7 +15,7 @@ namespace pa
 {
 	World::World()
 	{
-		_map					 = std::make_shared<GridMap>(20.0f);
+		_map					 = std::make_shared<GridMap>(50.0f);
 		static auto behaviorTree = std::make_shared<CharacterBehaviorTree>(*this);
 
 		// random generator for attack range
@@ -38,18 +38,29 @@ namespace pa
 						behaviorTreeComp->setBehaviorTree(behaviorTree);
 
 					if (SceneComponent* sceneComp = actor->getComponent<SceneComponent>())
-						sceneComp->position = {positionXZ.first, 0.0f, positionXZ.second};
+					{
+						sceneComp->position.x = positionXZ.first;
+						sceneComp->position.z = positionXZ.second;
+					}
 
 					if (CombatComponent* combatComp = actor->getComponent<CombatComponent>())
 					{
 						// set attack range randomly
-						combatComp->setAttackRange(dis(gen));
-						const int teamID = (x < _map->getMapWidth() / 2) ? 0 : 1;
-										
+						//combatComp->setAttackRange(dis(gen));
+						const int teamID = (x < _map->getMapWidth() / 2) ? 1 : 0;
 						combatComp->setTeamID(teamID);
 					}
 				}
 			}
+		}
+
+		// shuffle order of actors
+		for (size_t i = 0; i < _actors.size() / 2; i++)
+		{
+			if (i % 2)
+				continue;
+
+			_actors[i].swap(_actors[_actors.size() / 2 + i]);
 		}
 	}
 
@@ -67,14 +78,17 @@ namespace pa
 
 	void World::update(float deltaTime)
 	{
-		_aliveActorCount = 0;
+		_aliveActorCount	 = 0;
 		_actorCountInFrustum = 0;
 		this->boneMatrixPool.clear();
 		this->boneToBoneMatrixPool.clear();
 
-		// remove actors pending kill 
+		// remove actors pending kill
 		for (size_t i = 0; i < _actors.size(); i++)
 		{
+			if (i == _actors.size() - 1)
+				break;
+
 			std::shared_ptr<Actor>& actor = _actors[i];
 			if (actor->isPendingKill())
 			{
@@ -100,7 +114,7 @@ namespace pa
 		{
 			if (!cullActor(actor.get()))
 				_actorCountInFrustum++;
-		
+
 			actor->onUpdate(*this, deltaTime);
 		}
 	}

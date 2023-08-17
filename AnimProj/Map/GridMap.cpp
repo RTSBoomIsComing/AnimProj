@@ -36,7 +36,9 @@ namespace pa
 		size_t cellX = static_cast<size_t>(sceneComp->position.x / _cellSize);
 		size_t cellZ = static_cast<size_t>(sceneComp->position.z / _cellSize);
 
-		assert(0 <= cellX && 0 <= cellZ && cellX < _mapWidth && cellZ < _mapHeight);
+		if (0 > cellX || 0 > cellZ || cellX >= _mapWidth || cellZ >= _mapHeight)
+			::DebugBreak();
+
 		return std::pair<size_t, size_t>(cellX, cellZ);
 	}
 

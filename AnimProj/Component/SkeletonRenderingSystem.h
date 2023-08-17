@@ -26,6 +26,8 @@ namespace pa
 		ComPtr<ID3D11Buffer>			 _boneToBoneWorldSBuffer;
 		ComPtr<ID3D11ShaderResourceView> _SRVBoneToBoneWorld;
 
+		ComPtr<ID3D11Buffer> _teamColorCBuffer;
+
 	private:
 		size_t _boneCount		= 0;
 		size_t _boneToBoneCount = 0;

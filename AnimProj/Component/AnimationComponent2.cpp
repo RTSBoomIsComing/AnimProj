@@ -157,7 +157,7 @@ namespace pa
 					transitAnimationUpperBody(manager.getAnimation(AnimIndex::Idle_up), 0.2f);
 				}
 
-				if (_upperBody.playTime > 2.7f)
+				if (_upperBody.playTime > 1.0f)
 					combatComp->onAttack();
 
 				// when ending animation then looping

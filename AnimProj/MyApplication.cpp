@@ -77,6 +77,7 @@ void pa::MyApplication::onUpdate()
 	_world->update(_timer.getDeltaTime() * _gamePlaySpeed);
 
 	_skeletonRenderingSystem->update(_device.Get(), _deviceContext.Get(), _world->boneMatrixPool, _world->boneToBoneMatrixPool);
+
 }
 
 void pa::MyApplication::onRender()
@@ -135,7 +136,6 @@ void pa::MyApplication::renderImGui(void)
 
 	ImGui::Text("Number of Alive Characters: %d", _world->getAliveActorCount());
 	ImGui::Text("Number of Characters In Frustum: %d", _world->getActorCountInFrustum());
-
 
 	ImGui::SliderFloat("Game Speed", &_gamePlaySpeed, 0.0f, 10.f);
 

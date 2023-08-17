@@ -11,7 +11,7 @@ namespace pa
 	class CombatComponent;
 
 	template <typename... Ts>
-	class IActor abstract
+	class IActor
 	{
 	public:
 		virtual void onStartGame(World& world) {}

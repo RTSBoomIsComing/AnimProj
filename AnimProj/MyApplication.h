@@ -44,7 +44,7 @@ namespace pa
 		std::unique_ptr<SkeletonRenderingSystem> _skeletonRenderingSystem;
 
 	private:
-		float _gamePlaySpeed = 1.0f;
+		float _gamePlaySpeed = 0.1f;
 		Timer _timer;
 		float _clearColor[4] = {0.2f, 0.4f, 0.6f, 1.0f};
 
