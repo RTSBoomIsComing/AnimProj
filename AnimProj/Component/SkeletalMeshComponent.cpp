@@ -32,7 +32,7 @@ namespace pa
 		SceneComponent* sceneComp = owner.getComponent<SceneComponent>();
 		assert(sceneComp);
 
-		if (sceneComp->isCulled() || sceneComp->isPendingKill())
+		if (sceneComp->isCulled() || owner.isPendingKill())
 			return;
 
 

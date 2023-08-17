@@ -72,6 +72,12 @@ namespace pa
 		this->boneMatrixPool.clear();
 		this->boneToBoneMatrixPool.clear();
 
+		// remove actors pending kill 
+		//for (auto& actor : _actors)
+		//{
+		//	if (actor->is)
+		//}
+
 		_map->clearMap();
 		for (auto& actor : _actors)
 		{

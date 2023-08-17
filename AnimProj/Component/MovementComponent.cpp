@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "MovementComponent.h"
 #include "../World/World.h"
+#include "../Map/GridMap.h"
 #include "../Actor/Actor.h"
 #include "../Component/SceneComponent.h"
 #include "../Component/CombatComponent.h"
@@ -69,9 +70,16 @@ namespace pa
 			}
 		}
 
-		distance = std::min(distance, speed * deltaTime);
 
+		distance   = std::min(distance, speed * deltaTime);
 		XMVECTOR V = V0 + Vdir * distance;
 		XMStoreFloat3(&sceneComp->position, V);
+
+		if (const Actor* collider = world.getDefaultMap()->findNearestActor(world, owner, 3.0f))
+		{
+			_isMoving = false;
+			// roll back
+			XMStoreFloat3(&sceneComp->position, V0);
+		}
 	}
 }

@@ -46,8 +46,24 @@ namespace pa
 	public:
 		inline void setAlive(bool isAlive) { _isAlive = isAlive; }
 		inline bool isAlive() const { return _isAlive; }
+		inline bool isPendingKill() const { return _isPendingKill; }
+		inline void onUpdate(World& world, float deltaTime)
+		{
+			if (_isPendingKill)
+				return;
+			if (!_isAlive)
+			{
+				_killTimer += deltaTime;
+				if (_killTimer >= 3.0f)
+				{
+					_isPendingKill = true;
+				}
+			}
+		}
 
 	private:
-		bool _isAlive = true;
+		bool  _isAlive		 = true;
+		bool  _isPendingKill = false;
+		float _killTimer	 = 0.0f;
 	};
 }
