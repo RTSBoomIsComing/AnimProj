@@ -27,12 +27,13 @@ namespace pa
 		inline int	  getTeamID() const { return _teamID; }
 
 	private:
-		Actor*	  _targetToAttack = nullptr;
-		bool	  _isAttacking	  = false;
-		float	  _attackRange	  = 20.0f;
-		const int _attackDamage	  = 10;
-		int		  _health		  = 20;
-		float	  _sightRange	  = 40.0f;
-		int		  _teamID		  = -1;
+		Actor*	  _targetToAttack  = nullptr;
+		bool	  _isAttacking	   = false;
+		bool	  _hasBeenAttacked = false;
+		float	  _attackRange	   = 20.0f;
+		const int _attackDamage	   = 10;
+		int		  _health		   = 30;
+		float	  _sightRange	   = 40.0f;
+		int		  _teamID		   = -1;
 	};
 }

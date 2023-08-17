@@ -36,6 +36,7 @@ bool pa::CombatComponent::startAttack()
 		_isAttacking = false;
 
 	_isAttacking = true;
+	_hasBeenAttacked = false;
 	return _isAttacking;
 }
 
@@ -49,6 +50,10 @@ void pa::CombatComponent::onAttack()
 	if (nullptr == _targetToAttack)
 		return;
 
+	if (_hasBeenAttacked)
+		return;
+
+	_hasBeenAttacked = true;
 	CombatComponent* targetCombatComp = _targetToAttack->getComponent<CombatComponent>();
 	assert(targetCombatComp);
 
