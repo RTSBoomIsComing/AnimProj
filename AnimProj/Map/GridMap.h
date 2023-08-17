@@ -26,6 +26,7 @@ namespace pa
 		inline std::pair<float, float> getMapCenter() const { return std::make_pair(_mapWidth * _cellSize / 2.0f, _mapHeight * _cellSize / 2.0f); }
 
 		Actor* findNearestActor(World& world, Actor& actor, float radius) const;
+		Actor* findNearestActor(World& world, Actor& actor, float radius,std::function<bool(const Actor*)>& predicate) const;
 
 	private:
 		static constexpr size_t _mapWidth  = 20;

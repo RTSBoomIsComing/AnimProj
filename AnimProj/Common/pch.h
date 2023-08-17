@@ -14,6 +14,7 @@
 #include <numeric>
 #include <tuple>
 #include <list>
+#include <functional>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

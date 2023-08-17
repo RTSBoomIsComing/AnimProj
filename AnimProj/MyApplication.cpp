@@ -134,6 +134,8 @@ void pa::MyApplication::renderImGui(void)
 				1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 	ImGui::Text("Number of Alive Characters: %d", _world->getAliveActorCount());
+	ImGui::Text("Number of Characters In Frustum: %d", _world->getActorCountInFrustum());
+
 
 	ImGui::SliderFloat("Game Speed", &_gamePlaySpeed, 0.0f, 10.f);
 

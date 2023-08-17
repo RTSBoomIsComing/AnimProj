@@ -12,6 +12,15 @@
 
 namespace pa
 {
+	static bool isEnemy(int teamID, const Actor* actor)
+	{
+		const CombatComponent* combatComp = actor->getComponent<CombatComponent>();
+		assert(combatComp);
+
+		return combatComp->getTeamID() != teamID;
+	}
+
+
 	CharacterBehaviorTree::CharacterBehaviorTree(World& world)
 	{
 		auto findTargetInAttackRange = std::make_shared<FindTargetInAttackRange>();
@@ -24,7 +33,7 @@ namespace pa
 		DirectX::XMFLOAT3		mapCenterPosition(mapCenterXZ.first, 0.0f, mapCenterXZ.second);
 		auto					moveToCenter = std::make_shared<MoveTo>(mapCenterPosition);
 
-		auto mainSelector	= std::make_shared<Behavior::Selector>();
+		auto mainSelector = std::make_shared<Behavior::Selector>();
 		mainSelector->addChild(isAttacking);
 
 		auto attackSequence = std::make_shared<Behavior::Sequence>();
@@ -62,8 +71,11 @@ namespace pa
 		CombatComponent* combatComp = owner.getComponent<CombatComponent>();
 		assert(combatComp);
 
-		std::shared_ptr<GridMap> map   = world.getDefaultMap();
-		Actor*					 other = map->findNearestActor(world, owner, combatComp->getAttackRange());
+		std::shared_ptr<GridMap> map = world.getDefaultMap();
+
+		std::function<bool(const Actor*)> predicate = std::bind(&isEnemy, combatComp->getTeamID(), std::placeholders::_1);
+		Actor*							  other		= map->findNearestActor(world, owner, combatComp->getAttackRange(), predicate);
+		/*Actor*							  other		= map->findNearestActor(world, owner, combatComp->getAttackRange());*/
 
 		if (nullptr == other)
 		{
@@ -94,8 +106,9 @@ namespace pa
 		if (combatComp->isTargetValid())
 			return true;
 
-		std::shared_ptr<GridMap> map   = world.getDefaultMap();
-		Actor*					 other = map->findNearestActor(world, owner, combatComp->getSightRange());
+		std::shared_ptr<GridMap>		  map		= world.getDefaultMap();
+		std::function<bool(const Actor*)> predicate = std::bind(&isEnemy, combatComp->getTeamID(), std::placeholders::_1);
+		Actor*							  other		= map->findNearestActor(world, owner, combatComp->getSightRange(), predicate);
 
 		if (nullptr == other)
 		{
